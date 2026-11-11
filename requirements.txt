@@ -1,3 +1,4 @@
 torch==2.10.0
 tokenizers==0.23.1
 datasets==4.8.4
+wandb==0.31.0  # optional: only for --wandb

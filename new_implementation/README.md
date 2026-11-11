@@ -53,6 +53,10 @@ Two consequences drive everything in this folder:
   seconds / GPU-hours with eval, probes and checkpoint writes **excluded**, honest total wall clock,
   step time and peak memory, and the draw allocation whenever it changes. `gradient_probe` scores the
   estimate against backprop on a held-out batch without disturbing the perturbation RNG.
+- **`tracking.py`** — optional **Weights & Biases mirror** of `metrics.jsonl`: every record is also
+  logged to W&B (step = training step, probe flattened to `probe/...` keys, result.json's summary at the
+  end), and `--resume` continues the same W&B run via `<output>/wandb_id.txt`. Off unless `--wandb
+  PROJECT` is given; `wandb` is imported only then. `metrics.jsonl` stays the source of truth.
 - **`allocation.py`** — **adaptive allocation (method B)**: re-decides during training how many draws
   each part of the model gets, on a fixed budget (draws or FLOPs), from a measurement that costs no
   extra forward pass (`DUST.direct_errors(split=True)` compares two halves of the draws already run).
@@ -95,11 +99,13 @@ Two consequences drive everything in this folder:
   CPU smoke runs. `elapsed_seconds` used to include evaluation time; `train_seconds` now excludes it.
 - **`../baselines/backprop.py`** — same refactor into `train()` and the same `run_metrics` records (an
   update charged as 3 forwards), plus `--toy` / `--device`. No checkpoint/resume (not needed yet).
+- **`--wandb PROJECT`** (and `--wandb-entity/-group/-name/-tags`) on both trainers → `tracking.py`.
 
 ## How it wires together
 
 `accounting` imports `groups`; `profiling` and `run_metrics` import `accounting`; `gradient_check`
 imports `groups` and reaches back to `../dust.py` for one helper (`average_ranks`) through a small
+`sys.path` shim. **`../dust.py` now imports from here** (`checkpoint`, `run_metrics`, `tracking`; `toy` only under
 `sys.path` shim. `allocation` imports `accounting` and `groups`; `multiplexing` only torch.
 **`../dust.py` now imports from here** (`allocation`, `checkpoint`, `groups`, `multiplexing`, `run_metrics`; `toy` only under
 `--toy`) by appending this folder to `sys.path`, so this folder can no longer be moved out without

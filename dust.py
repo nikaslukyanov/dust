@@ -36,6 +36,7 @@ from model import GPT, GPTConfig, attention, apply_rotary_emb, has_ve, norm
 sys.path.append(str(Path(__file__).resolve().parent / 'new_implementation'))
 from allocation import Allocator, draw_costs  # noqa: E402
 from checkpoint import checkpoint_path, load_state, save_state  # noqa: E402
+from tracking import WandbLogger  # noqa: E402
 from groups import layer_of  # noqa: E402
 from multiplexing import KINDS, centered, code_length, codebook  # noqa: E402
 from run_metrics import TrainingLog, dust_update_cost, gradient_probe  # noqa: E402
@@ -696,7 +697,7 @@ def snapshot(model):
 def train(config, settings, training, validation, testing, output, *, steps, eval_interval, seed=42,
           device=torch.device('cpu'), rank=0, world=1, suffix=True, batch_size=8, checkpoint_interval=0,
           resume=False, probe_interval=0, probe_seeds=(0,), allocation=None, multiplex=None, metadata=None,
-          echo=print):
+          wandb=None, echo=print):
     """Train with DUST and write the run to ``output``; returns result.json's contents (rank 0) or None.
 
     ``training`` rows are consumed in order, ``batch_size`` per step; every rank sees the same batch and
@@ -713,6 +714,9 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
 
     ``probe_interval`` > 0 scores the estimate against backprop on the first ``batch_size`` validation
     rows every that many steps (run_metrics.gradient_probe); it does not change the training run.
+
+    ``wandb`` (rank 0): a dict of tracking.WandbLogger options (project, entity, group, ...) mirrors
+    every record to Weights & Biases; resume continues the same W&B run.
 
     ``allocation`` (a dict of make_allocator options, ``{}`` for the defaults) turns on adaptive
     allocation (method B): ``settings`` is then only the starting allocation and the budget. Each
@@ -758,6 +762,7 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
         output.mkdir(parents=True, exist_ok=True)
     if world > 1:
         torch.distributed.barrier()
+    tracker = WandbLogger(output, metadata, resume=resume, **wandb) if wandb and rank == 0 else None
 
     def save_best():
         if rank == 0:
@@ -768,6 +773,8 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
             echo(json.dumps(record))
             with metrics_file.open('a') as stream:
                 stream.write(json.dumps(record) + '\n')
+            if tracker is not None:
+                tracker.log(record)
 
     if resume:
         start, allocator_state, extra = load_state(state_file, model=model, optimizer=optimizer,
@@ -845,8 +852,27 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
     result = dict(best_val=best, best_step=best_step, test_at_best_val=evaluate(model, testing, device),
                   history=history, timing=run_log.summary())
     (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
+    if tracker is not None:
+        tracker.finish(result)
     echo(f"Best validation: {best:.4f} (step {best_step}); test: {result['test_at_best_val']:.4f}")
     return result
+
+
+def wandb_arguments(parser):
+    """--wandb PROJECT and friends; shared with baselines/backprop.py."""
+    parser.add_argument('--wandb', metavar='PROJECT',
+                        help='Also log to Weights & Biases under this project (run `wandb login` first).')
+    parser.add_argument('--wandb-entity', help='W&B team or user the project lives under.')
+    parser.add_argument('--wandb-group', help='W&B group, e.g. one per sweep or method.')
+    parser.add_argument('--wandb-name', help='W&B run name (default: the output directory name).')
+    parser.add_argument('--wandb-tags', nargs='*', help='W&B tags, e.g. A 1M K256.')
+
+
+def wandb_options(args):
+    if not args.wandb:
+        return None
+    return dict(project=args.wandb, entity=args.wandb_entity, group=args.wandb_group, name=args.wandb_name,
+                tags=args.wandb_tags)
 
 
 def main():
@@ -880,6 +906,7 @@ def main():
     parser.add_argument('--probe-interval', type=int, default=0,
                         help='Every N steps, log the cosine of the estimate to backprop on a held-out batch '
                              '(costs one backprop + one estimate per seed; 0: never).')
+    wandb_arguments(parser)
     parser.add_argument('--probe-seeds', type=int, default=1,
                         help='Estimates per probe; 2 or more also log estimator variance and bias.')
     parser.add_argument('--adaptive', action='store_true',
@@ -993,7 +1020,7 @@ def main():
         suffix=not args.full_replay, checkpoint_interval=args.checkpoint_interval, resume=args.resume,
         probe_interval=args.probe_interval, probe_seeds=tuple(range(args.probe_seeds)),
         allocation=allocation, multiplex=args.multiplex, metadata=metadata,
-        echo=lambda line: print(line, flush=True),
+        wandb=wandb_options(args), echo=lambda line: print(line, flush=True),
     )
     if world > 1:
         torch.distributed.destroy_process_group()

@@ -9,8 +9,9 @@ import sys
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from dust import GPTConfig, evaluate, file_hash, load_sequences, make_model
+from dust import GPTConfig, evaluate, file_hash, load_sequences, make_model, wandb_arguments, wandb_options
 from run_metrics import TrainingLog, backprop_update_cost  # new_implementation/, put on the path by dust
+from tracking import WandbLogger  # noqa: E402
 
 
 DEFAULT_CONFIGS = {
@@ -43,12 +44,13 @@ def train_step(model, optimizer, x, y):
 
 
 def train(config, training, validation, testing, output, *, steps, eval_interval, lr, momentum, seed=42,
-          device=torch.device('cpu'), batch_size=8, metadata=None, echo=print):
+          device=torch.device('cpu'), batch_size=8, metadata=None, wandb=None, echo=print):
     """Backprop SGD with the same per-step metrics records as dust.train (run_metrics.TrainingLog).
 
     Writes config.json, metrics.jsonl (step 0's val loss, then one record per step), best.pt and
     result.json to ``output``; returns result.json's contents. Compute is charged as forward + backward
     = 3 forwards per update (run_metrics.backprop_update_cost), on the same axis as DUST's.
+    ``wandb``: tracking.WandbLogger options, as in dust.train.
     """
     output = Path(output)
     model = make_model(config, device, seed).requires_grad_(True)
@@ -62,6 +64,7 @@ def train(config, training, validation, testing, output, *, steps, eval_interval
             dict(lr=g['lr'], momentum=g['momentum'], parameters=sum(p.numel() for p in g['params']))
             for g in optimizer.param_groups])
         (output / 'config.json').write_text(json.dumps(metadata, indent=2) + '\n')
+    tracker = WandbLogger(output, metadata, **wandb) if wandb else None
 
     def save_best():
         torch.save(
@@ -73,6 +76,8 @@ def train(config, training, validation, testing, output, *, steps, eval_interval
         echo(json.dumps(record))
         with (output / 'metrics.jsonl').open('a') as stream:
             stream.write(json.dumps(record) + '\n')
+        if tracker is not None:
+            tracker.log(record)
 
     with run_log.timed('eval'):
         best = evaluate(model, validation, device)
@@ -101,6 +106,8 @@ def train(config, training, validation, testing, output, *, steps, eval_interval
     result = dict(best_val=best, best_step=best_step, test_at_best_val=evaluate(model, testing, device),
                   history=history, timing=run_log.summary())
     (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
+    if tracker is not None:
+        tracker.finish(result)
     echo(f"Best validation: {best:.4f} (step {best_step}); test: {result['test_at_best_val']:.4f}")
     return result
 
@@ -116,6 +123,7 @@ def main():
     parser.add_argument('--steps', type=int, help='Stop early; keep the full selected training subset.')
     parser.add_argument('--toy', action='store_true',
                         help='Tiny model and synthetic data (new_implementation/toy.py): a CPU smoke run.')
+    wandb_arguments(parser)
     parser.add_argument('--device', help='cuda (default), cpu or mps. Only --toy runs are practical off CUDA.')
     args = parser.parse_args()
     defaults = DEFAULT_CONFIGS[args.tokens]
@@ -178,7 +186,7 @@ def main():
     print(f"Backprop SGD: {metadata['tokens']}, {steps} steps, device={device}", flush=True)
     train(config, training, validation, testing, args.output, steps=steps, eval_interval=interval,
           lr=args.lr, momentum=args.momentum, seed=args.seed, device=device, metadata=metadata,
-          echo=lambda line: print(line, flush=True))
+          wandb=wandb_options(args), echo=lambda line: print(line, flush=True))
 
 
 if __name__ == '__main__':
