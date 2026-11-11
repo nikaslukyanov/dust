@@ -22,7 +22,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import dust  # noqa: E402  (imports after the sys.path shim above)
 from accounting import analytic_cost  # noqa: E402
-from allocation import Allocator, apportion, draw_costs, neyman, unit_counts, unit_of, with_counts  # noqa: E402
+from allocation import (Allocator, apportion, draw_costs, neyman, proportional, unit_counts, unit_of,  # noqa: E402
+                        with_counts)
 from run_metrics import dust_update_cost  # noqa: E402
 from toy import TOY_CONFIG, toy_data, toy_recipe  # noqa: E402
 
@@ -40,16 +41,20 @@ def parameter_of(unit):
     if unit == 'embedding':
         return 'transformer.wte.weight'
     group, layer = unit.split('.')
+    if group == 'hubs':
+        return f'o@{layer}'
     return f"transformer.h.{layer}.{'attn.c_proj' if group == 'writers' else 'mlp.c_fc'}.weight"
 
 
-def statistics(variances, draws=8):
-    """What DUST.split_statistics would report for units with these per-draw variances."""
-    return {parameter_of(unit): (variance * draws, draws) for unit, variance in variances.items()}
+def statistics(variances, signals=None):
+    """What DUST.split_statistics would report for units with these per-draw variances (and signals)."""
+    signals = signals or {}
+    return {parameter_of(unit): dict(variance=variance, signal=signals.get(unit, 1.0), cosine=0.0, draws=8)
+            for unit, variance in variances.items()}
 
 
-def flat(recipe_, value=1.0, **overrides):
-    return {**{unit: value for unit in unit_counts(recipe_)}, **overrides}
+def flat(recipe_, value=1.0, hubs=False, **overrides):
+    return {**{unit: value for unit in unit_counts(recipe_, hubs)}, **overrides}
 
 
 def ones(units):
@@ -64,6 +69,9 @@ def test_units_cover_exactly_the_reallocated_parameters():
     assert units == set(unit_counts(recipe()))
     assert unit_of('transformer.h.2.attn.c_proj.weight') == unit_of('transformer.h.2.mlp.c_proj.weight') == 'writers.2'
     assert unit_of('transformer.h.1.attn.c_q.weight') is None and unit_of('lm_head.weight') is None
+    assert unit_of('o@2') == 'hubs.2' and 'hubs.2' in unit_counts(recipe(), hubs=True)
+    with_hubs = unit_counts(recipe(), hubs=True)
+    assert unit_counts(with_counts(recipe(), {**with_hubs, 'hubs.1': 12}), hubs=True)['hubs.1'] == 12
     assert unit_counts(with_counts(recipe(), unit_counts(recipe()))) == unit_counts(recipe())
 
 
@@ -146,21 +154,47 @@ def test_allocator_damping_interval_and_smoothing():
     assert not smooth.update(4), 'no reallocation until every unit has been measured'
 
 
-def test_noise_is_per_draw_and_weighted_and_summed_over_a_unit():
+def test_noise_is_weighted_and_summed_over_a_unit():
     allocator = Allocator(recipe(), ema=0.0, weights={'transformer.wte.weight': 10.0})
-    # The same per-draw variance measured from 8 or from 32 draws is the same noise.
-    allocator.observe(statistics({'hidden.0': 3.0}, draws=8))
-    few = allocator.variance['hidden.0']
-    allocator.observe(statistics({'hidden.0': 3.0}, draws=32))
-    assert allocator.variance['hidden.0'] == pytest.approx(few) == pytest.approx(3.0)
-    # A learning-rate weight of 10 is 100 in variance.
-    allocator.observe(statistics({'embedding': 2.0}))
+    # A learning-rate weight of 10 is 100 in variance and in squared signal.
+    allocator.observe(statistics({'embedding': 2.0}, {'embedding': 3.0}))
     assert allocator.variance['embedding'] == pytest.approx(200.0)
-    # The two writer projections of a block share draws: their variances add.
-    allocator.observe({'transformer.h.1.attn.c_proj.weight': (8.0, 8), 'transformer.h.1.mlp.c_proj.weight': (16.0, 8),
-                       'transformer.h.1.attn.c_q.weight': (99.0, 8)})
+    assert allocator.signal['embedding'] == pytest.approx(300.0)
+    # The two writer projections of a block share draws: their variances add. Parameters whose draws
+    # are not reallocated (c_q) and, under 'variance', the hubs are ignored.
+    measured = lambda variance: dict(variance=variance, signal=1.0, cosine=0.0, draws=8)
+    allocator.observe({'transformer.h.1.attn.c_proj.weight': measured(1.0), 'transformer.h.1.mlp.c_proj.weight': measured(2.0),
+                       'transformer.h.1.attn.c_q.weight': measured(99.0), 'o@1': measured(99.0)})
     assert allocator.variance['writers.1'] == pytest.approx(3.0)
-    assert set(allocator.variance) == {'hidden.0', 'embedding', 'writers.1'}
+    assert allocator.signal['writers.1'] == pytest.approx(2.0)
+    assert set(allocator.variance) == {'embedding', 'writers.1'}
+
+
+def test_agreement_policy_equalizes_relative_noise():
+    """Draws in proportion to v / |g|^2, hubs included. One hub with 100 times the relative noise of the
+    other twelve units: their share 68 / 112 is under the floor, so they are pinned (48) and it gets 20."""
+    assert proportional(dict(a=1.0, b=3.0), 40, 0, ones('ab')) == pytest.approx(dict(a=10, b=30))
+    allocator = Allocator(recipe(), policy='agreement', interval=1, ema=0.0, rate=1.0)
+    assert set(allocator.counts) == set(unit_counts(recipe(), hubs=True)) and allocator.budget == 68
+    allocator.observe(statistics(flat(recipe(), hubs=True), {'hubs.2': 0.01}))
+    assert allocator.relative_noise()['hubs.2'] == pytest.approx(100) and allocator.relative_noise()['hidden.0'] == 1
+    # Expected half-to-half cosine rho / (rho + 1), rho = |g|^2 K / (2 v): the noisy hub at 4 draws.
+    assert allocator.agreement()['hubs.2'] == pytest.approx(1 / (1 + 2 * 100 / 4))
+    assert allocator.agreement()['writers.0'] == pytest.approx(1 / (1 + 2 * 1 / 8))
+    assert allocator.update(1)
+    assert allocator.counts == flat(recipe(), 4, hubs=True, **{'hubs.2': 20})
+    assert allocator.recipe(recipe()).hubs == [4, 4, 20, 4]
+    # Scale-free: the same relative noise at 1000 times the gradient gives the same allocation ...
+    scaled = Allocator(recipe(), policy='agreement', interval=1, ema=0.0, rate=1.0)
+    scaled.observe(statistics(flat(recipe(), 1e6, hubs=True), {**flat(recipe(), 1e6, hubs=True), 'hubs.2': 1e4}))
+    scaled.update(1)
+    assert scaled.counts == allocator.counts
+    # ... and a unit whose signal is lost in the noise gets a large finite ratio, not infinity.
+    lost = Allocator(recipe(), policy='agreement', ema=0.0)
+    lost.observe(statistics({'hidden.0': 2.0}, {'hidden.0': -0.5}))
+    assert lost.relative_noise()['hidden.0'] == pytest.approx(68000)
+    with pytest.raises(ValueError, match='policy'):
+        Allocator(recipe(), policy='cosine')
 
 
 def test_allocator_start_and_validation():
@@ -240,9 +274,11 @@ def test_measuring_leaves_the_estimate_bit_identical():
     measured, split = estimate(model, 7, measure=True)
     assert nothing == {}
     assert all(torch.equal(plain[name], measured[name]) for name in plain)
-    assert {unit_of(name) for name in split} == set(unit_counts(recipe()))
-    assert all(square > 0 and draws == unit_counts(recipe())[unit_of(name)]
-               for name, (square, draws) in split.items())
+    counts = unit_counts(recipe(), hubs=True)
+    assert {unit_of(name) for name in split} == set(counts)
+    for name, measured in split.items():
+        assert measured['variance'] > 0 and measured['draws'] == counts[unit_of(name)]
+        assert -1 <= measured['cosine'] <= 1
 
 
 def test_split_noise_matches_the_variance_over_seeds():
@@ -251,16 +287,23 @@ def test_split_noise_matches_the_variance_over_seeds():
     model = dust.make_model(TOY_CONFIG, CPU, 0)
     seeds = range(10)
     runs = [estimate(model, seed, measure=True) for seed in seeds]
-    names = list(runs[0][1])
-    from_split = sum(sum(split[name][0] / split[name][1] for _, split in runs) / len(runs) for name in names)
-    over_seeds = sum(
-        split_draws * torch.stack([gradients[name] for gradients, _ in runs]).var(0).sum().item()
-        for name, (_, split_draws) in runs[0][1].items()
-    )
+    names = [name for name in runs[0][1] if not name.startswith('o@')]  # hubs are targets, not gradients
+    draws = {name: runs[0][1][name]['draws'] for name in names}
+    stacked = {name: torch.stack([gradients[name] for gradients, _ in runs]) for name in names}
+    average = lambda name, key: sum(split[name][key] for _, split in runs) / len(runs)
+    from_split = sum(average(name, 'variance') for name in names)
+    over_seeds = sum(draws[name] * stacked[name].var(0).sum().item() for name in names)
     assert 0.8 < from_split / over_seeds < 1.25  # measured 1.01 to 1.02 over three sets of 10 seeds
     # Negative control: without the per-draw rescale (the K above, 4 or 8 here) the two cannot agree.
-    unscaled = sum(torch.stack([gradients[name] for gradients, _ in runs]).var(0).sum().item() for name in names)
+    unscaled = sum(stacked[name].var(0).sum().item() for name in names)
     assert from_split / unscaled > 2
+
+    # ``signal`` claims to be |E g|^2. The mean over S seeds has |mean|^2 = |E g|^2 + v / (K S) on average.
+    signal = sum(average(name, 'signal') for name in names)
+    truth = sum(stacked[name].mean(0).square().sum().item() - average(name, 'variance') / (draws[name] * len(runs))
+                for name in names)
+    print('signal / truth', signal / truth)
+    assert 0.5 < signal / truth < 2
 
 
 # ---- the training loop ---------------------------------------------------------------------------
