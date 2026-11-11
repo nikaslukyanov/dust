@@ -1,6 +1,6 @@
 # DUST project — refined TODO
 
-Updated 2026-11-07. Companion to `PROJECT_PLAN.md` (the full plan) and `lessons/lectures.md` (how we
+Updated 2026-11-11. Companion to `PROJECT_PLAN.md` (the full plan) and `lessons/lectures.md` (how we
 measure performance). Each item says what it is and why it matters, not how it's wired.
 
 Legend: `[x]` done · `[~]` in progress · `[ ]` todo · **(GPU)** needs a GPU to validate.
@@ -54,7 +54,7 @@ Only `dust.py` was modified in place (the estimate/apply split); everything else
       method, warmup, reporting percentiles, a stability guard in the curve fit, the precision the
       reference gradient is computed at, and a caveat that FLOP savings may not show up in wall-clock.
 
-## Tests for the measurement stack (CPU) — in progress
+## Tests for the measurement stack (CPU) — done, except CI and the GPU checks
 
 The modules above were written without tests. Each test checks against an independent truth, and a
 deliberately broken version of the code must fail it. Run: `python -m pytest new_implementation/`.
@@ -111,8 +111,7 @@ deliberately broken version of the code must fail it. Run: `python -m pytest new
       fail when the rewind or the RNG restore is removed.
 - [ ] **(GPU)** check the CUDA paths the CPU tests cannot: CUDA-event timing / peak memory in the records,
       generator restore on resume, multi-GPU (per-rank `state.pt`, rank-0 metrics), probe memory at batch 8.
-- Not yet: split-half noise signal (first piece of Track 2); same logging is FLOP-convention-dependent
-  (see "FLOP convention" below).
+- Note: the logged FLOPs depend on the FLOP convention (see "FLOP convention" below).
 
 ## Validation — todo (deferred until we have a GPU)
 
@@ -123,7 +122,7 @@ deliberately broken version of the code must fail it. Run: `python -m pytest new
 - [ ] **(GPU)** Run the launch-bound test on real hardware, to settle GPU-bound vs launch-bound
       **before** we trust any predicted FLOP saving.
 
-## Track 1 — only re-run the part of the network a perturbation affects (baseline A) — todo
+## Track 1 — only re-run the part of the network a perturbation affects (baseline A) — done on CPU, GPU gate open
 
 A perturbation injected at some layer can only change the layers after it. Re-running the whole network
 to score it is wasted work. This track caches everything up to the injection point and re-runs just the
@@ -147,7 +146,7 @@ tail.
 - Note: this is the **only** paper optimization still missing from the public code — the other two
   shortcuts are already in it. It's also the groundwork that multiplexing (Track 3) builds on.
 
-## Track 2 — spend noise draws where they help most (B, our idea) — todo
+## Track 2 — spend noise draws where they help most (B, our idea) — written, tests not yet run
 
 The paper hand-tunes how many draws each group gets and freezes it. Our idea is to decide it live, giving
 more draws to the groups whose signal is noisiest.
@@ -157,14 +156,45 @@ more draws to the groups whose signal is noisiest.
       don't weight it separately. We can measure that noise for free by splitting each step's draws in
       half and comparing. One trap to avoid (don't compare already-averaged numbers). Written up in
       `lessons/literature-findings.md`.
-- [ ] **`new_implementation/allocation.py`** — a policy that picks each group's draw count from the measured noise and the
-      half-to-half agreement, keeps the total budget fixed, respects a minimum per group, and only
-      recomputes every so often.
-- [ ] **Free measurement hook** — read each group's noise and self-agreement off the two halves it
-      already computes, so adaptivity costs no extra passes.
-- [ ] **Integrate** the policy between estimate and apply, and save its state in the checkpoint.
+- [~] **First: run `python -m pytest new_implementation/`.** Everything below was written on
+      2026-11-11 without being executed (no local runs that day), so `test_allocation.py` has never
+      run and the existing tests have not been rerun against the `dust.py` changes. The two checks most
+      likely to need a tolerance adjusted: `test_split_noise_matches_the_variance_over_seeds` (a
+      statistical bound, 0.6–1.6) and the "allocation moves at least once in six steps" assertion.
+- [~] **`new_implementation/allocation.py`** — the policy. Draws go in proportion to each unit's
+      per-draw noise (Neyman), on a fixed budget, with a floor per unit (two chunks per GPU), counts
+      rounded to `world × nrep` by largest remainder, noise EMA-smoothed, recomputed every N steps, and
+      each recompute moving only part of the way. A "unit" is one block's `writers`, one block's
+      `hidden`, or `embedding`.
+- [~] **Free measurement hook** — `DUST.direct_errors(split=True)` pairs off the draw chunks it
+      already runs into two halves and keeps their signed sum; `|D|² / paired draws` is the per-draw
+      variance. No extra forward pass and the gradient estimate is bit-identical; the cost is one extra
+      error-times-input product per measured layer per step (inside the timed step, so it shows up in
+      `train_seconds`; not yet in `roofline.py`).
+- [~] **Integrated** into `dust.train()` (`allocation=...`, CLI `--adaptive`,
+      `--allocation-interval/-budget/-objective`): measure during the step, decide after it, use the
+      new allocation from the next step. Allocator state is in the checkpoint and resume refuses changed
+      allocation options. `metrics.jsonl` logs each new `allocation` and the `allocation_noise` behind it.
+- Decisions made while writing it — **team to confirm**:
+  - **`hubs` are not reallocated.** A hub's estimate is not a weight gradient but the target the
+    attention internals are scored against, so it has no free noise measurement in the same units.
+    Head, attention internals and scalars are also left alone (cheap, outside K).
+  - **Noise is weighed by learning rate by default** (`--allocation-objective update`): what matters
+    is the noise the SGD step injects, and the token embedding's rate is 1000 against ~0.25 for the
+    blocks. `gradient` weighs raw gradient noise instead. Which is better is an experiment.
+  - **Budget is a draw count by default**; `--allocation-budget flops` fixes the analytic FLOPs
+    instead (draws ∝ noise / √cost), which is the fairer match to A once cached-suffix makes shallow
+    draws dearer than deep ones.
+  - **Recipes with a unit under the floor are adjusted at step 0** (e.g. population 256, where the
+    last blocks get 2 draws = one chunk): lifted to the floor, paid for by the rest. So B's starting
+    allocation is not exactly A's there.
+  - Defaults (interval 4, EMA 0.7, rate 0.5) are untuned guesses; the 1M run is only 61 steps.
+- [ ] **(GPU)** multi-GPU path: the split statistics are summed over ranks with `all_reduce` so every
+      rank picks the same allocation — untested.
+- [ ] **SNR / cosine signal** (the half-to-half agreement, for an Adam-style objective) — not built;
+      only the `‖a−b‖` noise signal feeds the policy.
 - [ ] **Compare** B against the fixed allocation at equal budget, then find how much smaller a budget B
-      needs to match the fixed one's quality.
+      needs to match the fixed one's quality. Also vary the recompute interval and report the overhead.
 
 ## Track 3 — perturb several groups at once and untangle them (C) — todo
 

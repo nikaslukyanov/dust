@@ -26,10 +26,15 @@ TOY_BATCH = 8
 ALPHABET = 64
 
 
-def toy_recipe(lr=0.25, momentum=0.95):
-    """Every draw count a multiple of nrep; head a multiple of nrep * 16 vocabulary slabs."""
+def toy_recipe(lr=0.25, momentum=0.95, scale=1):
+    """Every draw count a multiple of nrep; head a multiple of nrep * 16 vocabulary slabs.
+
+    ``scale`` multiplies the direct draws. Adaptive allocation needs scale >= 2: every reallocated
+    unit must keep two chunks (4 draws), which the scale-1 recipe cannot afford.
+    """
     return Recipe(
-        writers=[4, 4, 2, 2], hidden=[4, 4, 2, 2], hubs=[2, 2, 2, 2], embedding=2, head=64,
+        writers=[4 * scale, 4 * scale, 2 * scale, 2 * scale], hidden=[4 * scale, 4 * scale, 2 * scale, 2 * scale],
+        hubs=[2 * scale] * 4, embedding=2 * scale, head=64,
         local=dict(q=2, v=2, gate=2, k=2, ve=2), nrep=2, lr=lr, momentum=momentum,
     )
 

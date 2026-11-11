@@ -34,6 +34,7 @@ from model import GPT, GPTConfig, attention, apply_rotary_emb, has_ve, norm
 
 # Training-time logging and checkpointing live in new_implementation/ (the team's additions).
 sys.path.append(str(Path(__file__).resolve().parent / 'new_implementation'))
+from allocation import Allocator, draw_costs  # noqa: E402
 from checkpoint import checkpoint_path, load_state, save_state  # noqa: E402
 from run_metrics import TrainingLog, dust_update_cost, gradient_probe  # noqa: E402
 
@@ -131,6 +132,9 @@ class DUST:
         self.modules = {n: m for n, m in model.named_modules() if isinstance(m, (nn.Linear, nn.Embedding))}
         self.inputs, self.outputs, self.jitter = {}, {}, {}
         self.capturing = False
+        # Split-half noise measurement for adaptive allocation (Track 2). Off by default. When on,
+        # estimate() fills ``split`` at no extra forward pass; read it with split_statistics().
+        self.measure_split, self.split = False, {}
 
         counts = settings.writers + settings.hidden + settings.hubs + [settings.embedding]
         counts += list(settings.local.values())
@@ -191,11 +195,16 @@ class DUST:
         finally:
             self.capturing = False
 
-    def direct_errors(self, sites, draws, sigma, start=None):
+    def direct_errors(self, sites, draws, sigma, start=None, split=False):
         """One-sided loss drops, centered across each chunk of draws.
 
         start is the first block the sites can change; with cached-suffix execution each draw reruns
         only blocks start onward. None (the token embedding) always reruns the whole network.
+
+        split=True also measures the estimate's noise for adaptive allocation, from the same draws:
+        chunks are paired off into two halves and their signed sum D (+ one half, - the other) is
+        turned into a weight gradient. |D|^2 / paired draws is the per-draw variance; it lands in
+        self.split[parameter] = (|D|^2, paired draws). The returned errors are unchanged.
         """
         n = self.settings.nrep
         x, y = self.x.repeat(n, 1), self.y.repeat(n, 1)
@@ -205,7 +214,11 @@ class DUST:
         width = lambda s: self.model.config.n_embd if s.startswith('o@') else self.outputs[s].shape[-1]
         errors = {s: torch.zeros(self.batch, self.length, width(s), device=self.device) for s in sites}
 
-        for _ in range(draws // n):
+        chunks = draws // n
+        paired = 2 * (chunks // 2) if split else 0  # an odd last chunk is left out of the comparison
+        halves = {s: torch.zeros_like(errors[s]) for s in sites} if paired else {}
+
+        for chunk in range(chunks):
             noise = {s: self.noise(n * self.batch, self.length, width(s)) for s in sites}
             self.jitter = {s: sigma * a for s, a in noise.items()}
             try:
@@ -217,12 +230,28 @@ class DUST:
             if n > 1:
                 reward = reward - reward.mean(0, keepdim=True)
             for site, a in noise.items():
-                errors[site] -= torch.einsum(
+                contribution = torch.einsum(
                     'nbt,nbtd->btd', reward.to(self.dtype),
                     a.view(n, self.batch, self.length, -1),
                 ).float() / sigma
+                errors[site] -= contribution
+                if chunk < paired:
+                    halves[site] += contribution if chunk % 2 else -contribution
 
+        for site, difference in halves.items():
+            self.split[site + '.weight'] = self.reassemble(site, difference).square().sum(), paired * n
         return {s: error / draws for s, error in errors.items()}
+
+    def split_statistics(self):
+        """The last estimate's split-half measurement: {parameter: (|D|^2, paired draws)}, both summed
+        over GPUs so every rank sees the same numbers. Empty unless measure_split is on. One host sync."""
+        if not self.split:
+            return {}
+        names = list(self.split)
+        squares = torch.stack([self.split[name][0] for name in names])
+        if torch.distributed.is_initialized():
+            torch.distributed.all_reduce(squares, op=torch.distributed.ReduceOp.SUM)
+        return {name: (square, self.split[name][1] * self.world) for name, square in zip(names, squares.tolist())}
 
     def head_error(self, draws, sigma=0.05):
         """Perturb one vocabulary slab at a time; recompute CE from its changed logits.
@@ -391,8 +420,8 @@ class DUST:
         # when no profiler is active, so they stay in the hot path.
         with record_function('dust/clean'):
             self.capture(x, y)
-        r, world = self.settings, self.world
-        gradients = {}
+        r, world, split = self.settings, self.world, self.measure_split
+        gradients, self.split = {}, {}
         with record_function('dust/direct'):
             for layer in range(self.model.config.n_layer):
                 prefix = f'transformer.h.{layer}.'
@@ -401,12 +430,12 @@ class DUST:
                     ([prefix + 'mlp.c_fc'], r.hidden[layer]),
                 ]
                 for sites, count in groups:
-                    for site, error in self.direct_errors(sites, count // world, 0.2, layer).items():
+                    for site, error in self.direct_errors(sites, count // world, 0.2, layer, split).items():
                         gradients[site + '.weight'] = self.reassemble(site, error)
 
         with record_function('dust/embedding'):
             site = 'transformer.wte'
-            error = self.direct_errors([site], r.embedding // world, 0.2)[site]
+            error = self.direct_errors([site], r.embedding // world, 0.2, split=split)[site]
             gradients[site + '.weight'] = self.reassemble(site, error)
 
         # Attention outputs, each block alone. The deeper half moves the loss too little at 0.2 for a readable
@@ -521,6 +550,26 @@ def make_optimizer(model, settings):
     )
 
 
+def make_allocator(model, optimizer, config, settings, *, world=1, batch_size=8, suffix=True,
+                   budget='draws', objective='update', **options):
+    """The adaptive allocator for a run (new_implementation/allocation.py, Track 2).
+
+    budget: 'draws' keeps the number of reallocated draws fixed; 'flops' keeps their analytic cost
+    fixed instead, so an expensive shallow draw has to earn more than a cheap deep one.
+    objective: 'update' weighs each parameter's noise by its learning rate, i.e. the noise the SGD
+    step actually injects (the token embedding's rate is 1000, the blocks' about 0.25); 'gradient'
+    weighs the raw gradient noise equally. The remaining ``options`` go to Allocator.
+    """
+    if budget not in ('draws', 'flops') or objective not in ('update', 'gradient'):
+        raise ValueError("budget must be 'draws' or 'flops', objective 'update' or 'gradient'")
+    weights = None
+    if objective == 'update':
+        rates = {id(p): group['lr'] for group in optimizer.param_groups for p in group['params']}
+        weights = {name: rates[id(p)] for name, p in model.named_parameters()}
+    costs = draw_costs(config, batch_size, suffix) if budget == 'flops' else None
+    return Allocator(settings, world=world, weights=weights, costs=costs, **options)
+
+
 def file_hash(path):
     digest = hashlib.sha256()
     with open(path, 'rb') as stream:
@@ -543,7 +592,7 @@ def snapshot(model):
 
 def train(config, settings, training, validation, testing, output, *, steps, eval_interval, seed=42,
           device=torch.device('cpu'), rank=0, world=1, suffix=True, batch_size=8, checkpoint_interval=0,
-          resume=False, probe_interval=0, probe_seeds=(0,), metadata=None, echo=print):
+          resume=False, probe_interval=0, probe_seeds=(0,), allocation=None, metadata=None, echo=print):
     """Train with DUST and write the run to ``output``; returns result.json's contents (rank 0) or None.
 
     ``training`` rows are consumed in order, ``batch_size`` per step; every rank sees the same batch and
@@ -560,15 +609,29 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
 
     ``probe_interval`` > 0 scores the estimate against backprop on the first ``batch_size`` validation
     rows every that many steps (run_metrics.gradient_probe); it does not change the training run.
+
+    ``allocation`` (a dict of make_allocator options, ``{}`` for the defaults) turns on adaptive
+    allocation (method B): ``settings`` is then only the starting allocation and the budget. Each
+    step's noise is measured from its own draws, and the allocation it yields is used from the next
+    step on. metrics.jsonl gets ``allocation`` on the first step run with a new allocation and
+    ``allocation_noise`` (per-unit per-draw noise) on the step that decided it. The measurement and
+    the decision are inside the timed step, so their overhead is in ``train_seconds``.
     """
     output = Path(output)
     state_file, metrics_file = output / 'state.pt', output / 'metrics.jsonl'
     fingerprint = dict(model=asdict(config), recipe=asdict(settings), seed=seed, world=world,
-                       suffix=suffix, batch_size=batch_size, data_sha256=data_hash(training, validation))
+                       suffix=suffix, batch_size=batch_size, data_sha256=data_hash(training, validation),
+                       allocation=allocation)
 
     model = make_model(config, device, seed)
     optimizer = make_optimizer(model, settings)
-    estimator = DUST(model, settings, seed, rank, world, suffix=suffix)
+    allocator = None
+    if allocation is not None:
+        allocator = make_allocator(model, optimizer, config, settings, world=world, batch_size=batch_size,
+                                   suffix=suffix, **allocation)
+    estimator = DUST(model, allocator.recipe(settings) if allocator else settings, seed, rank, world,
+                     suffix=suffix)
+    estimator.measure_split = allocator is not None
     cost = partial(dust_update_cost, config=config, world=world, batch=batch_size, suffix=suffix)
     run_log = TrainingLog(cost, world=world)
 
@@ -593,11 +656,14 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
                 stream.write(json.dumps(record) + '\n')
 
     if resume:
-        start, _, extra = load_state(state_file, model=model, optimizer=optimizer, estimator=estimator,
-                                     rank=rank, world=world)
+        start, allocator_state, extra = load_state(state_file, model=model, optimizer=optimizer,
+                                                   estimator=estimator, rank=rank, world=world)
         changed = sorted(k for k in fingerprint if extra['fingerprint'].get(k) != fingerprint[k])
         if changed:
             raise ValueError(f'Cannot resume {output}: the run differs from the checkpoint in {changed}')
+        if allocator is not None:
+            allocator.load_state_dict(allocator_state)
+            estimator.settings = allocator.recipe(settings)
         best, best_step, best_state, history = extra['best'], extra['best_step'], extra['best_state'], extra['history']
         run_log.load_state_dict(extra['log'])
         if rank == 0:
@@ -623,9 +689,16 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
 
     for step in range(start + 1, steps + 1):
         batch = training[(step - 1) * batch_size:step * batch_size].to(device)
+        reallocated = False
         with run_log.step():
             loss = estimator.step(batch[:, :-1].contiguous(), batch[:, 1:].contiguous(), optimizer)
-        record = run_log.record(step, loss, estimator.settings)
+            if allocator is not None:
+                allocator.observe(estimator.split_statistics())
+                reallocated = allocator.update(step)
+        record = run_log.record(step, loss, estimator.settings)  # charged the allocation this step ran
+        if reallocated:
+            estimator.settings = allocator.recipe(estimator.settings)
+            record['allocation_noise'] = allocator.sigmas()
         if step == 1 or step % eval_interval == 0 or step == steps:
             with run_log.timed('eval'):
                 value = evaluate(model, validation, device)
@@ -643,7 +716,8 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
             with run_log.timed('checkpoint'):
                 save_state(
                     state_file, model=model, optimizer=optimizer, estimator=estimator, step=step,
-                    settings=asdict(settings), rank=rank, world=world,
+                    settings=asdict(estimator.settings), rank=rank, world=world,
+                    allocator_state=allocator.state_dict() if allocator else None,
                     extra=dict(fingerprint=fingerprint, best=best, best_step=best_step, best_state=best_state,
                                history=history, log=run_log.state_dict()),
                 )
@@ -692,6 +766,15 @@ def main():
                              '(costs one backprop + one estimate per seed; 0: never).')
     parser.add_argument('--probe-seeds', type=int, default=1,
                         help='Estimates per probe; 2 or more also log estimator variance and bias.')
+    parser.add_argument('--adaptive', action='store_true',
+                        help='Adaptive allocation (method B): move the writer, hidden and embedding draws to '
+                             'where the estimate is noisiest. The recipe is the starting point and the budget.')
+    parser.add_argument('--allocation-interval', type=int, default=4,
+                        help='With --adaptive: recompute the allocation every N steps (0: measure only).')
+    parser.add_argument('--allocation-budget', choices=('draws', 'flops'), default='draws',
+                        help='With --adaptive: hold the reallocated draw count fixed, or its analytic FLOPs.')
+    parser.add_argument('--allocation-objective', choices=('update', 'gradient'), default='update',
+                        help='With --adaptive: weigh noise by learning rate (update) or not (gradient).')
     args = parser.parse_args()
 
     rank, world = int(os.environ.get('RANK', 0)), int(os.environ.get('WORLD_SIZE', 1))
@@ -711,10 +794,18 @@ def main():
         torch.distributed.init_process_group('nccl', device_id=device)
     if min(args.checkpoint_interval, args.probe_interval) < 0 or args.probe_seeds < 1:
         parser.error('--checkpoint-interval and --probe-interval must be >= 0, --probe-seeds >= 1')
+    if args.allocation_interval < 0:
+        parser.error('--allocation-interval must be >= 0')
+    allocation = None
+    if args.adaptive:
+        allocation = dict(interval=args.allocation_interval, budget=args.allocation_budget,
+                          objective=args.allocation_objective)
 
     if args.toy:
         from toy import TOY_BATCH, TOY_CONFIG, TOY_EVAL_INTERVAL, TOY_STEPS, toy_data, toy_recipe
-        settings, config, steps, interval = toy_recipe(), TOY_CONFIG, TOY_STEPS, TOY_EVAL_INTERVAL
+        # The toy recipe has too few draws to keep two chunks per unit; doubled, it can be reallocated.
+        settings = toy_recipe(scale=2 if args.adaptive else 1)
+        config, steps, interval = TOY_CONFIG, TOY_STEPS, TOY_EVAL_INTERVAL
         training, validation, testing = toy_data(TOY_STEPS, TOY_BATCH)
         data = dict(source='toy (new_implementation/toy.py)')
     else:
@@ -753,6 +844,7 @@ def main():
         test_sequences=len(testing),
         model=asdict(config),
         recipe=asdict(settings),
+        allocation=allocation,  # None: fixed; else the adaptive options, and `recipe` is the starting point
         reward_centering='per-token local draw-chunk mean; skipped at nrep=1; no rescaling',
         execution='full-replay' if args.full_replay else 'cached-suffix',
         device=str(device),
@@ -771,7 +863,8 @@ def main():
         config, settings, training, validation, testing, args.output,
         steps=steps, eval_interval=interval, seed=args.seed, device=device, rank=rank, world=world,
         suffix=not args.full_replay, checkpoint_interval=args.checkpoint_interval, resume=args.resume,
-        probe_interval=args.probe_interval, probe_seeds=tuple(range(args.probe_seeds)), metadata=metadata,
+        probe_interval=args.probe_interval, probe_seeds=tuple(range(args.probe_seeds)),
+        allocation=allocation, metadata=metadata,
         echo=lambda line: print(line, flush=True),
     )
     if world > 1:

@@ -53,6 +53,11 @@ Two consequences drive everything in this folder:
   seconds / GPU-hours with eval, probes and checkpoint writes **excluded**, honest total wall clock,
   step time and peak memory, and the draw allocation whenever it changes. `gradient_probe` scores the
   estimate against backprop on a held-out batch without disturbing the perturbation RNG.
+- **`allocation.py`** — **adaptive allocation (method B)**: re-decides during training how many draws
+  each block's writers / hidden layer and the embedding get, in proportion to their measured per-draw
+  noise, on a fixed budget (draws or FLOPs). The noise comes free from the draws already run
+  (`DUST.direct_errors(split=True)` compares two halves). `python dust.py --adaptive`. No torch
+  dependency. **Written without being run — run `test_allocation.py` before relying on it.**
 - **`toy.py`** — a **toy setup** (4×64 model, tiny recipe, synthetic data with a learnable next-token
   rule) so the full training path runs on a CPU in seconds: `python dust.py --toy`,
   `python baselines/backprop.py --toy`. For checking plumbing, not for results.
@@ -88,7 +93,7 @@ Two consequences drive everything in this folder:
 
 `accounting` imports `groups`; `profiling` and `run_metrics` import `accounting`; `gradient_check`
 imports `groups` and reaches back to `../dust.py` for one helper (`average_ranks`) through a small
-`sys.path` shim. **`../dust.py` now imports from here** (`checkpoint`, `run_metrics`; `toy` only under
+`sys.path` shim. `allocation` imports `accounting` and `groups`. **`../dust.py` now imports from here** (`allocation`, `checkpoint`, `run_metrics`; `toy` only under
 `--toy`) by appending this folder to `sys.path`, so this folder can no longer be moved out without
 breaking training. `run_metrics` imports `gradient_check` lazily to avoid an import cycle with `dust`.
 
