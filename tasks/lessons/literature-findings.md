@@ -191,3 +191,35 @@ Split `K_i` draws into two independent halves → estimates `a, b`:
   small σ, same/adjacent-layer groups. The cheap-to-multiplex groups are the bias-prone ones.
 - **Both rely on the centering baseline** (general-agent result): without loss-centering, variance
   blows up as `d·f²/σ²`. B and C must preserve DUST's reward centering exactly.
+
+---
+
+## Addendum, 2026-11-11 — what the first CPU measurements add (to be confirmed on GPU)
+
+Derived while building B and C and checked on the toy model (`new_implementation/test_allocation.py`,
+`multiplex_experiment.py`). Not from the literature agents; treat as our own working results.
+
+### B: the split-half formulas hold on the real estimator
+- Split-half per-draw variance ÷ variance over seeds: 1.01–1.02 pooled.
+- Measured half-to-half cosine vs `rho/(rho+1)`: agrees per parameter (0.051 vs 0.051, 0.028 vs 0.029).
+- At 4–8 draws per unit the cosines are 0.01–0.08: every unit is noise-dominated, so the per-step
+  cosine/SNR signal is itself very noisy and must be averaged over steps. The `|a-b|` variance signal
+  is tight per step.
+- Both proposal policies are built: `variance` = Neyman `K_i ∝ σ_i`; `agreement` = norm test
+  `K_i ∝ v_i/‖g_i‖²`, with `‖g_i‖²` from the halves' inner product (`E[a·b] = ‖g_i‖²`), which can be
+  averaged over steps where a raw cosine cannot.
+
+### C: a code sequence tests one direction per group
+- Code: Hadamard columns with an **odd number of set bits** (a sum-free set: odd XOR odd is even) and
+  never the all-ones column. Cancels the baseline, self-curvature and all cross-curvature. Costs
+  `M/2 ≥ G`: 2 groups need 4 passes.
+- A sequence fixes one base noise field per group, so `M` passes yield `G` directional derivatives —
+  rate `G/M ≤ 1/2` directions per pass with the sum-free set. Plain DUST draws a fresh direction every
+  pass and loses one per chunk to centering: rate `(nrep−1)/nrep`.
+- Since estimator variance is `d/K` in *directions*, Hadamard multiplexing ties plain DUST at equal
+  forward passes for `nrep = 2` and loses for larger `nrep`. Measured (cosine to backprop, 32 passes):
+  nrep 2 — Hadamard 0.313 vs separate 0.284; nrep 8 — Hadamard 0.313 vs separate 0.365. Rademacher is
+  worse than Hadamard in both (0.218).
+- So the multiplex (Fellgett) advantage can only come from the **readout-noise** side: each direction
+  is read `M` times and curvature is cancelled, which matters under bf16 and at large σ. That is a GPU
+  question. In the direction-limited regime C saves passes only by testing fewer directions.

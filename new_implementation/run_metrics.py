@@ -7,7 +7,9 @@ what the update cost and how long it took, cumulatively, so held-out loss can be
   3x a forward (backprop), summed over GPUs. Recomputed from the live Recipe every step, so a run whose
   allocation changes (adaptive allocation) is charged what it actually ran. Attention FLOPs follow
   accounting's current convention (see TODO.md, "FLOP convention").
-- ``draws`` (cumulative perturbations, every group) and ``population`` (the per-update K).
+- ``draws`` (cumulative perturbations, every group), ``population`` (the per-update K) and, for DUST,
+  ``direct_forwards`` (the per-update forward evaluations by direct draws; fewer than the direct draws
+  when groups share multiplexed passes).
 - ``train_seconds`` / ``gpu_hours``: training-step time only. Evaluation, gradient probes and checkpoint
   writes are timed separately and excluded, so loss-vs-wall-clock does not charge a method for how often
   it was evaluated. ``elapsed_seconds`` is the honest total wall clock, everything included.
@@ -34,11 +36,11 @@ def allocation(settings):
     return {name: getattr(settings, name) for name in ALLOCATION_FIELDS}
 
 
-def dust_update_cost(settings, config, world=1, batch=8, suffix=True):
+def dust_update_cost(settings, config, world=1, batch=8, suffix=True, multiplex=False):
     """Cost of one DUST update from the Recipe, population-wide (all GPUs)."""
-    cost = analytic_cost(settings, config, world=world, batch=batch, suffix=suffix)
+    cost = analytic_cost(settings, config, world=world, batch=batch, suffix=suffix, multiplex=multiplex)
     return dict(flops=cost.flops_total, forward_equivalents=cost.forward_equivalents,
-                draws=cost.total_draws, population=cost.population_K)
+                draws=cost.total_draws, population=cost.population_K, direct_forwards=cost.direct_forwards)
 
 
 def forward_flops(config, batch=8):
@@ -63,7 +65,8 @@ class TrainingLog:
         self.update_cost, self.world = update_cost, world
         self.meters = RunMeters(warmup=warmup)
         self.totals = dict(flops=0.0, forward_equivalents=0.0, draws=0, train_seconds=0.0,
-                           eval_seconds=0.0, probe_seconds=0.0, checkpoint_seconds=0.0)
+                           eval_seconds=0.0, probe_seconds=0.0, checkpoint_seconds=0.0,
+                           allocation_seconds=0.0)  # allocation: inside train_seconds, not on top of it
         self.elapsed_before = 0.0          # wall clock of earlier processes of a resumed run
         self.started = time.monotonic()
         self.last_allocation = None
@@ -113,6 +116,8 @@ class TrainingLog:
             gpu_hours=self.totals['train_seconds'] * self.world / 3600,
             elapsed_seconds=self.elapsed(), step_host_ms=host_ms,
         )
+        if 'direct_forwards' in cost:
+            record['direct_forwards'] = cost['direct_forwards']
         if self.meters.step_gpu_ms:
             record['step_gpu_ms'] = self.meters.step_gpu_ms[-1]
             record['peak_memory_gb'] = self.meters.peak_memory_bytes / 1024 ** 3
@@ -137,7 +142,7 @@ class TrainingLog:
         )
 
     def load_state_dict(self, state):
-        self.totals = dict(state['totals'])
+        self.totals.update(state['totals'])
         self.elapsed_before, self.started = state['elapsed'], time.monotonic()
         self.last_allocation = state['last_allocation']
         self.meters = RunMeters(**state['meters'])

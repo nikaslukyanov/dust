@@ -1,6 +1,6 @@
 # DUST project — refined TODO
 
-Updated 2026-11-07. Companion to `PROJECT_PLAN.md` (the full plan) and `lessons/lectures.md` (how we
+Updated 2026-11-11. Companion to `PROJECT_PLAN.md` (the full plan) and `lessons/lectures.md` (how we
 measure performance). Each item says what it is and why it matters, not how it's wired.
 
 Legend: `[x]` done · `[~]` in progress · `[ ]` todo · **(GPU)** needs a GPU to validate.
@@ -54,7 +54,7 @@ Only `dust.py` was modified in place (the estimate/apply split); everything else
       method, warmup, reporting percentiles, a stability guard in the curve fit, the precision the
       reference gradient is computed at, and a caveat that FLOP savings may not show up in wall-clock.
 
-## Tests for the measurement stack (CPU) — in progress
+## Tests for the measurement stack (CPU) — done, except CI and the GPU checks
 
 The modules above were written without tests. Each test checks against an independent truth, and a
 deliberately broken version of the code must fail it. Run: `python -m pytest new_implementation/`.
@@ -111,8 +111,7 @@ deliberately broken version of the code must fail it. Run: `python -m pytest new
       fail when the rewind or the RNG restore is removed.
 - [ ] **(GPU)** check the CUDA paths the CPU tests cannot: CUDA-event timing / peak memory in the records,
       generator restore on resume, multi-GPU (per-rank `state.pt`, rank-0 metrics), probe memory at batch 8.
-- Not yet: split-half noise signal (first piece of Track 2); same logging is FLOP-convention-dependent
-  (see "FLOP convention" below).
+- Note: the logged FLOPs depend on the FLOP convention (see "FLOP convention" below).
 
 ## Validation — todo (deferred until we have a GPU)
 
@@ -123,7 +122,7 @@ deliberately broken version of the code must fail it. Run: `python -m pytest new
 - [ ] **(GPU)** Run the launch-bound test on real hardware, to settle GPU-bound vs launch-bound
       **before** we trust any predicted FLOP saving.
 
-## Track 1 — only re-run the part of the network a perturbation affects (baseline A) — todo
+## Track 1 — only re-run the part of the network a perturbation affects (baseline A) — done on CPU, GPU gate open
 
 A perturbation injected at some layer can only change the layers after it. Re-running the whole network
 to score it is wasted work. This track caches everything up to the injection point and re-runs just the
@@ -147,46 +146,144 @@ tail.
 - Note: this is the **only** paper optimization still missing from the public code — the other two
   shortcuts are already in it. It's also the groundwork that multiplexing (Track 3) builds on.
 
-## Track 2 — spend noise draws where they help most (B, our idea) — todo
+## Track 2 — spend noise draws where they help most (B, our idea) — built and CPU-tested; GPU comparison open
 
 The paper hand-tunes how many draws each group gets and freezes it. Our idea is to decide it live, giving
-more draws to the groups whose signal is noisiest.
+more draws to the groups whose estimate is least reliable.
 
 - [x] **Math verified.** The literature confirms the rule: draws in proportion to each group's noise
       minimizes total gradient error, and a group's importance already enters through its noise, so we
       don't weight it separately. We can measure that noise for free by splitting each step's draws in
       half and comparing. One trap to avoid (don't compare already-averaged numbers). Written up in
       `lessons/literature-findings.md`.
-- [ ] **`new_implementation/allocation.py`** — a policy that picks each group's draw count from the measured noise and the
-      half-to-half agreement, keeps the total budget fixed, respects a minimum per group, and only
-      recomputes every so often.
-- [ ] **Free measurement hook** — read each group's noise and self-agreement off the two halves it
-      already computes, so adaptivity costs no extra passes.
-- [ ] **Integrate** the policy between estimate and apply, and save its state in the checkpoint.
-- [ ] **Compare** B against the fixed allocation at equal budget, then find how much smaller a budget B
-      needs to match the fixed one's quality.
+- [x] **`new_implementation/allocation.py`** — both policies the proposal names, on a fixed budget,
+      with a floor per unit (two chunks per GPU), counts rounded to `world × nrep` by largest
+      remainder, measurements EMA-smoothed, recomputed every N steps, each recompute moving only part
+      of the way, and each allocation used from the step after the one that measured it.
+  - **`variance`** (Neyman): draws ∝ per-draw noise. Units: each block's `writers`, each block's
+    `hidden`, and `embedding`.
+  - **`agreement`** (gradient agreement / the norm test): draws ∝ noise² ÷ signal², which brings every
+    unit to the same cosine between its two half-population estimates. Scale-free, so it also
+    reallocates the `hubs`.
+- [x] **Free measurement hook** — `DUST.direct_errors(split=True)` sums the draw chunks it already
+      runs into two halves; `split_statistics()` turns them into per-draw variance, squared gradient
+      norm and the half-to-half cosine. No extra forward pass, the gradient estimate is bit-identical,
+      one host sync per step and none inside the draw loops (lessons L3). Cost: two extra
+      error-times-input products per measured layer per step (not yet in `roofline.py`).
+- [x] **Integrated** into `dust.train()` (`allocation=...`; CLI `--adaptive`,
+      `--allocation-policy/-interval/-budget/-objective`). Allocator state is in the checkpoint; resume
+      refuses changed options. `metrics.jsonl` logs each new `allocation` plus the `allocation_noise`
+      and `allocation_agreement` behind it; `result.json` totals the decision's own time as
+      `allocation_seconds` (the proposal's "cost of recomputing allocations").
+- [x] **`test_allocation.py`** (18 tests, CPU, ~30 s). Hand-solved allocations for both policies and a
+      brute-force search (allocating by variance instead of noise must lose); measuring leaves the
+      estimate and a whole training run bit-identical; the budget holds at every reallocation; logged
+      FLOPs equal the sum of each step's cost under the allocation in force; resume equals an
+      uninterrupted run. Against the real estimator, over seeds:
+  - split-half variance ÷ variance over seeds = 1.01–1.02 pooled (0.92–1.06 per parameter);
+  - split-half signal ÷ squared mean gradient = 0.87 pooled over 40 seeds (0.67–1.23 per parameter);
+  - the measured half-to-half cosine matches the literature's ρ/(ρ+1) per parameter (e.g. 0.051 vs
+    0.051, 0.028 vs 0.029, 0.080 vs 0.093).
+- **What the toy shows about the signal** (4×64 model, 4–8 draws per unit): half-to-half cosines are
+  0.01–0.08, i.e. every unit is deep in the noise. The variance signal is still tight per step; the
+  agreement signal needs its EMA. Expect the same at population 256 on the real model.
+- Toy training, 20 steps, one seed — **plumbing check, not a result**: fixed 1.975; `variance` 1.879;
+  `agreement` 1.870 best val, at the same forward-equivalents within 1%. Decision time 1.6 ms over the
+  run. Under `variance` with learning-rate weighting the embedding's noise is ~300× any block's (its
+  rate is 1000), so it takes every spare draw.
+- Decisions made while writing it — **team to confirm**:
+  - **`variance` does not reallocate the `hubs`.** A hub's estimate is the target the attention
+    internals are scored against, not a weight gradient, so its noise is in different units.
+    `agreement` is scale-free and does include them. Head, attention internals and scalars are never
+    moved (cheap, outside K).
+  - **`variance` weighs noise by learning rate by default** (`--allocation-objective update`; the
+    bibliography's weighted objective, K ∝ √w·σ): the token embedding's rate is 1000 against ~0.25 for
+    the blocks. `gradient` weighs raw gradient noise instead. Which is better is an experiment.
+  - **Budget is a draw count by default**, as the proposal says ("the same total budget; adaptive
+    methods change only its distribution"). `--allocation-budget flops` fixes the analytic FLOPs
+    instead (draws ∝ noise / √cost).
+  - **Recipes with a unit under the floor are adjusted at step 0** (e.g. population 256, where the
+    last blocks get 2 draws = one chunk): lifted to the floor, paid for by the rest. So B's starting
+    allocation is not exactly A's there.
+  - Defaults (interval 4, EMA 0.7, rate 0.5) are untuned guesses; the 1M run is only 61 steps. No
+    dead-band beyond the damping.
+- [ ] **(GPU)** multi-GPU path: the split statistics are summed over ranks with `all_reduce` so every
+      rank picks the same allocation — untested.
+- [ ] **Compare** B (both policies) against the fixed allocation at equal budget, then at smaller
+      budgets to find what B needs to match A. Vary the recompute interval; report the overhead
+      (measure-only run, `--allocation-interval 0`, against a fixed run).
 
-## Track 3 — perturb several groups at once and untangle them (C) — todo
+## Track 3 — perturb several groups at once and untangle them (C) — built and CPU-tested; first result is negative
 
 Instead of testing one group per forward pass, perturb several at once using coded patterns, then
-separate out each group's individual effect afterward — the same information from far fewer passes.
+separate out each group's individual effect afterward.
 
 - [x] **Math verified.** The decode is exact to first order, but a second-order cross-term (curvature
       between groups) survives and biases the result when groups interact. The fix is a specific
       structured code, small noise, and only multiplexing groups in the same or neighboring layers. The
       catch: the groups cheapest to multiplex together are exactly the ones most prone to this bias.
       Written up in `lessons/literature-findings.md`.
-- [ ] **Codebook + decoder** — build the coded patterns and the routine that recovers each group,
-      and prove recovery on a controlled linear test case first.
-- [ ] **Experiment** — multiplex two groups that share a re-run; compare against testing them
-      separately and against plain random codes; measure the real bias and variance in the actual
-      (nonlinear) model.
-- [ ] **Constraint** — only multiplex same/adjacent-layer groups, or the shared-compute saving erodes.
+- [x] **Codebook + decoder — `new_implementation/multiplexing.py`.** Sylvester Hadamard codes without
+      the all-ones column (rejects the baseline and each group's own curvature), restricted to columns
+      with an odd number of set bits — the literature's "sum-free" set — so that no second-order cross
+      term reaches any group. G groups need sequences of M passes with M/2 ≥ G (2 groups: 4 passes).
+      Random-sign (Rademacher) codes of the same length for the comparison. Decoder = code column
+      correlated with the losses, centered over the sequence (DUST's reward centering, with the code
+      sequence as the centering group). `test_multiplexing.py` proves it on controlled losses: a linear
+      loss is recovered exactly; on a quadratic loss the sum-free code is still exact, while columns
+      1, 2, 3 of H4 leak each pair's cross-curvature onto the third group at full strength, as the
+      math predicts.
+- [x] **Estimator + training — `DUST.multiplexed_errors`, `dust.py --multiplex hadamard|rademacher`.**
+      Each block's writers and hidden layer (two groups that restart at the same block) share
+      sign-coded passes: the same draws per group, half the forward passes for those groups.
+      `accounting.analytic_cost(multiplex=True)` charges the shared passes once and still counts both
+      groups' draws (the proposal's rule); it equals the FLOPs PyTorch executes, exactly. Metrics gain
+      `direct_forwards`, the suffix-forward count.
+- [x] **Constraint** — `multiplexed_errors` refuses groups that are not in the start block or the one
+      after it.
+- [x] **Experiment, CPU half — `multiplex_experiment.py`** (toy 4×64 model at init, block 0, cosine to
+      backprop, mean over 16 seeds; P = 32 draws per group):
+
+      | method | forward passes | cosine, nrep 2 (writers / hidden) | cosine, nrep 8 |
+      |---|---|---|---|
+      | separate (DUST as is) | 64 | 0.375 / 0.413 | 0.481 / 0.511 |
+      | separate, half the draws | 32 | 0.284 / 0.308 | 0.365 / 0.391 |
+      | joint, independent noise | 32 | 0.280 / 0.299 | 0.359 / 0.379 |
+      | Hadamard | 32 | 0.313 / 0.317 | 0.313 / 0.317 |
+      | Rademacher | 32 | 0.218 / 0.255 | 0.218 / 0.255 |
+
+  - Exactly orthogonal codes beat random signs, as the literature says.
+  - **At equal forward passes Hadamard does not beat plain DUST**: slightly ahead at nrep 2, behind at
+    nrep 8 — and the shipped recipes use nrep 8–16 from population 1024 up.
+  - **Why (our derivation, consistent with the table; team to check):** a code sequence holds one
+    noise direction per group, so M passes test G directions however long the sequence is — 2
+    directions per 4 passes here. Plain DUST tests one fresh direction per pass and loses one per
+    chunk to centering: (nrep − 1)/nrep directions per pass, i.e. 1/2 at nrep 2 (a tie) and 7/8 at
+    nrep 8. Gradient quality follows directions tested, so coding cannot win where the estimate is
+    limited by direction count. This is the bibliography's MeZO caveat ("multiplexing re-allocates
+    passes; it does not shrink the per-estimate dimension cost") showing up in numbers.
+  - **Where C can still win:** where the reward *readout* is the limit rather than the number of
+    directions — bf16 rounding on small loss changes (the paper raises σ to 0.4 in the deeper half for
+    this reason). A sequence reads each direction M times and cancels curvature exactly, so it
+    tolerates a larger σ. CPU runs are fp32 and cannot show this.
+  - Toy training, 20 steps, one seed, untuned — plumbing check: C reaches 2.28 (Hadamard) / 2.14
+    (Rademacher) best val against 1.98 for A, at 27% fewer forward-equivalents.
+- [ ] **(GPU) Experiment, GPU half** — rerun `multiplex_experiment.py` on the real model under bf16,
+      per block, with a σ sweep (the bias is second order in σ, the readout noise falls with σ), and
+      time it. This decides whether C is worth a training campaign.
+- [ ] **Higher code rate** — untested variants that test more directions per pass: 3 groups on all of
+      H4's columns (rate 3/4, cross-curvature aliasing back); adding the block's hub as a third group;
+      groups from the adjacent block.
+- Not done: a learning-rate retune for C (Hadamard estimates are not shrunk by the (1 − 1/nrep)
+  centering factor, so the same lr is a bigger step); `roofline.py` does not model the shared passes.
 
 ## Track D — combine B and C — todo
 
 - [ ] Make adaptive allocation and multiplexing agree on sizes (draw counts vs code lengths), integrate
       them, and attribute the speedup to each piece against baselines A, B, and C.
+      `dust.train` refuses `allocation` together with `multiplex` until this exists. What it needs:
+      multiplexed writers + hidden draw from one count per block (one allocation unit, in multiples of
+      the code length 4), and the split-half measurement taken over whole code sequences.
 
 ## Model sizes — todo
 

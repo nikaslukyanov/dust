@@ -82,6 +82,7 @@ class CostRecord:
     flops_clean_forward: float
     forward_equivalents: float        # flops_total / flops_clean_forward
     forward_equivalents_per_gpu: float
+    direct_forwards: int = 0          # forward evaluations by direct draws (shared multiplexed passes once)
     note: str = (
         'forward_equivalents = update FLOPs / one clean forward. population_K excludes head, '
         'attention-internal and scalar draws. Every direct draw pays a full head recompute, which '
@@ -94,12 +95,17 @@ class CostRecord:
         return asdict(self)
 
 
-def analytic_cost(recipe, config, world=1, batch=8, suffix=True):
+def analytic_cost(recipe, config, world=1, batch=8, suffix=True, multiplex=False):
     """Expected FLOPs and forward-equivalents of one DUST.estimate update, from the Recipe alone.
 
     ``suffix``: True models cached-suffix execution (a direct draw at block L reruns blocks L..end);
     False models the public code's full replay (every direct draw reruns the whole stack). The ratio
     of the two is Track 1's saving for this exact allocation.
+
+    ``multiplex``: True models method C (DUST(multiplex=...)): each block's hidden-layer draws ride the
+    writers' forward passes, so they cost no forward of their own. Both groups' draws are still
+    counted in ``draws`` and ``population_K`` (each perturbed group in a shared evaluation counts
+    separately); ``direct_forwards`` counts the forward evaluations actually run.
 
     Costs are population-wide (summed over GPUs). forward_equivalents_per_gpu divides the parallel
     draw work by ``world`` (the clean forward runs once per GPU, so it is not divided).
@@ -124,6 +130,12 @@ def analytic_cost(recipe, config, world=1, batch=8, suffix=True):
 
     for group in ('writers', 'hidden', 'hubs'):
         draws[group], flops_per_group[group] = direct_group(group)
+    direct_forwards = draws['writers'] + draws['hidden'] + draws['hubs'] + group_draw_count(recipe, 'embedding')
+    if multiplex:
+        if list(recipe.writers) != list(recipe.hidden):
+            raise ValueError('Multiplexing needs equal writer and hidden draws at every block')
+        flops_per_group['hidden'] = 0.0  # carried by the writers' passes
+        direct_forwards -= draws['hidden']
 
     embedding_draws = group_draw_count(recipe, 'embedding')          # perturbs the input -> whole stack
     draws['embedding'] = embedding_draws
@@ -163,6 +175,7 @@ def analytic_cost(recipe, config, world=1, batch=8, suffix=True):
         flops_total=total_flops, flops_per_group=flops_per_group, flops_clean_forward=clean_forward,
         forward_equivalents=total_flops / clean_forward,
         forward_equivalents_per_gpu=clean_forward / clean_forward + parallel_flops / world / clean_forward,
+        direct_forwards=direct_forwards,
     )
 
 
