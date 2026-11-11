@@ -257,7 +257,7 @@ def test_split_noise_matches_the_variance_over_seeds():
         split_draws * torch.stack([gradients[name] for gradients, _ in runs]).var(0).sum().item()
         for name, (_, split_draws) in runs[0][1].items()
     )
-    assert 0.6 < from_split / over_seeds < 1.6
+    assert 0.8 < from_split / over_seeds < 1.25  # measured 1.01 to 1.02 over three sets of 10 seeds
     # Negative control: without the per-draw rescale (the K above, 4 or 8 here) the two cannot agree.
     unscaled = sum(torch.stack([gradients[name] for gradients, _ in runs]).var(0).sum().item() for name in names)
     assert from_split / unscaled > 2

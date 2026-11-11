@@ -146,7 +146,7 @@ tail.
 - Note: this is the **only** paper optimization still missing from the public code — the other two
   shortcuts are already in it. It's also the groundwork that multiplexing (Track 3) builds on.
 
-## Track 2 — spend noise draws where they help most (B, our idea) — written, tests not yet run
+## Track 2 — spend noise draws where they help most (B, our idea) — built and CPU-tested; GPU comparison open
 
 The paper hand-tunes how many draws each group gets and freezes it. Our idea is to decide it live, giving
 more draws to the groups whose signal is noisiest.
@@ -156,22 +156,28 @@ more draws to the groups whose signal is noisiest.
       don't weight it separately. We can measure that noise for free by splitting each step's draws in
       half and comparing. One trap to avoid (don't compare already-averaged numbers). Written up in
       `lessons/literature-findings.md`.
-- [~] **First: run `python -m pytest new_implementation/`.** Everything below was written on
-      2026-11-11 without being executed (no local runs that day), so `test_allocation.py` has never
-      run and the existing tests have not been rerun against the `dust.py` changes. The two checks most
-      likely to need a tolerance adjusted: `test_split_noise_matches_the_variance_over_seeds` (a
-      statistical bound, 0.6–1.6) and the "allocation moves at least once in six steps" assertion.
-- [~] **`new_implementation/allocation.py`** — the policy. Draws go in proportion to each unit's
+- [x] **`test_allocation.py`** (17 tests, CPU, ~35 s) — passes, and the 81 existing tests still pass
+      with the `dust.py` changes. Checks: hand-solved allocations and a brute-force search (allocating
+      by variance instead of noise must lose); the split-half noise against the estimate's variance
+      over seeds (ratio 1.01–1.02 pooled, 0.92–1.06 per parameter, over three sets of 10 seeds);
+      measuring leaves the estimate and a whole training run bit-identical; the budget holds at every
+      reallocation; logged FLOPs equal the sum of each step's cost under the allocation in force;
+      resume equals an uninterrupted run.
+- Toy run, 20 steps, one seed — **plumbing check, not a result**: fixed 1.975, adaptive `update`
+  1.879, adaptive `gradient` 1.978 best val, at the same forward-equivalents within 1%. Under
+  `update` the embedding's noise is ~300× any block's (its learning rate is 1000), so it takes every
+  spare draw and the blocks sit at the floor; under `gradient` draws shift mildly toward block 0.
+- [x] **`new_implementation/allocation.py`** — the policy. Draws go in proportion to each unit's
       per-draw noise (Neyman), on a fixed budget, with a floor per unit (two chunks per GPU), counts
       rounded to `world × nrep` by largest remainder, noise EMA-smoothed, recomputed every N steps, and
       each recompute moving only part of the way. A "unit" is one block's `writers`, one block's
       `hidden`, or `embedding`.
-- [~] **Free measurement hook** — `DUST.direct_errors(split=True)` pairs off the draw chunks it
+- [x] **Free measurement hook** — `DUST.direct_errors(split=True)` pairs off the draw chunks it
       already runs into two halves and keeps their signed sum; `|D|² / paired draws` is the per-draw
       variance. No extra forward pass and the gradient estimate is bit-identical; the cost is one extra
       error-times-input product per measured layer per step (inside the timed step, so it shows up in
       `train_seconds`; not yet in `roofline.py`).
-- [~] **Integrated** into `dust.train()` (`allocation=...`, CLI `--adaptive`,
+- [x] **Integrated** into `dust.train()` (`allocation=...`, CLI `--adaptive`,
       `--allocation-interval/-budget/-objective`): measure during the step, decide after it, use the
       new allocation from the next step. Allocator state is in the checkpoint and resume refuses changed
       allocation options. `metrics.jsonl` logs each new `allocation` and the `allocation_noise` behind it.

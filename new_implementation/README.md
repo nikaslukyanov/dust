@@ -57,7 +57,7 @@ Two consequences drive everything in this folder:
   each block's writers / hidden layer and the embedding get, in proportion to their measured per-draw
   noise, on a fixed budget (draws or FLOPs). The noise comes free from the draws already run
   (`DUST.direct_errors(split=True)` compares two halves). `python dust.py --adaptive`. No torch
-  dependency. **Written without being run — run `test_allocation.py` before relying on it.**
+  dependency. `test_allocation.py` checks the math, the measurement and the wiring on CPU.
 - **`toy.py`** — a **toy setup** (4×64 model, tiny recipe, synthetic data with a learnable next-token
   rule) so the full training path runs on a CPU in seconds: `python dust.py --toy`,
   `python baselines/backprop.py --toy`. For checking plumbing, not for results.
