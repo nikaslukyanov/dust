@@ -1,6 +1,6 @@
 # DUST project — refined TODO
 
-Updated 2026-11-11. Companion to `PROJECT_PLAN.md` (the full plan) and `lessons/lectures.md` (how we
+Updated 2026-11-12. Companion to `PROJECT_PLAN.md` (the full plan) and `lessons/lectures.md` (how we
 measure performance). Each item says what it is and why it matters, not how it's wired.
 
 Legend: `[x]` done · `[~]` in progress · `[ ]` todo · **(GPU)** needs a GPU to validate.
@@ -9,6 +9,88 @@ Legend: `[x]` done · `[~]` in progress · `[ ]` todo · **(GPU)** needs a GPU t
 profiling, checkpoint, groups — see `new_implementation/README.md`). The original DUST repo stays at
 the root (`dust.py`, `model.py`, `prepare_data.py`) so the README's training commands keep working.
 Only `dust.py` was modified in place (the estimate/apply split); everything else of ours is additive.
+
+---
+
+## Mid-point report — todo (course template; one item per required section)
+
+State on 2026-11-12: everything below "Foundation" is built and tested **on CPU only**. No GPU run
+exists yet (no `runs/`, no `preflight.json`, no W&B run). The template requires every reported metric
+to carry exact hardware, dtype/backend, batch/context size, warm-up and repetitions — today only the
+CPU toy numbers can be reported that way. The GPU items are therefore the critical path for the report.
+
+**Title & Team**
+- [x] Title: *Compute-Efficient DUST: Adaptive Population Allocation and Structured Perturbation
+      Multiplexing* (Team 27).
+- [x] Names + UNIs: Nikas Lukyanov (nl2951), David Fu (dyf2101), Junyang Ma (jm5914), Patrick Shen
+      (pts2125), Srabon Nath (skn2134).
+- [ ] **Roles per member.** `PROJECT_PLAN.md` only has "Person 1–5" (cloud/runs, suffix replay,
+      diagnostics, allocation, multiplexing). Put a name on each.
+
+**Project Summary**
+- [ ] **Project goal** — one-paragraph performance claim: match baseline DUST's held-out loss with
+      fewer perturbation draws / suffix-forward passes (B, C, D vs A). Source: proposal "Goals".
+      State up front that the first C result is negative at equal forward passes (Track 3).
+- [ ] **Background context** — model: 8-layer, 512-wide GPT (plus the toy 4×64 used on CPU); data:
+      FineWeb 1M / 10M tokens, BPE-4096, seq 2,048, batch 8, 544 held-out sequences per split;
+      hardware: one GCP A100 40GB (`a2-highgpu-1g`), bf16 autocast, torch 2.10.0 + cu128.
+      **Confirm the hardware line against what is actually provisioned.**
+- [ ] **Optimization methodology** — Track 1 cached-suffix replay (A), Track 2 adaptive allocation
+      (`variance` / `agreement`), Track 3 Hadamard multiplexing, D = B + C; engineering levers kept
+      separate (masked-aware attention, batched population, CUDA Graphs / `torch.compile`).
+- [ ] **Profiling / benchmarking / evaluation tools** — list what exists: `torch.profiler` harness with
+      `dust/<phase>` labels (`profiling.py`), CUDA-event timing with warm-up discarded and
+      median/p10/p90 (`accounting.py`), analytic FLOPs / forward-equivalents checked against
+      `FlopCounterMode`, roofline + MFU + Amdahl (`roofline.py`), launch-bound test, gradient cosine /
+      bias / variance vs backprop (`gradient_check.py`), per-step `metrics.jsonl` + `compare_runs.py`,
+      W&B (`tracking.py`). Planned, not built: nsys + NVTX timeline, Nsight Compute.
+- [ ] **Project links** — GitHub: <https://github.com/nikaslukyanov/dust> (check graders can open it).
+      **W&B dashboard link is missing**: create the shared team/entity, log at least one run with
+      `--wandb`, make the project readable, paste the URL here.
+
+**Current Progress**
+- [ ] **(GPU) Baseline & experimental setup — the baseline must run on a GPU.** Minimum: `gpu_preflight.py`
+      → `preflight.json`; `python dust.py --tokens 1M --population 256 --full-replay` (upstream
+      reference) and the same without `--full-replay` (A); `baselines/backprop.py --tokens 1M`; all with
+      `--wandb`. Then write up: pipeline, relevant papers (`lessons/literature-findings.md`, the three
+      `bibliography.md`), experiment design (A/B/C/D, equal budget, seeds).
+- [ ] **Metric provenance table** — for every number in the report: GPU model + count, dtype/backend
+      (bf16 autocast vs fp32; SDPA kernel), batch × context, warm-up steps discarded, repetitions /
+      seeds. CPU toy numbers must be labelled as such (CPU model, fp32, 4×64 model, seed counts as
+      already recorded in Tracks 2–3).
+- [ ] **(GPU) Profiling / baseline analysis** — limiting resource per phase. Have now: the roofline
+      *prediction* (K=256 update bandwidth-bound, 3.4 s GPU floor vs 0.34 s launch floor, 67% of GPU
+      time in unfused elementwise ops) and ~32% of attention FLOPs spent on masked positions. Need
+      measured: `phase_seconds` breakdown, `torch.profiler` table + trace, launch-bound test verdict,
+      which SDPA kernel runs, peak memory, MFU. Report prediction vs measurement side by side.
+- [ ] **First optimization status** — reportable today (CPU): suffix replay is bit-identical to full
+      replay with 15.5–17.9% fewer analytic update FLOPs (16.4% at 1M/16k); allocation measurement
+      validated against seeds (variance ratio 1.01–1.02); multiplexing table (Hadamard > Rademacher,
+      no win over plain DUST at nrep 8). **(GPU)** needed for a real result: suffix vs `--full-replay`
+      wall-clock and peak memory under bf16 (Track 1 GPU gate).
+
+**Future Work**
+- [ ] **Remaining work & experiments** — condense from the sections below: Track 2 comparison at equal
+      and smaller budgets, Track 3 GPU σ sweep, Track D, model sizes, launch-bound fix, masked-aware
+      attention, FLOP convention, runner / matrix / plots.
+- [ ] **Scope adjustments — applies if no GPU baseline by the deadline.** Draft the narrowing now:
+      (1) 1M tokens / population 256 / single A100 only; (2) drop or shrink the model-size study;
+      (3) C reported as a gradient-quality diagnostic only unless the bf16 σ sweep shows a win, so D
+      becomes conditional; (4) 10M and multi-GPU runs out of scope.
+
+**Blockers & Limitations**
+- [ ] **Write up, with resolution or plan for each:**
+  - No GPU validation yet (GCP quota / VM setup, `PROJECT_PLAN.md` steps 1–2) — every CUDA path is
+    unrun: CUDA-event timing, generator restore on resume, probe memory, multi-GPU `all_reduce`.
+  - Bugs found by CPU tests and fixed (NaN variance, complex `c_max`, per-block draw counts, fp32
+    cosine > 1, probe dtype crash on CUDA, checkpoint `set_state` on CUDA generators).
+  - Multiplexing cannot beat plain DUST where direction count is the limit (Track 3 derivation);
+    fp32 CPU cannot test the bf16 readout regime where it might.
+  - Half-to-half agreement signal is deep in noise (cosines 0.01–0.08) → needs EMA; allocation
+    defaults untuned; the 1M run is only 61 steps.
+  - FLOP convention gap (accounting = 85% of executed on the base model); FLOP savings may not show
+    in wall-clock if launch-bound.
+  - Upstream omits its execution optimizations; README assumes 8 GPUs for the default population.
 
 ---
 
