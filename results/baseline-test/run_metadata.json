@@ -1,0 +1,199 @@
+{
+  "job": {
+    "id": 13891039,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "start": "2026-11-13T00:43:15-05:00",
+    "end": "2026-11-13T01:12:56-05:00",
+    "elapsed_seconds": 1781,
+    "node": "ins039",
+    "gpu_time_limit": "10:00:00"
+  },
+  "environment": {
+    "python": "3.11.5",
+    "torch": "2.10.0+cu128",
+    "cuda": "12.8",
+    "gpu": "NVIDIA L40S",
+    "gpu_memory_bytes": 47803596800,
+    "compute_capability": [
+      8,
+      9
+    ]
+  },
+  "source_commit": "506f7a31ea3370156c96f1cf61e4b842eca853af",
+  "source_patches": [
+    {
+      "path": "new_implementation/gpu_preflight.py",
+      "patch_file": "runs/baseline-gpu-20261112-224500/preflight-device-index.patch",
+      "sha256_before": "49c9d6906c3da105d97dc2f7e113f57ff3fd22d39cca20a799da677a87d9890f",
+      "sha256_after": "cbd0cc193e3afe79654cb6f472c2fb89f92cf36dbb9a1e63ffe6f00df77b4910",
+      "reason": "Resolve an unindexed CUDA device before calling set_device."
+    }
+  ],
+  "configuration": {
+    "tokens": "1M",
+    "training_prediction_tokens": 999424,
+    "steps_per_run": 61,
+    "population": 256,
+    "seed": 42,
+    "batch_size": 8,
+    "model": {
+      "sequence_len": 2048,
+      "vocab_size": 4096,
+      "n_layer": 8,
+      "n_head": 8,
+      "n_kv_head": 8,
+      "n_embd": 512,
+      "window_pattern": "SSSL"
+    },
+    "probe_interval": 10,
+    "checkpoint_interval": 10,
+    "adaptive": false,
+    "multiplex": null,
+    "backprop_baseline": false,
+    "wandb": false,
+    "execution_order": [
+      "full-replay",
+      "cached-suffix"
+    ]
+  },
+  "data_manifest": {
+    "corpus": "HuggingFaceFW/fineweb",
+    "subset": "sample-10BT",
+    "skipped_documents": 200000,
+    "tokenizer_sha256": "a15168ae52f4a1b1c80b270a5e18a2ce3e038b5e3772a1ad3982044602da0ae7",
+    "files": {
+      "train_1M.pt": {
+        "sequences": 488,
+        "prediction_tokens": 999424,
+        "sha256": "f9996e06a0a617c5acf25e3454ccfbbe550db89f1ab0d587fe7d48b7d38efd7d"
+      },
+      "train_10M.pt": {
+        "sequences": 4880,
+        "prediction_tokens": 9994240,
+        "sha256": "eae3a22f5d589c7c02d3aa135abc83b3e23eabc1c5697ec788cb908d675a1d45"
+      },
+      "val.pt": {
+        "sequences": 544,
+        "prediction_tokens": 1114112,
+        "sha256": "8d123afe426b7789a47e7959a17f912ee58436941fa02e32bf4662373cf1e52c"
+      },
+      "test.pt": {
+        "sequences": 544,
+        "prediction_tokens": 1114112,
+        "sha256": "cf7185682b3cae85d35024890f94fe6dd8192cad9122815a43fcccb6e61b9483"
+      }
+    }
+  },
+  "preflight": {
+    "environment": {
+      "status": "PASS",
+      "check_seconds": 0.00014797801850363612
+    },
+    "equivalence": {
+      "status": "PASS",
+      "check_seconds": 26.967631700012134,
+      "max_relative_difference": 1.4633192790824978e-07
+    },
+    "timing": {
+      "status": "PASS",
+      "check_seconds": 69.29873939900426
+    },
+    "probe": {
+      "status": "PASS",
+      "check_seconds": 8.296244967990788
+    },
+    "training": {
+      "status": "PASS",
+      "check_seconds": 72.54041520197643,
+      "resume_max_relative_weight_difference": 0.0
+    },
+    "launch-bound": {
+      "status": "PASS",
+      "check_seconds": 102.4793740340101
+    }
+  },
+  "timing": {
+    "full-replay": {
+      "steps_kept": 58,
+      "warmup_discarded": 3,
+      "host_median_ms": 9317.396255995845,
+      "host_p10_ms": 9304.627930017887,
+      "host_p90_ms": 9334.459556994261,
+      "gpu_median_ms": 9318.53125,
+      "gpu_p10_ms": 9305.7578125,
+      "gpu_p90_ms": 9335.6298828125,
+      "likely_launch_bound": false,
+      "wall_seconds": 568.2900908240117,
+      "gpu_hours": 0.15785835856222546,
+      "peak_memory_gb": 6.630462646484375,
+      "scope": "step only; excludes data load and host->device copy unless inside the measured block",
+      "totals": {
+        "flops": 2.175972669390848e+16,
+        "forward_equivalents": 17588.564957960392,
+        "draws": 98576,
+        "train_seconds": 568.2900908240117,
+        "eval_seconds": 73.94565369194606,
+        "probe_seconds": 66.51031085502473,
+        "checkpoint_seconds": 2.126971224002773,
+        "allocation_seconds": 0.0
+      },
+      "elapsed_seconds": 717.9329318770033
+    },
+    "cached-suffix": {
+      "steps_kept": 58,
+      "warmup_discarded": 3,
+      "host_median_ms": 8060.505892004585,
+      "host_p10_ms": 8050.805604987545,
+      "host_p90_ms": 8068.092111003352,
+      "gpu_median_ms": 8061.66064453125,
+      "gpu_p10_ms": 8051.93408203125,
+      "gpu_p90_ms": 8069.25048828125,
+      "likely_launch_bound": false,
+      "wall_seconds": 491.67915449105203,
+      "gpu_hours": 0.13657754291418112,
+      "peak_memory_gb": 6.630462646484375,
+      "scope": "step only; excludes data load and host->device copy unless inside the measured block",
+      "totals": {
+        "flops": 1.8397103784984576e+16,
+        "forward_equivalents": 14870.529373474345,
+        "draws": 98576,
+        "train_seconds": 491.67915449105203,
+        "eval_seconds": 73.99673754599644,
+        "probe_seconds": 57.70071225101128,
+        "checkpoint_seconds": 3.4404544130084105,
+        "allocation_seconds": 0.0
+      },
+      "elapsed_seconds": 633.4329396929825
+    }
+  },
+  "wall_time_accounting": {
+    "train_seconds": 1059.9692453150637,
+    "eval_seconds": 147.9423912379425,
+    "probe_seconds": 124.21102310603601,
+    "checkpoint_seconds": 5.567425637011183,
+    "preflight_checks_seconds": 279.5825532810122,
+    "other_job_seconds": 163.72736142293434,
+    "job_wall_seconds": 1781
+  },
+  "verification": {
+    "complete_steps_per_run": 61,
+    "records_including_step_zero_per_run": 62,
+    "matched_configuration_except_execution": true,
+    "shared_validation_evaluations": 33,
+    "all_logged_losses_and_host_timings_finite": true,
+    "dataset_and_tokenizer_hashes_verified": true
+  },
+  "artifact_directory": "runs/baseline-gpu-20261112-224500",
+  "artifact_sha256": {
+    "summary.json": "5237c2b0688ec72a66540cba0ebecdab69fb8f4512510691e277011989724683",
+    "comparison.txt": "2e0a7caa2eec08cd6107e8f850c0c48f46d628bb7e042de43331cc7794f740c1",
+    "preflight/preflight.json": "f8c9d2dd642469156441bb5187cb54602f45dd4f8afa7e0653e322923a599240",
+    "full-replay/config.json": "471e6a9ba6059cd0eb44348f73914492b3c99a99033bdaddf4dac283bc7a2697",
+    "full-replay/metrics.jsonl": "1825d5c4a3fcda6487a67a154e3b331e6dd6d521817fc4cd1a878396c01a8b73",
+    "full-replay/result.json": "2aca510c2ef0f2486210834b17f45c32018b2802e55722407fcfd4c7538742ee",
+    "cached-suffix/config.json": "955c55af340aa939dcd63d414e091bbf5250dad4312dd451e7ceb7a69bb52a4d",
+    "cached-suffix/metrics.jsonl": "aff21251c461c77caab9bf8f143fdd87e0f66ec261b8c48843589af319118861",
+    "cached-suffix/result.json": "aab3f817c5257b5470cadf88481495d6b1668d0254323bd875b65c44c5fd9736"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "matched_configuration": true,
+  "runs": {
+    "full-replay": {
+      "best_val": 6.075499674853156,
+      "best_step": 61,
+      "test_at_best_val": 6.060479837305405,
+      "median_step_host_ms": 9319.245641003363,
+      "train_seconds": 568.2900908240117,
+      "peak_training_memory_gb": 6.630462646484375
+    },
+    "cached-suffix": {
+      "best_val": 6.075182886684642,
+      "best_step": 61,
+      "test_at_best_val": 6.060117300818948,
+      "median_step_host_ms": 8060.724970506271,
+      "train_seconds": 491.67915449105203,
+      "peak_training_memory_gb": 6.630462646484375
+    }
+  },
+  "median_step_time_reduction_percent": 13.504533724916302,
+  "maximum_absolute_validation_difference": 0.0012842907625083555
+}
