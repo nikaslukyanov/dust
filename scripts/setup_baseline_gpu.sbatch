@@ -7,8 +7,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=00:45:00
+#SBATCH --time=02:00:00
 #SBATCH --no-requeue
+#SBATCH --mail-user=pts2125@columbia.edu
+#SBATCH --mail-type=FAIL
 
 set -euo pipefail
 repo=$1
@@ -18,11 +20,16 @@ module load anaconda/2023.09
 unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 export PIP_DISABLE_PIP_VERSION_CHECK=1
-export PIP_NO_CACHE_DIR=1
+unset PIP_NO_CACHE_DIR
+export PIP_CACHE_DIR="$repo/.venv/pip-cache"
 env_dir="$repo/.venv/baseline-cu128"
+wheelhouse="$repo/.venv/wheelhouse-cu128"
+test -f "$wheelhouse/wheels.ready"
 python --version
 python -m venv "$env_dir"
-"$env_dir/bin/python" -m pip install 'torch==2.10.0' --index-url https://download.pytorch.org/whl/cu128
+# Large CUDA wheels are staged and checksum-verified before submission. Keep
+# downloads off the setup job's critical path and retain smaller pip downloads.
+"$env_dir/bin/python" -m pip install --index-url https://pypi.org/simple "$wheelhouse"/*.whl
 "$env_dir/bin/python" -m pip install -r "$experiment/source/requirements.txt" pytest
 "$env_dir/bin/python" -m pip check
 "$env_dir/bin/python" -m pip freeze > "$experiment/environment.txt"
