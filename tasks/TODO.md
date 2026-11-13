@@ -50,6 +50,10 @@ Only `dust.py` was modified in place (the estimate/apply split); everything else
 - [x] **`new_implementation/checkpoint.py` — resume a run exactly where it stopped.** Saves everything
       needed to continue bit-for-bit (weights, optimizer momentum, the noise generator's state, the
       allocator's state, the step count), writes it safely, one file per worker.
+- [x] **`new_implementation/tracking.py` — optional Weights & Biases logging.** `--wandb PROJECT`
+      on `dust.py` / `baselines/backprop.py` mirrors each metrics.jsonl record to W&B (live curves,
+      cross-run comparison); resume continues the same W&B run. Tested with a fake W&B and the real
+      package offline (`test_tracking.py`). Team setup: one shared W&B team/entity, `wandb login` on the VM.
 - [x] **Audited the whole stack against the profiling lecture** and fixed what was off: the timing
       method, warmup, reporting percentiles, a stability guard in the curve fit, the precision the
       reference gradient is computed at, and a caveat that FLOP savings may not show up in wall-clock.
