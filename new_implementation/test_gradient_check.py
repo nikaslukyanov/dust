@@ -196,3 +196,29 @@ def test_estimate_improves_with_population(model, data, reference):
         assert large > small + 0.05, f'{group}: cosine did not rise with population ({small:.3f} -> {large:.3f})'
         fit = curve[group]['fit']
         assert isinstance(fit['c_max'], float) and (fit['c_max'] > 0 or 'note' in fit)
+
+
+def test_reference_handles_bf16_embeddings_and_chunks(model, data):
+    """On CUDA the token and value embeddings are bf16; the fp32 reference must still run (it used to
+    raise a dtype mismatch at the first Linear), give the gradient of the same weights, and leave the
+    model bit-identical. Backpropagating one sequence at a time must give the same gradient."""
+    x, y = data
+    whole, loss = gc.reference_gradients(model, x, y)
+    chunked, chunked_loss = gc.reference_gradients(model, x, y, chunk=1)
+    assert chunked_loss == pytest.approx(loss, rel=1e-6)
+    for name in whole:
+        assert torch.allclose(chunked[name], whole[name], rtol=1e-4, atol=1e-7), name
+
+    narrow = copy.deepcopy(model)
+    narrow.transformer.wte.to(dtype=torch.bfloat16)  # what GPT.init_weights does on CUDA
+    for ve in narrow.value_embeds.values():
+        ve.to(dtype=torch.bfloat16)
+    before = {name: value.clone() for name, value in narrow.state_dict().items()}
+    widened = copy.deepcopy(narrow).float()  # the same (bf16-rounded) weights, stored in fp32
+    expected, _ = gc.reference_gradients(widened, x, y)
+    found, _ = gc.reference_gradients(narrow, x, y, chunk=1)
+    for name in expected:
+        assert torch.allclose(found[name], expected[name], rtol=1e-4, atol=1e-7), name
+    for name, value in narrow.state_dict().items():
+        assert value.dtype == before[name].dtype and torch.equal(value, before[name]), name
+    assert not any(p.requires_grad or p.grad is not None for p in narrow.parameters())

@@ -109,6 +109,19 @@ deliberately broken version of the code must fail it. Run: `python -m pytest new
       probe leaves training bit-identical; a crash past the checkpoint + resume = the uninterrupted run;
       resume refuses a changed seed/recipe; the CLIs run and resume. Resume and probe tests verified to
       fail when the rewind or the RNG restore is removed.
+- [x] **Baseline = the original code, proven.** `test_upstream.py` checks upstream `dust.py` + `model.py`
+      out of git history (`b20f7c0`) and trains a tiny model with each: `--full-replay` and cached-suffix
+      both end at bit-identical weights and losses. So the upstream baseline is `dust.py --full-replay`,
+      with our records attached — no second copy of the code to keep in sync.
+- [x] **Fixed: the gradient probe crashed on CUDA.** The fp32 backprop reference ran without autocast, and
+      on CUDA the embeddings are bf16, so the first Linear raised a dtype mismatch (CPU tests never store
+      bf16). `reference_gradients` now widens them for the pass and restores them exactly, and
+      backpropagates one sequence at a time (`chunk`) so the probe's memory stays near a training step's.
+      Reproduced and tested on CPU by narrowing the embeddings by hand; **still unrun on a GPU**.
+- [x] **Per-phase time in every record** (`phase_seconds`: clean / direct / embedding / hubs / head /
+      local / scalars), so one training run shows where the suffix saving lands without a profiler rerun.
+- [x] **`gpu_preflight.py`** — the (GPU) checks below as one script that runs in minutes and writes
+      `preflight.json`; **`compare_runs.py`** — the side-by-side table of finished runs.
 - [ ] **(GPU)** check the CUDA paths the CPU tests cannot: CUDA-event timing / peak memory in the records,
       generator restore on resume, multi-GPU (per-rank `state.pt`, rank-0 metrics), probe memory at batch 8.
 - Note: the logged FLOPs depend on the FLOP convention (see "FLOP convention" below).

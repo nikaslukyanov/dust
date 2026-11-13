@@ -148,19 +148,20 @@ class TrainingLog:
         self.meters = RunMeters(**state['meters'])
 
 
-def gradient_probe(estimator, x, y, seeds=(0,), sync=False):
+def gradient_probe(estimator, x, y, seeds=(0,), sync=False, precision='fp32', chunk=1):
     """Cosine and relative norm of DUST's estimate vs the backprop gradient, per group, on (x, y).
 
     With two or more ``seeds`` it also reports the estimator's variance and bias over them
     (gradient_check.estimate_statistics). The perturbation generator is restored afterwards, so the
     training run continues exactly as if the probe had not run. Costs one backprop pass plus one
-    DUST estimate per seed.
+    DUST estimate per seed. The reference is backpropagated ``chunk`` sequences at a time (1 by
+    default), so the probe's memory stays near the training step's instead of a full-batch backward's.
     """
     import gradient_check as gc  # lazy: gradient_check imports dust, which imports this module
 
     state = estimator.generator.get_state()
     try:
-        reference, _ = gc.reference_gradients(estimator.model, x, y)
+        reference, _ = gc.reference_gradients(estimator.model, x, y, precision=precision, chunk=chunk)
         if len(seeds) == 1:
             estimate, _ = gc.estimate_gradients(estimator, x, y, seed=seeds[0], sync=sync)
             report = gc.compare(reference, estimate)

@@ -27,7 +27,8 @@ from run_metrics import backprop_update_cost, dust_update_cost  # noqa: E402
 from toy import TOY_CONFIG, toy_data, toy_recipe  # noqa: E402
 
 CPU = torch.device('cpu')
-TIMING = {'train_seconds', 'gpu_hours', 'elapsed_seconds', 'step_host_ms', 'step_gpu_ms', 'peak_memory_gb'}
+TIMING = {'train_seconds', 'gpu_hours', 'elapsed_seconds', 'step_host_ms', 'step_gpu_ms', 'peak_memory_gb',
+          'phase_seconds'}
 DATA = toy_data(steps=24)
 
 
@@ -121,6 +122,10 @@ def test_logged_cost_and_time_add_up(tmp_path, monkeypatch):
     step_seconds = sum(r['step_host_ms'] for r in rows[1:]) / 1000
     assert rows[-1]['train_seconds'] == pytest.approx(step_seconds)
     assert rows[-1]['gpu_hours'] == pytest.approx(step_seconds / 3600)
+    # Every step times the estimate's phases; together they are the step minus the optimizer update.
+    for row in rows[1:]:
+        assert set(row['phase_seconds']) == {'clean', 'direct', 'embedding', 'hubs', 'head', 'local', 'scalars'}
+        assert 0 < sum(row['phase_seconds'].values()) <= row['step_host_ms'] / 1000
     # Four evaluations (steps 0, 1, 2, 4) each slept `pause`; the wall clock sees them, training time does not.
     timing = json.loads((tmp_path / 'run' / 'result.json').read_text())['timing']
     assert timing['totals']['eval_seconds'] >= 4 * pause
