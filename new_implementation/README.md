@@ -68,6 +68,15 @@ Two consequences drive everything in this folder:
 - **`toy.py`** — a **toy setup** (4×64 model, tiny recipe, synthetic data with a learnable next-token
   rule) so the full training path runs on a CPU in seconds: `python dust.py --toy`,
   `python baselines/backprop.py --toy`. For checking plumbing, not for results.
+- **`gpu_preflight.py`** — run this first on a GPU: a few minutes on the real model that exercise the
+  CUDA paths the CPU tests cannot (bf16 suffix-vs-full-replay equivalence, timing per phase and peak
+  memory in both modes, the gradient probe, checkpoint/resume with the CUDA generator, optionally the
+  launch-bound test). Writes `preflight.json`; exits 1 on a failed check. See "Running the baseline".
+- **`compare_runs.py`** — side-by-side table of finished runs (loss, FLOPs, step time, per-phase time,
+  peak memory), the first run as the reference.
+- **`test_upstream.py`** — checks the original public code out of git history (commit `b20f7c0`) and
+  shows `DUST(suffix=False)` trains to bit-identical weights: `--full-replay` *is* the upstream code
+  with our logging.
 - **`test_*.py`** — CPU tests (pytest): `python -m pytest new_implementation/` from the repo root.
   Each checks against an independent truth (an uninterrupted run, finite differences, a known
   curve) on a tiny model, so they need no GPU and run in seconds.
@@ -95,6 +104,24 @@ Two consequences drive everything in this folder:
   CPU smoke runs. `elapsed_seconds` used to include evaluation time; `train_seconds` now excludes it.
 - **`../baselines/backprop.py`** — same refactor into `train()` and the same `run_metrics` records (an
   update charged as 3 forwards), plus `--toy` / `--device`. No checkpoint/resume (not needed yet).
+
+## Running the baseline (upstream vs cached suffix)
+
+The baseline is the original public code; `--full-replay` reproduces it bit-for-bit (`test_upstream.py`)
+while writing the same records as every other variant. Both runs consume the same noise, so their loss
+curves agree up to bf16 rounding and the comparison is time, memory and FLOPs at equal quality.
+
+```bash
+python prepare_data.py --tokens 1M
+python new_implementation/gpu_preflight.py --population 256 --launch-bound --output runs/preflight
+python dust.py --tokens 1M --population 256 --full-replay --probe-interval 10 --checkpoint-interval 10 --output runs/1m-p256-upstream
+python dust.py --tokens 1M --population 256               --probe-interval 10 --checkpoint-interval 10 --output runs/1m-p256-suffix
+python new_implementation/compare_runs.py runs/1m-p256-upstream runs/1m-p256-suffix
+```
+
+Run them one after the other on an otherwise idle GPU. A run that dies continues with the same command
+plus `--resume`. Analytic cost per update (forward-equivalents, full replay -> cached suffix):
+population 256: 288 -> 244 (15.5% fewer FLOPs); population 1024: 1102 -> 924 (16.2%).
 
 ## How it wires together
 

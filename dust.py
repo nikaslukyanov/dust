@@ -16,7 +16,7 @@ No autograd or backward pass is used. One update (DUST.step):
      two-sided weight-space ES. Then one SGD step.
 """
 import argparse
-from contextlib import nullcontext
+from contextlib import contextmanager, nullcontext
 from dataclasses import asdict, dataclass
 from functools import partial
 import hashlib
@@ -25,6 +25,7 @@ import math
 import os
 from pathlib import Path
 import sys
+import time
 
 import torch
 from torch import nn
@@ -144,6 +145,10 @@ class DUST:
         # Split-half noise measurement for adaptive allocation (Track 2). Off by default. When on,
         # estimate() fills ``split`` at no extra forward pass; read it with split_statistics().
         self.measure_split, self.split = False, {}
+        # Per-phase wall time of estimate(). None: off. Set to a dict and estimate() adds each phase's
+        # seconds to it (clean, direct, embedding, hubs, head, local, scalars), with a device sync at
+        # each phase boundary so the time is the phase's own GPU work.
+        self.phase_seconds = None
 
         counts = settings.writers + settings.hidden + settings.hubs + [settings.embedding]
         counts += list(settings.local.values())
@@ -157,6 +162,23 @@ class DUST:
         for layer in range(model.config.n_layer):
             module = self.modules[f'transformer.h.{layer}.attn.c_proj']
             self.hooks.append(module.register_forward_pre_hook(self.input_hook(f'o@{layer}')))
+
+    @contextmanager
+    def phase(self, name):
+        """Label a phase of estimate() for the profiler and, if phase_seconds is a dict, time it."""
+        timed = self.phase_seconds is not None
+        if timed:
+            if self.device.type == 'cuda':
+                torch.cuda.synchronize(self.device)
+            start = time.monotonic()
+        # record_function names the phase in the profiler table and the Perfetto trace (Lecture 3);
+        # it is inert when no profiler is active, so it stays in the hot path.
+        with record_function(f'dust/{name}'):
+            yield
+        if timed:
+            if self.device.type == 'cuda':
+                torch.cuda.synchronize(self.device)
+            self.phase_seconds[name] = self.phase_seconds.get(name, 0.0) + time.monotonic() - start
 
     def autocast(self):
         return torch.autocast('cuda', dtype=self.dtype) if self.device.type == 'cuda' else nullcontext()
@@ -509,14 +531,11 @@ class DUST:
         allocator call this and inspect the estimate; apply() consumes it to take the SGD step.
         estimate() followed by apply() is identical to the old fused step().
         """
-        # record_function labels name each phase in the profiler table and the Perfetto trace, so the
-        # trace reads as direct / embedding / hubs / head / local / scalars (Lecture 3). They are inert
-        # when no profiler is active, so they stay in the hot path.
-        with record_function('dust/clean'):
+        with self.phase('clean'):
             self.capture(x, y)
         r, world, split = self.settings, self.world, self.measure_split
         gradients, self.split = {}, {}
-        with record_function('dust/direct'):
+        with self.phase('direct'):
             for layer in range(self.model.config.n_layer):
                 prefix = f'transformer.h.{layer}.'
                 groups = [
@@ -535,7 +554,7 @@ class DUST:
                     for site, error in self.direct_errors(sites, count // world, 0.2, layer, split).items():
                         gradients[site + '.weight'] = self.reassemble(site, error)
 
-        with record_function('dust/embedding'):
+        with self.phase('embedding'):
             site = 'transformer.wte'
             error = self.direct_errors([site], r.embedding // world, 0.2, split=split)[site]
             gradients[site + '.weight'] = self.reassemble(site, error)
@@ -543,7 +562,7 @@ class DUST:
         # Attention outputs, each block alone. The deeper half moves the loss too little at 0.2 for a readable
         # reward, so it uses 0.4. The targets are averaged over GPUs so that every GPU scores the attention
         # internals against the estimate from the whole population.
-        with record_function('dust/hubs'):
+        with self.phase('hubs'):
             targets = {}
             for layer in range(self.model.config.n_layer):
                 site = f'o@{layer}'
@@ -551,13 +570,13 @@ class DUST:
                 errors = self.direct_errors([site], r.hubs[layer] // world, sigma, layer, split)
                 targets[layer] = average_ranks(errors[site])
 
-        with record_function('dust/head'):
+        with self.phase('head'):
             gradients['lm_head.weight'] = self.reassemble('lm_head', self.head_error(r.head // world))
-        with record_function('dust/local'):
+        with self.phase('local'):
             for kind, count in r.local.items():
                 for site, error in self.local_errors(kind, count // world, targets).items():
                     gradients[site + '.weight'] = self.reassemble(site, error)
-        with record_function('dust/scalars'):
+        with self.phase('scalars'):
             gradients.update(self.scalar_gradients(8 // world))
 
         valid_tokens = (y != -1).sum()
@@ -704,7 +723,8 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
 
     - config.json: ``metadata`` (written once, on a fresh run);
     - metrics.jsonl: step 0's val loss, then one run_metrics record per step (cost, time, val loss on
-      eval steps, the gradient probe on probe steps);
+      eval steps, the gradient probe on probe steps, and ``phase_seconds``: the estimate's wall time
+      per phase -- clean, direct, embedding, hubs, head, local, scalars);
     - best.pt: weights at the best validation loss; result.json: best val, test at best val, history,
       timing summary;
     - state.pt (every rank, every ``checkpoint_interval`` steps and at the end): resumable full state.
@@ -804,6 +824,7 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
     for step in range(start + 1, steps + 1):
         batch = training[(step - 1) * batch_size:step * batch_size].to(device)
         reallocated = False
+        estimator.phase_seconds = {}
         with run_log.step():
             loss = estimator.step(batch[:, :-1].contiguous(), batch[:, 1:].contiguous(), optimizer)
             if allocator is not None:
@@ -811,6 +832,7 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
                     allocator.observe(estimator.split_statistics())
                     reallocated = allocator.update(step)
         record = run_log.record(step, loss, estimator.settings)  # charged the allocation this step ran
+        record['phase_seconds'], estimator.phase_seconds = estimator.phase_seconds, None
         if reallocated:
             estimator.settings = allocator.recipe(estimator.settings)
             record['allocation_noise'] = allocator.sigmas()

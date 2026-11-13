@@ -41,10 +41,10 @@ from dust import average_ranks  # noqa: E402  (import after the sys.path shim ab
 from groups import param_group  # noqa: E402
 
 
-def reference_gradients(model, x, y, precision='fp32'):
+def reference_gradients(model, x, y, precision='fp32', chunk=None):
     """True gradient of the mean cross-entropy w.r.t. every parameter, as a name -> tensor dict.
 
-    Temporarily enables autograd on the (otherwise frozen) model, runs one forward/backward, reads
+    Temporarily enables autograd on the (otherwise frozen) model, runs forward/backward, reads
     the grads, then restores the original requires_grad flags and clears the grads. Returns
     (gradients, loss).
 
@@ -54,29 +54,47 @@ def reference_gradients(model, x, y, precision='fp32'):
     "true gradient" and answers "how close is DUST to the real gradient"; ``precision='match'`` uses
     bf16 autocast on CUDA, matching DUST's own precision, and isolates DUST's algorithm error from the
     dtype gap. On CPU the two are identical (no bf16 autocast), so this only bites on the GPU runs.
+
+    On CUDA the token and value embeddings are stored in bf16 (model.init_weights), and without
+    autocast a bf16 stream cannot enter an fp32 Linear. The fp32 reference therefore widens those
+    weights to fp32 for the pass and narrows them back afterwards; bf16 -> fp32 -> bf16 is exact, so
+    the model is left bit-identical.
+
+    ``chunk``: sequences per backward pass (default: the whole batch). The gradients are accumulated,
+    so the result is the same up to rounding, while autograd holds only ``chunk`` sequences'
+    activations -- the dense [T, T] attention weights of every block are what make a full-batch fp32
+    backward large (about 2 GB per block at batch 8, length 2048).
     """
     device = next(model.parameters()).device
-    was = {name: p.requires_grad for name, p in model.named_parameters()}
-    for p in model.parameters():
-        p.requires_grad_(True)
-        p.grad = None
-    autocast = (
-        torch.autocast(device.type, dtype=torch.bfloat16)
-        if precision == 'match' and device.type == 'cuda' else nullcontext()
-    )
+    match = precision == 'match' and device.type == 'cuda'
+    was = {name: (p.requires_grad, p.dtype) for name, p in model.named_parameters()}
+    autocast = torch.autocast('cuda', dtype=torch.bfloat16) if match else nullcontext()
+    valid = (y != -1).sum()
+    total = 0.0
     try:
-        with torch.enable_grad(), autocast:
-            loss = model(x, y)  # default reduction='mean' -> grads are already mean-loss gradients
-        loss.backward()
+        for p in model.parameters():
+            if not match and p.dtype != torch.float32:
+                p.data = p.data.float()
+            p.requires_grad_(True)
+            p.grad = None
+        size = chunk or len(x)
+        for xs, ys in zip(x.split(size), y.split(size)):
+            with torch.enable_grad(), autocast:
+                loss = model(xs, ys, loss_reduction='sum')
+            loss.backward()  # accumulates into .grad across chunks
+            total += loss.item()
         gradients = {
-            name: p.grad.detach().float().clone()
+            name: p.grad.detach().float() / valid
             for name, p in model.named_parameters() if p.grad is not None
         }
     finally:
         for name, p in model.named_parameters():
+            requires_grad, dtype = was[name]
             p.grad = None
-            p.requires_grad_(was[name])
-    return gradients, loss.item()
+            p.requires_grad_(requires_grad)
+            if p.dtype != dtype:
+                p.data = p.data.to(dtype)
+    return gradients, total / valid.item()
 
 
 def reseed(estimator, seed):
