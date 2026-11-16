@@ -1,0 +1,11 @@
+{
+  "python": "3.11.5",
+  "torch": "2.10.0+cu128",
+  "cuda": "12.8",
+  "gpu": "NVIDIA L40S",
+  "gpu_memory_bytes": 47803596800,
+  "compute_capability": [
+    8,
+    9
+  ]
+}

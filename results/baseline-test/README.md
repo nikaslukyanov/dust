@@ -107,6 +107,45 @@ python new_implementation/compare_runs.py \
 
 The explicit `cuda:0` preflight argument also avoids the unindexed-device startup error in the original source snapshot.
 
-The original cluster artifacts are under `runs/baseline-gpu-20261112-224500/`. They include both runs' `config.json`, `metrics.jsonl`, `result.json`, `best.pt`, and `state.pt`, the preflight report, and `job-13891039.log`.
+The raw evidence is committed in this directory, so the reported measurements can be checked without cluster access. The following files are byte-for-byte copies from `runs/baseline-gpu-20261112-224500/`:
 
-This directory contains exact copies of the saved [summary.json](summary.json) and [comparison.txt](comparison.txt), plus [run_metadata.json](run_metadata.json) with the environment, source and data hashes, per-run timing summaries, wall-time accounting, and verification results. Both raw metric files were checked for all 61 steps, finite losses and host timings, matching configurations, and the same 33 validation evaluations. Dataset and tokenizer hashes were checked against the experiment manifest. Slurm accounting confirms successful completion.
+| Evidence | Committed files |
+|---|---|
+| Full replay | [config.json](full-replay/config.json), [metrics.jsonl](full-replay/metrics.jsonl), [result.json](full-replay/result.json), [console log](full-replay.log) |
+| Cached suffix | [config.json](cached-suffix/config.json), [metrics.jsonl](cached-suffix/metrics.jsonl), [result.json](cached-suffix/result.json), [console log](cached-suffix.log) |
+| Six GPU preflight checks | [preflight.json](preflight/preflight.json), [console log](preflight.log) |
+| Successful GPU job | [job-13891039.log](job-13891039.log), [status.txt](status.txt) |
+| Environment and setup | [gpu-environment.json](gpu-environment.json), [nvidia-smi.txt](nvidia-smi.txt), [environment.txt](environment.txt), [setup-13890838.log](setup-13890838.log) with the 26 passing CPU tests |
+| Source adjustment | [preflight-device-index.patch](preflight-device-index.patch) |
+| Saved aggregates | [summary.json](summary.json), [comparison.txt](comparison.txt) |
+
+[slurm-accounting.txt](slurm-accounting.txt) is a fresh capture of `sacct` for job 13891039, including its completed state, exit code, allocation, and 1,781-second elapsed time. [run_metadata.json](run_metadata.json) records the capture command and timestamp, the original and committed artifact directories, SHA-256 hashes for every evidence file above, source and dataset hashes, and the timing accounting. Its `artifact_sha256` paths are relative to this directory. The previously recorded hashes of both runs and the preflight report are unchanged.
+
+Both raw metric files contain all 61 steps plus step zero, finite losses and host timings, matching configurations apart from execution mode, and the same 33 validation evaluations. Dataset and tokenizer hashes were checked against the experiment manifest during the job. Model checkpoints (`best.pt` and `state.pt`) and dataset tensors remain on the cluster; they are not needed to recompute the reported aggregates from these logs.
+
+To verify the evidence hashes and regenerate the numerical comparisons from a checkout, run the following from the repository root. These checks use only Python's standard library and do not require a GPU or training dependencies. The summary command rewrites `summary.json`; the subsequent diff confirms it matches the committed version.
+
+```bash
+set -euo pipefail
+
+python3 - <<'PY'
+import hashlib
+import json
+from pathlib import Path
+
+root = Path('results/baseline-test')
+metadata = json.loads((root / 'run_metadata.json').read_text())
+for name, expected in metadata['artifact_sha256'].items():
+    actual = hashlib.sha256((root / name).read_bytes()).hexdigest()
+    if actual != expected:
+        raise SystemExit(f'Checksum mismatch: {name}')
+print(f"Verified {len(metadata['artifact_sha256'])} evidence files")
+PY
+
+python3 scripts/check_baseline_results.py results/baseline-test
+git diff --exit-code HEAD -- results/baseline-test/summary.json
+
+python3 new_implementation/compare_runs.py \
+  results/baseline-test/full-replay results/baseline-test/cached-suffix \
+  | diff - results/baseline-test/comparison.txt
+```

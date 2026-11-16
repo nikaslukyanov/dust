@@ -27,7 +27,8 @@
       "patch_file": "runs/baseline-gpu-20261112-224500/preflight-device-index.patch",
       "sha256_before": "49c9d6906c3da105d97dc2f7e113f57ff3fd22d39cca20a799da677a87d9890f",
       "sha256_after": "cbd0cc193e3afe79654cb6f472c2fb89f92cf36dbb9a1e63ffe6f00df77b4910",
-      "reason": "Resolve an unindexed CUDA device before calling set_device."
+      "reason": "Resolve an unindexed CUDA device before calling set_device.",
+      "committed_patch_file": "preflight-device-index.patch"
     }
   ],
   "configuration": {
@@ -194,6 +195,31 @@
     "full-replay/result.json": "2aca510c2ef0f2486210834b17f45c32018b2802e55722407fcfd4c7538742ee",
     "cached-suffix/config.json": "955c55af340aa939dcd63d414e091bbf5250dad4312dd451e7ceb7a69bb52a4d",
     "cached-suffix/metrics.jsonl": "aff21251c461c77caab9bf8f143fdd87e0f66ec261b8c48843589af319118861",
-    "cached-suffix/result.json": "aab3f817c5257b5470cadf88481495d6b1668d0254323bd875b65c44c5fd9736"
+    "cached-suffix/result.json": "aab3f817c5257b5470cadf88481495d6b1668d0254323bd875b65c44c5fd9736",
+    "job-13891039.log": "4a593789bd72aa1e8b53793ed04dd4055d860a937d68be9457ac01d9142f0aa9",
+    "full-replay.log": "bcc081826db96d6216058a42633bc8e7ceed6e7f8cfd939f4ba79f9e7fcf1d8a",
+    "cached-suffix.log": "e1b50dfea2917d9eb4ca4b29df6f3e1d32a429382b37a40ac8c071b372a5a2d7",
+    "preflight.log": "08619026353ecb5eaaaf343757abc4932afbca082f46fe1e0904db665aa90bd4",
+    "status.txt": "8ccfd8174e0d0c33ced8f120351db3494b733f55a8bce1977c94d65b42c87ec2",
+    "gpu-environment.json": "321b605d7fd66566f733b04785fb80b993fe56247d54aadd8907d9f8d391183f",
+    "environment.txt": "e5a5cc9678851e6233dc869ccc77d059ed3c6243aa8d032bee758d5bd69666e7",
+    "nvidia-smi.txt": "cc28a234ea1142eb0d7c8dd8a8a907254d32a0bd5032c0fa4971c3a4d5dfeb87",
+    "preflight-device-index.patch": "f96339b48aefb0a663920723a7097a9763d4378cd3d7be06b73b3cbecc925ec0",
+    "setup-13890838.log": "b71fb6d98e1ea24da6e79c4fc675674242d63672488cfc2d74ebe9ad3b7ffaed",
+    "slurm-accounting.txt": "5c1f0164fd1784945b180b5272fdeaebee963ef09c0c254c8588473ca9c17af8"
+  },
+  "committed_artifact_directory": "results/baseline-test",
+  "slurm_accounting_capture": {
+    "file": "slurm-accounting.txt",
+    "captured_at": "2026-11-16T05:32:36.776512+00:00",
+    "command": [
+      "sacct",
+      "-j",
+      "13891039",
+      "--units=G",
+      "--parsable2",
+      "--format=JobID,JobName,State,ExitCode,Start,End,Elapsed,ElapsedRaw,NodeList,AllocTRES,Timelimit"
+    ],
+    "timestamp_timezone": "America/New_York"
   }
 }
