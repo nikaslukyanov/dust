@@ -1,0 +1,6 @@
+# Keep raw console whitespace intact and collapse generated evidence in GitHub diffs.
+*.log linguist-generated=true -whitespace
+*.json linguist-generated=true
+*.jsonl linguist-generated=true
+*.txt linguist-generated=true
+nvidia-smi.txt -whitespace

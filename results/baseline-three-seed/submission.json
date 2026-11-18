@@ -1,0 +1,13 @@
+{
+  "setup_job": 13991786,
+  "gpu_jobs": {
+    "42": 13991787,
+    "43": 13991788,
+    "44": 13991789
+  },
+  "wandb_mode": "offline",
+  "command": "WANDB_MODE=offline bash scripts/launch_baseline.sh --seeds '42 43 44' --order alternate --wandb dust-hpml",
+  "branch": "patrick-next-steps",
+  "audit_job": 13992283,
+  "audit_source_commit": "615f65a31735b69b76886a0acc82851ee1ee8b60"
+}
