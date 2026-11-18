@@ -23,6 +23,13 @@ front-loaded allocation the suffix saving is real but bounded -- the counter tel
 
 FLOP conventions: one multiply-add = 2 FLOPs; matmuls dominate, so norm / rotary / softmax /
 elementwise are ignored as lower order. Numbers are estimates for comparison, not profiler truth.
+
+Attention is counted two ways (``count``), because model.attention passes an explicit mask to SDPA:
+- ``'needed'`` (default; the compute axis for comparisons): only the keys a query may see, causal and
+  inside its window. What any implementation must spend.
+- ``'executed'``: what today's dense masked kernel actually runs, every query against all T keys.
+  Equals the FLOPs FlopCounterMode sees (test_accounting) and the roofline's attention ops.
+Projections, MLP and head are the same in both. analytic_cost reports both totals.
 """
 from dataclasses import dataclass, field, asdict
 
@@ -45,23 +52,37 @@ def _padded_vocab(config, pad_to=64):
     return (config.vocab_size + pad_to - 1) // pad_to * pad_to
 
 
-def attention_flops(tokens, window, config):
+COUNTS = ('needed', 'executed')
+
+
+def _keys_per_sequence(window, sequence_len, count):
+    """Query-key pairs one sequence scores: model.attention lets position s see keys s - window .. s."""
+    if count == 'executed':
+        return sequence_len * sequence_len               # dense masked kernel: every key, masked or not
+    if count == 'needed':
+        w = min(window, sequence_len - 1)                # sum over s of min(s, window) + 1
+        return (w + 1) * (w + 2) // 2 + (sequence_len - 1 - w) * (w + 1)
+    raise ValueError(f'count must be one of {COUNTS}')
+
+
+def attention_flops(tokens, window, config, count='needed'):
     """The two attention matmuls (scores and value mix) for one block, over ``tokens`` query tokens.
 
-    Each query attends min(window + 1, sequence_len) keys; 2 matmuls, 2 FLOPs per multiply-add.
+    ``tokens`` is a whole number of sequences. ``count``: 'needed' (causal + window keys) or
+    'executed' (all T keys, as the dense masked kernel runs). 2 matmuls, 2 FLOPs per multiply-add.
     """
     head_dim = config.n_embd // config.n_head
-    keys = min(window + 1, config.sequence_len)
-    return 4 * tokens * keys * head_dim * config.n_head
+    pairs = tokens // config.sequence_len * _keys_per_sequence(window, config.sequence_len, count)
+    return 4 * pairs * head_dim * config.n_head
 
 
-def block_flops(tokens, window, config):
+def block_flops(tokens, window, config, count='needed'):
     """One transformer block's forward FLOPs over ``tokens`` tokens: q/k/v/out projections, MLP, attention."""
     n = config.n_embd
     kv = config.n_kv_head * (config.n_embd // config.n_head)
     projections = 2 * tokens * n * (2 * n + 2 * kv)          # c_q, c_proj (n->n) and c_k, c_v (n->kv)
     mlp = 2 * tokens * (n * 4 * n + 4 * n * n)               # c_fc and squared-ReLU c_proj
-    return projections + mlp + attention_flops(tokens, window, config)
+    return projections + mlp + attention_flops(tokens, window, config, count)
 
 
 def head_flops(tokens, config):
@@ -83,6 +104,8 @@ class CostRecord:
     forward_equivalents: float        # flops_total / flops_clean_forward
     forward_equivalents_per_gpu: float
     direct_forwards: int = 0          # forward evaluations by direct draws (shared multiplexed passes once)
+    count: str = 'needed'             # attention FLOP convention of flops_* above (see module docstring)
+    flops_total_executed: float = 0.0  # flops_total under count='executed': what the dense kernel runs
     note: str = (
         'forward_equivalents = update FLOPs / one clean forward. population_K excludes head, '
         'attention-internal and scalar draws. Every direct draw pays a full head recompute, which '
@@ -95,8 +118,11 @@ class CostRecord:
         return asdict(self)
 
 
-def analytic_cost(recipe, config, world=1, batch=8, suffix=True, multiplex=False):
+def analytic_cost(recipe, config, world=1, batch=8, suffix=True, multiplex=False, count='needed'):
     """Expected FLOPs and forward-equivalents of one DUST.estimate update, from the Recipe alone.
+
+    ``count`` picks the attention convention of every FLOP field ('needed' or 'executed', module
+    docstring); ``flops_total_executed`` always holds the executed total as well.
 
     ``suffix``: True models cached-suffix execution (a direct draw at block L reruns blocks L..end);
     False models the public code's full replay (every direct draw reruns the whole stack). The ratio
@@ -110,9 +136,11 @@ def analytic_cost(recipe, config, world=1, batch=8, suffix=True, multiplex=False
     Costs are population-wide (summed over GPUs). forward_equivalents_per_gpu divides the parallel
     draw work by ``world`` (the clean forward runs once per GPU, so it is not divided).
     """
+    if count not in COUNTS:
+        raise ValueError(f'count must be one of {COUNTS}')
     tokens = batch * config.sequence_len
     windows = window_sizes(config)
-    blocks = [block_flops(tokens, w, config) for w in windows]
+    blocks = [block_flops(tokens, w, config, count) for w in windows]
     suffix_flops = [sum(blocks[start:]) for start in range(config.n_layer + 1)]  # blocks start..end
     head_full = head_flops(tokens, config)
     clean_forward = sum(blocks) + head_full
@@ -122,10 +150,10 @@ def analytic_cost(recipe, config, world=1, batch=8, suffix=True, multiplex=False
     def direct_group(group):
         total_draws, total_flops = 0, 0.0
         for layer in range(config.n_layer):
-            count = group_draw_count(recipe, group, layer)
+            draws_here = group_draw_count(recipe, group, layer)
             start = suffix_start_block(f'o@{layer}', config.n_layer) if suffix else 0
-            total_draws += count
-            total_flops += count * (suffix_flops[start] + head_full)  # blocks reran + full head/CE
+            total_draws += draws_here
+            total_flops += draws_here * (suffix_flops[start] + head_full)  # blocks reran + full head/CE
         return total_draws, total_flops
 
     for group in ('writers', 'hidden', 'hubs'):
@@ -155,9 +183,9 @@ def analytic_cost(recipe, config, world=1, batch=8, suffix=True, multiplex=False
         for layer in range(config.n_layer):
             if group in ('gate', 've') and not _has_ve(layer, config.n_layer):
                 continue
-            count = group_draw_count(recipe, group, layer)
-            total_draws += count
-            total_flops += count * attention_flops(tokens, windows[layer], config)
+            draws_here = group_draw_count(recipe, group, layer)
+            total_draws += draws_here
+            total_flops += draws_here * attention_flops(tokens, windows[layer], config, count)
         draws[group], flops_per_group[group] = total_draws, total_flops
 
     # Residual scalars: 8 two-sided draws = 16 full forwards (scalar_gradients reruns the whole model).
@@ -175,7 +203,10 @@ def analytic_cost(recipe, config, world=1, batch=8, suffix=True, multiplex=False
         flops_total=total_flops, flops_per_group=flops_per_group, flops_clean_forward=clean_forward,
         forward_equivalents=total_flops / clean_forward,
         forward_equivalents_per_gpu=clean_forward / clean_forward + parallel_flops / world / clean_forward,
-        direct_forwards=direct_forwards,
+        direct_forwards=direct_forwards, count=count,
+        flops_total_executed=(total_flops if count == 'executed' else analytic_cost(
+            recipe, config, world=world, batch=batch, suffix=suffix, multiplex=multiplex,
+            count='executed').flops_total),
     )
 
 
@@ -217,7 +248,7 @@ def analytic_memory(recipe, config, batch=8, activation_bytes=2):
     return dict(
         mlp_hidden_bytes=hidden, residual_bytes=residual, accumulator_bytes=accumulator,
         params_bytes=params, grad_bytes=params, optimizer_bytes=params,
-        peak_estimate_gb=peak / 1024 ** 3,
+        peak_estimate_gib=peak / 1024 ** 3,
         note='rough; no autograd activations (no_grad). nrep*batch*seqlen through 4*n_embd dominates '
              'the transient, so population/nrep, not the model, sets peak memory.',
     )
@@ -237,12 +268,18 @@ def _has_ve(layer_idx, n_layer):
 # moves when you double the batch, the step is launch-bound and the FLOP model will not predict it.
 
 def _percentile(values, q):
-    """Nearest-rank percentile of a list (q in [0, 100]); 0.0 for an empty list."""
+    """Linearly interpolated percentile (q in [0, 100]; numpy's default); 0.0 for an empty list.
+
+    The 50th percentile is the conventional median (``statistics.median``), the one convention used by
+    ``compare_runs`` and ``scripts/check_baseline_results.py`` as well.
+    """
     ordered = sorted(values)
     if not ordered:
         return 0.0
-    index = min(len(ordered) - 1, max(0, round(q / 100 * (len(ordered) - 1))))
-    return ordered[index]
+    position = min(len(ordered) - 1, max(0.0, q / 100 * (len(ordered) - 1)))
+    low = int(position)
+    high = min(low + 1, len(ordered) - 1)
+    return ordered[low] + (ordered[high] - ordered[low]) * (position - low)
 
 
 @dataclass
@@ -290,7 +327,7 @@ class RunMeters:
             'likely_launch_bound': launch_bound,
             'wall_seconds': wall,
             'gpu_hours': wall * world / 3600,
-            'peak_memory_gb': self.peak_memory_bytes / 1024 ** 3,
+            'peak_memory_gib': self.peak_memory_bytes / 1024 ** 3,
             'scope': 'step only; excludes data load and host->device copy unless inside the measured block',
         }
 

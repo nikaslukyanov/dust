@@ -8,12 +8,14 @@ What analytic_cost covers and how it is checked:
 - clean pass, direct draws (writers, hidden, hubs, embedding) and the 16 scalar forwards: exactly,
   against the FLOPs FlopCounterMode attributes to the transformer blocks and lm_head;
 - head slab and attention-internal draws: not model-module matmuls, so checked by formula only.
-Sliding-window blocks are the one known gap: accounting counts the keys inside each window, but
-model.attention computes the masked dense scores, so the executed count is higher (pinned below).
+Attention is counted 'needed' (causal + window keys) and 'executed' (all keys, as the dense masked
+kernel runs). The executed count must equal FlopCounterMode exactly on full and sliding windows; the
+needed count is checked against a brute-force count of the mask.
 
 Run: python -m pytest new_implementation/test_accounting.py
 """
 import re
+import statistics
 import sys
 import time
 from pathlib import Path
@@ -91,31 +93,48 @@ def test_matmul_attention_is_the_model_attention():
         assert torch.allclose(matmul_attention(q, k, v, window), model_module.attention(q, k, v, window), atol=1e-5)
 
 
+@pytest.mark.parametrize('config', [FULL_WINDOWS, SLIDING], ids=['full-windows', 'sliding'])
 @pytest.mark.parametrize('suffix', [True, False], ids=['cached-suffix', 'full-replay'])
-def test_forward_flops_match_a_real_estimate(counted_attention, suffix):
+def test_executed_flops_match_a_real_estimate(counted_attention, suffix, config):
     settings = tiny_recipe()
-    cost = acc.analytic_cost(settings, FULL_WINDOWS, batch=2, suffix=suffix)
-    assert executed_forward_flops(FULL_WINDOWS, settings, suffix) == predicted_forward_flops(cost)
+    cost = acc.analytic_cost(settings, config, batch=2, suffix=suffix, count='executed')
+    assert executed_forward_flops(config, settings, suffix) == predicted_forward_flops(cost)
 
 
 def test_wrong_suffix_mode_is_caught(counted_attention):
     """Negative control: the cached-suffix prediction must not match a full-replay run."""
     settings = tiny_recipe()
-    cached = acc.analytic_cost(settings, FULL_WINDOWS, batch=2, suffix=True)
+    cached = acc.analytic_cost(settings, FULL_WINDOWS, batch=2, suffix=True, count='executed')
     assert executed_forward_flops(FULL_WINDOWS, settings, suffix=False) != predicted_forward_flops(cached)
 
 
-def test_sliding_windows_are_counted_as_windowed(counted_attention):
-    """Known convention gap: the masked dense kernel executes every key, accounting counts only the window.
+@pytest.mark.parametrize('window', [0, 1, 7, 31, 63, 64, 1000])
+def test_needed_keys_match_the_model_mask(window):
+    """'needed' counts exactly the query-key pairs model.attention's mask allows; 'executed' all of them."""
+    T = 64
+    positions = torch.arange(T)
+    distance = positions[:, None] - positions[None, :]
+    allowed = int(((distance >= 0) & (distance <= window)).sum())
+    assert acc._keys_per_sequence(window, T, 'needed') == allowed
+    assert acc._keys_per_sequence(window, T, 'executed') == T * T
+    config = GPTConfig(sequence_len=T, n_layer=1, n_head=4, n_kv_head=4, n_embd=64)
+    assert acc.attention_flops(3 * T, window, config) == 4 * 3 * allowed * 64  # 3 sequences, head_dim*heads = 64
+    with pytest.raises(ValueError):
+        acc.attention_flops(T, window, config, count='hybrid')
 
-    Pinned so a change to either side is noticed. The difference is exactly the out-of-window keys of the
-    short-window blocks, over every forward that runs them.
-    """
+
+def test_needed_is_below_executed_and_both_totals_are_reported():
     settings = tiny_recipe()
-    cost = acc.analytic_cost(settings, SLIDING, batch=2, suffix=True)
-    executed = executed_forward_flops(SLIDING, settings, suffix=True)
-    dense = acc.analytic_cost(settings, FULL_WINDOWS, batch=2, suffix=True)
-    assert predicted_forward_flops(cost) < executed == predicted_forward_flops(dense)
+    needed = acc.analytic_cost(settings, SLIDING, batch=2)
+    executed = acc.analytic_cost(settings, SLIDING, batch=2, count='executed')
+    assert needed.count == 'needed' and executed.count == 'executed'
+    assert needed.flops_total < executed.flops_total
+    assert needed.flops_total_executed == executed.flops_total == executed.flops_total_executed
+    # Projections, MLP and head do not depend on the convention: only attention differs.
+    for group in ('head', 'scalars'):
+        assert needed.flops_per_group[group] <= executed.flops_per_group[group]
+    with pytest.raises(ValueError):
+        acc.analytic_cost(settings, SLIDING, count='hybrid')
 
 
 def test_suffix_saving_and_draw_bookkeeping():
@@ -180,12 +199,15 @@ def test_memory_estimate_scales_with_the_draw_chunk():
     small, large = acc.analytic_memory(recipe('1M', 256), config), acc.analytic_memory(recipe('1M', 16384), config)
     assert large['mlp_hidden_bytes'] == 8 * small['mlp_hidden_bytes']  # nrep 16 vs 2
     assert large['params_bytes'] == small['params_bytes']
-    assert 0 < small['peak_estimate_gb'] < large['peak_estimate_gb']
+    assert 0 < small['peak_estimate_gib'] < large['peak_estimate_gib']
 
 
-def test_percentile_is_nearest_rank():
+def test_percentile_interpolates_and_its_median_is_the_conventional_one():
     values = list(range(11, 0, -1))  # unsorted on purpose
     assert [acc._percentile(values, q) for q in (0, 10, 50, 90, 100)] == [1, 2, 6, 10, 11]
+    assert acc._percentile([4, 1, 3, 2], 50) == statistics.median([4, 1, 3, 2]) == 2.5
+    assert acc._percentile([1, 2, 3, 4], 10) == pytest.approx(1.3)
+    assert acc._percentile([7], 90) == 7
     assert acc._percentile([], 50) == 0.0
 
 

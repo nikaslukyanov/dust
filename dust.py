@@ -821,7 +821,7 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
         best_state = snapshot(model) if rank == 0 else None
         save_best()
         history = [dict(step=0, val_loss=best)]
-        write(dict(step=0, val_loss=best, flops=0.0, forward_equivalents=0.0, draws=0,
+        write(dict(step=0, val_loss=best, flops=0.0, flops_executed=0.0, forward_equivalents=0.0, draws=0,
                    train_seconds=0.0, gpu_hours=0.0))
 
     if probe_interval:

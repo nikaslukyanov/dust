@@ -8,15 +8,26 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --gres=gpu:1
-#SBATCH --constraint=h100|l40s|l40|A6000
+#SBATCH --constraint=l40s
 #SBATCH --time=10:00:00
 #SBATCH --no-requeue
-#SBATCH --mail-user=pts2125@columbia.edu
-#SBATCH --mail-type=END,FAIL
+# Submit through scripts/launch_baseline.sh, not by hand. Every run is pinned to one GPU model (L40S)
+# so step times from different jobs are comparable; the environment stage also refuses any other GPU.
+#
+# Arguments: REPO BATCH SEED ORDER
+#   BATCH  launcher's batch folder (holds source/ and environment.ready); this job writes BATCH/seed-SEED
+#   ORDER  full-first | suffix-first: which execution mode runs first on the GPU
+# Environment (optional): WANDB_PROJECT, WANDB_ENTITY (log every run to W&B), RUN_BACKPROP=0 (skip the
+#   backprop reference), plus anything wandb itself reads (WANDB_MODE=offline if nodes lack internet).
 
 set -euo pipefail
 repo=$1
-experiment=$2
+batch=$2
+seed=$3
+order=$4
+experiment="$batch/seed-$seed"
+mkdir -p "$experiment"
+case "$order" in full-first|suffix-first) ;; *) echo "ORDER must be full-first or suffix-first" >&2; exit 2 ;; esac
 stage=starting
 finish() {
     result=$?
@@ -27,7 +38,7 @@ finish() {
 }
 trap finish EXIT
 
-test -f "$experiment/environment.ready"
+test -f "$batch/environment.ready"
 module load anaconda/2023.09
 unset PYTHONPATH
 export PYTHONNOUSERSITE=1
@@ -40,7 +51,12 @@ scratch=$(mktemp -d "/tmp/dust-baseline-${SLURM_JOB_ID}-XXXXXX")
 export HF_HOME="$scratch/hf-cache"
 export HF_HUB_OFFLINE=1
 export HF_DATASETS_OFFLINE=1
-cd "$experiment/source"
+cd "$batch/source"
+wandb_args=()
+if [ -n "${WANDB_PROJECT:-}" ]; then
+    wandb_args=(--wandb "$WANDB_PROJECT" --wandb-group "$(basename "$batch")" --wandb-tags 1M K256 "seed$seed")
+    if [ -n "${WANDB_ENTITY:-}" ]; then wandb_args+=(--wandb-entity "$WANDB_ENTITY"); fi
+fi
 
 stage=environment
 date --iso-8601=seconds
@@ -51,6 +67,7 @@ import json, platform, torch
 assert torch.cuda.is_available(), 'CUDA is unavailable'
 assert torch.cuda.device_count() == 1, 'Expected exactly one allocated GPU'
 assert torch.cuda.is_bf16_supported(), 'GPU must support bfloat16'
+assert 'L40S' in torch.cuda.get_device_name(0), f'Expected an L40S, got {torch.cuda.get_device_name(0)}'
 assert torch.__version__.startswith('2.10.0') and torch.version.cuda == '12.8'
 device = torch.cuda.get_device_properties(0)
 x = torch.randn(64, 64, device='cuda', dtype=torch.bfloat16)
@@ -93,20 +110,33 @@ for name, item in checks.items():
         print(f'Preflight warning retained in report: {name}: {item}')
 PY
 
-stage=full_replay
-"$python_bin" -u dust.py --device cuda --tokens 1M --population 256 --seed 42 \
-    --full-replay --probe-interval 10 --checkpoint-interval 10 \
-    --data-dir "$scratch/data" --output "$experiment/full-replay" \
-    2>&1 | tee "$experiment/full-replay.log"
+run_dust() {  # $1 = full-replay | cached-suffix
+    local mode=$1 extra=()
+    if [ "$mode" = full-replay ]; then extra=(--full-replay); fi
+    if [ ${#wandb_args[@]} -gt 0 ]; then extra+=("${wandb_args[@]}" --wandb-name "$mode-s$seed"); fi
+    stage=${mode//-/_}
+    "$python_bin" -u dust.py --device cuda --tokens 1M --population 256 --seed "$seed" \
+        --probe-interval 10 --checkpoint-interval 10 ${extra[@]+"${extra[@]}"} \
+        --data-dir "$scratch/data" --output "$experiment/$mode" \
+        2>&1 | tee "$experiment/$mode.log"
+}
+if [ "$order" = full-first ]; then
+    run_dust full-replay; run_dust cached-suffix
+else
+    run_dust cached-suffix; run_dust full-replay
+fi
 
-stage=cached_suffix
-"$python_bin" -u dust.py --device cuda --tokens 1M --population 256 --seed 42 \
-    --probe-interval 10 --checkpoint-interval 10 \
-    --data-dir "$scratch/data" --output "$experiment/cached-suffix" \
-    2>&1 | tee "$experiment/cached-suffix.log"
+if [ "${RUN_BACKPROP:-1}" != 0 ]; then
+    stage=backprop
+    extra=()
+    if [ ${#wandb_args[@]} -gt 0 ]; then extra=("${wandb_args[@]}" --wandb-name "backprop-s$seed"); fi
+    "$python_bin" -u baselines/backprop.py --device cuda --tokens 1M --seed "$seed" ${extra[@]+"${extra[@]}"} \
+        --data-dir "$scratch/data" --output "$experiment/backprop" \
+        2>&1 | tee "$experiment/backprop.log"
+fi
 
 stage=comparison
-"$python_bin" "$experiment/check_baseline_results.py" "$experiment" | tee "$experiment/summary.log"
+"$python_bin" scripts/check_baseline_results.py "$experiment" --seed "$seed" | tee "$experiment/summary.log"
 "$python_bin" new_implementation/compare_runs.py \
     "$experiment/full-replay" "$experiment/cached-suffix" | tee "$experiment/comparison.txt"
 stage=completed

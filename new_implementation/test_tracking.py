@@ -26,7 +26,8 @@ from tracking import ID_FILE, flatten  # noqa: E402
 
 CPU = torch.device('cpu')
 DATA = toy_data(steps=24)
-TIMING = {'train_seconds', 'gpu_hours', 'elapsed_seconds', 'step_host_ms', 'step_gpu_ms', 'peak_memory_gb'}
+TIMING = {'train_seconds', 'gpu_hours', 'elapsed_seconds', 'step_host_ms', 'step_gpu_ms', 'peak_memory_gib',
+          'phase_seconds'}
 
 
 class FakeWandb(types.ModuleType):

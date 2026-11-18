@@ -254,8 +254,8 @@ def test_accounting_matches_the_flops_a_multiplexed_estimate_runs(monkeypatch, s
     blocks = sum(v for k, v in counts.items() if re.fullmatch(r'GPT\.transformer\.h\.\d+|GPT\.lm_head', k))
     executed = blocks - sum(v for k, v in counts.items() if k.endswith('.ve_gate'))
 
-    shared = analytic_cost(coded_recipe(), config, batch=2, suffix=suffix, multiplex=True)
-    separate = analytic_cost(coded_recipe(), config, batch=2, suffix=suffix)
+    shared = analytic_cost(coded_recipe(), config, batch=2, suffix=suffix, multiplex=True, count='executed')
+    separate = analytic_cost(coded_recipe(), config, batch=2, suffix=suffix, count='executed')
     assert executed == accounting_checks.predicted_forward_flops(shared)
     assert executed < accounting_checks.predicted_forward_flops(separate), 'negative control'
     # Both groups' draws still count; only the forward evaluations are shared.

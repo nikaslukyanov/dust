@@ -8,6 +8,7 @@ comparison both runs consume the same noise, so their loss curves should agree u
 step-time percentiles (result.json's timing).
 """
 import json
+import statistics
 import sys
 from pathlib import Path
 
@@ -23,8 +24,13 @@ def load(folder):
 
 
 def median(values):
-    ordered = sorted(values)
-    return ordered[len(ordered) // 2] if ordered else float('nan')
+    """Conventional median (mean of the two middle values for an even count), as everywhere else."""
+    return statistics.median(values) if values else float('nan')
+
+
+def peak_memory_gib(record):
+    """Runs before 2026-11-18 named the field ``peak_memory_gb``; it was always GiB."""
+    return record.get('peak_memory_gib', record.get('peak_memory_gb', float('nan')))
 
 
 def summarize(run, warmup=3):
@@ -38,11 +44,12 @@ def summarize(run, warmup=3):
         'test at best val': result.get('test_at_best_val', float('nan')),
         'final train loss': last['train_loss'],
         'forward-equivalents / step': last['forward_equivalents'] / last['step'],
-        'FLOPs / step': last['flops'] / last['step'],
+        'FLOPs / step': last['flops'] / last['step'],  # attention 'needed'; pre-2026-11-18 runs: hybrid count
+        'FLOPs executed / step': last.get('flops_executed', float('nan')) / last['step'],
         'step host ms (median)': median([r['step_host_ms'] for r in kept]),
         'step gpu ms (median)': median([r['step_gpu_ms'] for r in kept if 'step_gpu_ms' in r]),
         'train seconds': last['train_seconds'],
-        'peak memory GB': last.get('peak_memory_gb', float('nan')),
+        'peak memory GiB': peak_memory_gib(last),
     }
     for phase in PHASES:
         row[f'  {phase} s (median)'] = median([r['phase_seconds'][phase] for r in kept if 'phase_seconds' in r])

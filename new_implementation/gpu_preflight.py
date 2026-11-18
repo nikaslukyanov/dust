@@ -20,7 +20,8 @@ Checks, each reported as PASS / WARN / FAIL (a failed check does not stop the ot
                  after step 1 and resumed. Checks the records carry every diagnostic and that the
                  resumed run ends at the same weights (the CUDA generator restore).
 6. launch-bound  (--launch-bound) the double-batch test: is the step GPU-bound, i.e. will a FLOP
-                 saving show up in wall-clock at all.
+                 saving show up in wall-clock at all. PASS only for verdict `gpu-bound`; `mixed` or
+                 `launch-bound` is a WARN (FLOP savings will not fully show in step time).
 
 Writes OUTPUT/preflight.json. Exit code 1 if any check FAILs. Single GPU only: the multi-GPU paths
 (per-rank checkpoints, all_reduce) are not covered.
@@ -46,9 +47,9 @@ from model import GPTConfig  # noqa: E402
 from profiling import launch_bound_test  # noqa: E402
 from run_metrics import gradient_probe  # noqa: E402
 
-RECORD_KEYS = ('train_loss', 'flops', 'forward_equivalents', 'draws', 'population', 'direct_forwards',
+RECORD_KEYS = ('train_loss', 'flops', 'flops_executed', 'forward_equivalents', 'draws', 'population', 'direct_forwards',
                'train_seconds', 'gpu_hours', 'elapsed_seconds', 'step_host_ms', 'phase_seconds', 'probe')
-CUDA_RECORD_KEYS = ('step_gpu_ms', 'peak_memory_gb')
+CUDA_RECORD_KEYS = ('step_gpu_ms', 'peak_memory_gib')
 PHASES = ('clean', 'direct', 'embedding', 'hubs', 'head', 'local', 'scalars')
 
 
@@ -57,7 +58,7 @@ def sync(device):
         torch.cuda.synchronize(device)
 
 
-def peak_gb(device):
+def peak_gib(device):
     return torch.cuda.max_memory_allocated(device) / 1024 ** 3 if device.type == 'cuda' else None
 
 
@@ -71,7 +72,7 @@ def check_environment(device, paths):
     status, notes = 'PASS', []
     if device.type == 'cuda':
         properties = torch.cuda.get_device_properties(device)
-        info.update(gpu=properties.name, gpu_memory_gb=properties.total_memory / 1024 ** 3,
+        info.update(gpu=properties.name, gpu_memory_gib=properties.total_memory / 1024 ** 3,
                     gpus_visible=torch.cuda.device_count(), cuda=torch.version.cuda,
                     bf16=torch.cuda.is_bf16_supported())
         if not info['bf16']:
@@ -137,11 +138,11 @@ def check_timing(model, settings, config, x, y, repeats, warmup=1):
                 phases.append(estimator.phase_seconds)
         finally:
             estimator.close()
-        cost = analytic_cost(settings, config, batch=len(x), suffix=suffix)
+        cost = analytic_cost(settings, config, batch=len(x), suffix=suffix, count='executed')  # vs time: what runs
         result[mode] = dict(
             estimate_seconds_median=_percentile(seconds[warmup:], 50), estimate_seconds=seconds[warmup:],
             phase_seconds_median={p: _percentile([s[p] for s in phases[warmup:]], 50) for p in PHASES},
-            peak_memory_gb=peak_gb(device), forward_equivalents=cost.forward_equivalents,
+            peak_memory_gib=peak_gib(device), forward_equivalents=cost.forward_equivalents,
             flops=cost.flops_total,
         )
     full, cached = result['full_replay'], result['cached_suffix']
@@ -174,7 +175,7 @@ def check_probe(model, settings, x, y):
     finite = all(c == c for c in cosines.values())
     status = 'PASS' if restored and untouched and frozen and finite else 'FAIL'
     return status, dict(
-        seconds=seconds, peak_memory_gb=peak_gb(device), mean_group_cosine=probe['mean_group_cosine'],
+        seconds=seconds, peak_memory_gib=peak_gib(device), mean_group_cosine=probe['mean_group_cosine'],
         cosine_to_backprop=cosines, rel_norm={g: m['rel_norm'] for g, m in probe['per_group'].items()},
         generator_restored=restored, weights_untouched=untouched, model_left_frozen=frozen,
         note='cosine_to_backprop at init on one batch; compare the ordering with the paper (head highest).',
@@ -223,7 +224,13 @@ def check_launch_bound(model, settings, x, y, repeats=3, warmup=1):
             estimator.close()
 
     doubled = (torch.cat([x, x]), torch.cat([y, y]))
-    return 'PASS', launch_bound_test(run, (x, y), doubled, repeats=repeats, warmup=warmup)
+    report = launch_bound_test(run, (x, y), doubled, repeats=repeats, warmup=warmup)
+    return launch_bound_status(report['verdict']), report
+
+
+def launch_bound_status(verdict):
+    """The check passes only when FLOP savings will show up in wall-clock: a GPU-bound step."""
+    return 'PASS' if verdict == 'gpu-bound' else 'WARN'
 
 
 def main():
@@ -307,6 +314,9 @@ def main():
         print(f"\n  estimate: full replay {full['estimate_seconds_median']:.2f}s, cached suffix "
               f"{cached['estimate_seconds_median']:.2f}s -> {100 * timing['measured_time_saving']:.1f}% faster "
               f"(FLOP model predicts {100 * timing['predicted_flop_saving']:.1f}%)")
+    bound = report['checks'].get('launch-bound', {})
+    if 'verdict' in bound:
+        print(f"  launch-bound test: 2x batch -> {bound['ratio']:.2f}x step time, verdict {bound['verdict']}")
     print(f"  report: {args.output / 'preflight.json'}")
     sys.exit(1 if any(c['status'] == 'FAIL' for c in report['checks'].values()) else 0)
 

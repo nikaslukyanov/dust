@@ -9,8 +9,7 @@
 #SBATCH --mem=16G
 #SBATCH --time=02:00:00
 #SBATCH --no-requeue
-#SBATCH --mail-user=pts2125@columbia.edu
-#SBATCH --mail-type=FAIL
+# Submitted by scripts/launch_baseline.sh. Arguments: REPO BATCH (the launcher's batch folder).
 
 set -euo pipefail
 repo=$1
