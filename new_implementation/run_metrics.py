@@ -5,15 +5,17 @@ what the update cost and how long it took, cumulatively, so held-out loss can be
 
 - ``flops`` / ``forward_equivalents``: cumulative analytic cost from accounting.analytic_cost (DUST) or
   3x a forward (backprop), summed over GPUs. Recomputed from the live Recipe every step, so a run whose
-  allocation changes (adaptive allocation) is charged what it actually ran. Attention FLOPs follow
-  accounting's current convention (see TODO.md, "FLOP convention").
+  allocation changes (adaptive allocation) is charged what it actually ran. ``flops`` counts attention
+  as *needed* (causal + window keys, the comparison axis); ``flops_executed`` as the dense masked kernel
+  runs it (all keys). See accounting's docstring. Runs before 2026-11-18 logged one hybrid count as
+  ``flops`` and no ``flops_executed``.
 - ``draws`` (cumulative perturbations, every group), ``population`` (the per-update K) and, for DUST,
   ``direct_forwards`` (the per-update forward evaluations by direct draws; fewer than the direct draws
   when groups share multiplexed passes).
 - ``train_seconds`` / ``gpu_hours``: training-step time only. Evaluation, gradient probes and checkpoint
   writes are timed separately and excluded, so loss-vs-wall-clock does not charge a method for how often
   it was evaluated. ``elapsed_seconds`` is the honest total wall clock, everything included.
-- ``step_host_ms`` (and ``step_gpu_ms`` + ``peak_memory_gb`` on CUDA) from accounting.measure.
+- ``step_host_ms`` (and ``step_gpu_ms`` + ``peak_memory_gib`` on CUDA) from accounting.measure.
 - ``allocation``: the per-group draw counts, written on the first step and whenever they change.
 
 ``gradient_probe`` scores the estimate against backprop on a fixed held-out batch (gradient_check) without
@@ -39,19 +41,22 @@ def allocation(settings):
 def dust_update_cost(settings, config, world=1, batch=8, suffix=True, multiplex=False):
     """Cost of one DUST update from the Recipe, population-wide (all GPUs)."""
     cost = analytic_cost(settings, config, world=world, batch=batch, suffix=suffix, multiplex=multiplex)
-    return dict(flops=cost.flops_total, forward_equivalents=cost.forward_equivalents,
+    return dict(flops=cost.flops_total, flops_executed=cost.flops_total_executed,
+                forward_equivalents=cost.forward_equivalents,
                 draws=cost.total_draws, population=cost.population_K, direct_forwards=cost.direct_forwards)
 
 
-def forward_flops(config, batch=8):
-    """One clean forward over ``batch`` sequences, in accounting's conventions."""
+def forward_flops(config, batch=8, count='needed'):
+    """One clean forward over ``batch`` sequences, in accounting's conventions ('needed' or 'executed')."""
     tokens = batch * config.sequence_len
-    return sum(block_flops(tokens, w, config) for w in window_sizes(config)) + head_flops(tokens, config)
+    return (sum(block_flops(tokens, w, config, count) for w in window_sizes(config))
+            + head_flops(tokens, config))
 
 
 def backprop_update_cost(config, batch=8):
     """One backprop update: forward + backward, the backward counted as 2 forwards (the standard 3x)."""
-    return dict(flops=3 * forward_flops(config, batch), forward_equivalents=3.0, draws=0, population=0)
+    return dict(flops=3 * forward_flops(config, batch), flops_executed=3 * forward_flops(config, batch, 'executed'),
+                forward_equivalents=3.0, draws=0, population=0)
 
 
 class TrainingLog:
@@ -64,7 +69,7 @@ class TrainingLog:
     def __init__(self, update_cost, world=1, warmup=3):
         self.update_cost, self.world = update_cost, world
         self.meters = RunMeters(warmup=warmup)
-        self.totals = dict(flops=0.0, forward_equivalents=0.0, draws=0, train_seconds=0.0,
+        self.totals = dict(flops=0.0, flops_executed=0.0, forward_equivalents=0.0, draws=0, train_seconds=0.0,
                            eval_seconds=0.0, probe_seconds=0.0, checkpoint_seconds=0.0,
                            allocation_seconds=0.0)  # allocation: inside train_seconds, not on top of it
         self.elapsed_before = 0.0          # wall clock of earlier processes of a resumed run
@@ -105,12 +110,14 @@ class TrainingLog:
         cost = self._cost(settings)
         host_ms = self.meters.step_host_ms[-1]
         self.totals['flops'] += cost['flops']
+        self.totals['flops_executed'] += cost['flops_executed']
         self.totals['forward_equivalents'] += cost['forward_equivalents']
         self.totals['draws'] += cost['draws']
         self.totals['train_seconds'] += host_ms / 1000
         record = dict(
             step=step, train_loss=train_loss,
-            flops=self.totals['flops'], forward_equivalents=self.totals['forward_equivalents'],
+            flops=self.totals['flops'], flops_executed=self.totals['flops_executed'],
+            forward_equivalents=self.totals['forward_equivalents'],
             draws=self.totals['draws'], population=cost['population'],
             train_seconds=self.totals['train_seconds'],
             gpu_hours=self.totals['train_seconds'] * self.world / 3600,
@@ -120,7 +127,7 @@ class TrainingLog:
             record['direct_forwards'] = cost['direct_forwards']
         if self.meters.step_gpu_ms:
             record['step_gpu_ms'] = self.meters.step_gpu_ms[-1]
-            record['peak_memory_gb'] = self.meters.peak_memory_bytes / 1024 ** 3
+            record['peak_memory_gib'] = self.meters.peak_memory_bytes / 1024 ** 3
         if settings is not None:
             current = allocation(settings)
             if current != self.last_allocation:
@@ -156,20 +163,32 @@ def gradient_probe(estimator, x, y, seeds=(0,), sync=False, precision='fp32', ch
     training run continues exactly as if the probe had not run. Costs one backprop pass plus one
     DUST estimate per seed. The reference is backpropagated ``chunk`` sequences at a time (1 by
     default), so the probe's memory stays near the training step's instead of a full-batch backward's.
+
+    On CUDA the result also has ``peak_memory_gib``: the probe's own peak allocation. The step's
+    ``peak_memory_gib`` cannot show it, because every measured step resets the peak counter.
     """
     import gradient_check as gc  # lazy: gradient_check imports dust, which imports this module
 
+    cuda = x.is_cuda
+    if cuda:
+        torch.cuda.synchronize(x.device)
+        torch.cuda.reset_peak_memory_stats(x.device)
     state = estimator.generator.get_state()
     try:
         reference, _ = gc.reference_gradients(estimator.model, x, y, precision=precision, chunk=chunk)
         if len(seeds) == 1:
             estimate, _ = gc.estimate_gradients(estimator, x, y, seed=seeds[0], sync=sync)
             report = gc.compare(reference, estimate)
-            return dict(**report['overall'], per_group={
+            result = dict(**report['overall'], per_group={
                 g: dict(cosine=m['cosine'], rel_norm=m['rel_norm']) for g, m in report['per_group'].items()})
-        stats = gc.estimate_statistics(estimator, x, y, seeds, reference=reference, sync=sync)
-        cosines = [m['cosine_mean'] for m in stats.values()]
-        return dict(mean_group_cosine=sum(cosines) / len(cosines), min_group_cosine=min(cosines),
-                    seeds=len(seeds), per_group=stats)
+        else:
+            stats = gc.estimate_statistics(estimator, x, y, seeds, reference=reference, sync=sync)
+            cosines = [m['cosine_mean'] for m in stats.values()]
+            result = dict(mean_group_cosine=sum(cosines) / len(cosines), min_group_cosine=min(cosines),
+                          seeds=len(seeds), per_group=stats)
+        if cuda:
+            torch.cuda.synchronize(x.device)
+            result['peak_memory_gib'] = torch.cuda.max_memory_allocated(x.device) / 1024 ** 3
+        return result
     finally:
         estimator.generator.set_state(state)

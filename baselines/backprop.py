@@ -84,7 +84,7 @@ def train(config, training, validation, testing, output, *, steps, eval_interval
     best_step = 0
     save_best()
     history = [dict(step=0, val_loss=best)]
-    write(dict(step=0, val_loss=best, flops=0.0, forward_equivalents=0.0, draws=0,
+    write(dict(step=0, val_loss=best, flops=0.0, flops_executed=0.0, forward_equivalents=0.0, draws=0,
                train_seconds=0.0, gpu_hours=0.0))
 
     for step in range(1, steps + 1):

@@ -1,8 +1,13 @@
-"""Refuse incomplete or mismatched full-replay/suffix comparisons."""
+"""Refuse incomplete or mismatched full-replay/suffix comparisons.
+
+    python3 scripts/check_baseline_results.py EXPERIMENT_DIR [--seed 42]
+
+Standard library only. Writes EXPERIMENT_DIR/summary.json.
+"""
+import argparse
 import json
 import math
 import statistics
-import sys
 from pathlib import Path
 
 
@@ -22,8 +27,17 @@ def read_run(folder):
     return config, result, records
 
 
+def peak_memory_gib(record):
+    # Runs before 2026-11-18 named the field peak_memory_gb; it was always GiB.
+    return record['peak_memory_gib'] if 'peak_memory_gib' in record else record['peak_memory_gb']
+
+
 def main():
-    experiment = Path(sys.argv[1])
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('experiment', type=Path)
+    parser.add_argument('--seed', type=int, default=42, help='Seed both runs must have used.')
+    args = parser.parse_args()
+    experiment = args.experiment
     full, cached = (read_run(experiment / name) for name in ('full-replay', 'cached-suffix'))
     left, right = full[0], cached[0]
     if left['execution'] != 'full-replay' or right['execution'] != 'cached-suffix':
@@ -32,7 +46,7 @@ def main():
                    if key != 'execution' and left.get(key) != right.get(key)]
     if differences:
         raise ValueError(f'Run configurations differ beyond execution mode: {differences}')
-    for key, value in dict(tokens='1M', population=256, seed=42, steps=61, world=1,
+    for key, value in dict(tokens='1M', population=256, seed=args.seed, steps=61, world=1,
                            allocation=None, multiplex=None).items():
         if left[key] != value:
             raise ValueError(f'Unexpected experiment setting {key}={left[key]!r}')
@@ -45,7 +59,7 @@ def main():
             'test_at_best_val': result['test_at_best_val'],
             'median_step_host_ms': statistics.median(row['step_host_ms'] for row in kept),
             'train_seconds': records[-1]['train_seconds'],
-            'peak_training_memory_gb': records[-1]['peak_memory_gb'],
+            'peak_training_memory_gib': peak_memory_gib(records[-1]),
         }
     baseline = summary['runs']['full-replay']['median_step_host_ms']
     suffix = summary['runs']['cached-suffix']['median_step_host_ms']

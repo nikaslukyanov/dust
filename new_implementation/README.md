@@ -34,7 +34,8 @@ Two consequences drive everything in this folder:
   *Measured:* times real steps the right way (CUDA events, warmup discarded, median/p10/p90) and flags
   launch-bound steps.
 - **`roofline.py`** — the **roofline**: accounting's FLOPs paired with bytes moved, kernel launches and
-  host syncs, per op and per phase, placed on an A100/H100 roofline to name each phase's regime
+  host syncs, per op and per phase, placed on an L40S (default; the GPU every run uses), A100 or H100
+  roofline to name each phase's regime
   (compute / bandwidth / launch) and the best-case MFU; plus `mfu()` and `amdahl()` for measured
   numbers. `python roofline.py --population 256 [--attention math] [--full-replay] [--json]`.
   `test_roofline.py` pins its matmul FLOPs to a real `DUST.estimate` under `FlopCounterMode`.

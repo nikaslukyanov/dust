@@ -61,7 +61,7 @@ def test_matmul_flops_match_a_real_estimate(suffix):
 
 def test_forward_matmuls_and_attention_match_accounting():
     """Same FLOP conventions as accounting.py: projections + MLP + head exactly (plus the tiny ve_gate),
-    and dense attention equals accounting's count on the full-window blocks, more on the windowed ones."""
+    and the roofline's dense attention equals accounting's 'executed' count on every block."""
     tokens = 8 * FULL.sequence_len
     ops = rl._forward(FULL, tokens)
     windows = window_sizes(FULL)
@@ -70,8 +70,8 @@ def test_forward_matmuls_and_attention_match_accounting():
     assert sum(op.flops for op in ops if op.kind == 'matmul') - gates == projections + head_flops(tokens, FULL)
     dense = [op.flops for op in ops if op.kind == 'attention']
     for flops, window in zip(dense, windows):
-        expected = attention_flops(tokens, window, FULL)
-        assert flops == expected if window >= FULL.sequence_len else flops > expected
+        assert flops == attention_flops(tokens, window, FULL, count='executed')
+        assert flops > attention_flops(tokens, window, FULL, count='needed')
 
 
 def test_single_ops_by_hand():
@@ -153,8 +153,10 @@ def test_regime_classification():
 
 
 def test_mfu_and_amdahl():
-    assert rl.mfu(312e12, 1.0) == pytest.approx(1.0)
-    assert rl.mfu(156e12, 2.0) == pytest.approx(0.25)
+    assert rl.mfu(312e12, 1.0, hardware=rl.A100_40GB) == pytest.approx(1.0)
+    assert rl.mfu(156e12, 2.0, hardware=rl.A100_40GB) == pytest.approx(0.25)
+    assert rl.mfu(362.05e12, 1.0) == pytest.approx(1.0)  # default: the L40S every run uses
+    assert rl.HARDWARE['l40s'] is rl.L40S
     assert rl.amdahl({'a': 0.5, 'b': 0.5}, {'a': 2}) == pytest.approx(1 / 0.75)
     assert rl.amdahl({'a': 0.9, 'b': 0.1}, {'a': float('inf')}) == pytest.approx(10)
     assert rl.amdahl_limit(0.9) == pytest.approx(10)

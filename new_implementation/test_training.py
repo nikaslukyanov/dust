@@ -27,7 +27,7 @@ from run_metrics import backprop_update_cost, dust_update_cost  # noqa: E402
 from toy import TOY_CONFIG, toy_data, toy_recipe  # noqa: E402
 
 CPU = torch.device('cpu')
-TIMING = {'train_seconds', 'gpu_hours', 'elapsed_seconds', 'step_host_ms', 'step_gpu_ms', 'peak_memory_gb',
+TIMING = {'train_seconds', 'gpu_hours', 'elapsed_seconds', 'step_host_ms', 'step_gpu_ms', 'peak_memory_gib',
           'phase_seconds'}
 DATA = toy_data(steps=24)
 

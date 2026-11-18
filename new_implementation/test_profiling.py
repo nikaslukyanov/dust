@@ -79,3 +79,10 @@ def test_launch_bound_verdict(cost, verdict):
                                          repeats=5, warmup=1)
     assert result['verdict'] == verdict
     assert result['step_ms_2x'] / result['step_ms_1x'] == pytest.approx(result['ratio'])
+
+
+def test_preflight_launch_bound_check_passes_only_when_gpu_bound():
+    import gpu_preflight  # noqa: E402  (CPU-importable; it only needs CUDA when run)
+    assert gpu_preflight.launch_bound_status('gpu-bound') == 'PASS'
+    assert gpu_preflight.launch_bound_status('mixed') == 'WARN'
+    assert gpu_preflight.launch_bound_status('launch-bound') == 'WARN'

@@ -1,7 +1,7 @@
 # DUST project — refined TODO
 
-Updated 2026-11-16. Companion to `PROJECT_PLAN.md` (the full plan) and `lessons/lectures.md` (how we
-measure performance). Each item says what it is and why it matters, not how it's wired.
+Updated 2026-11-18. Companion to `ANALYSIS.md` (results so far), `old/PROJECT_PLAN.md` (the original plan) and `lessons/lectures.md` (how we
+measure performance). Consult `lessons/literature-findings.md` and 'dust/literature/' and your research tool if you need more literature info. Each item says what it is and why it matters, not how it's wired.
 
 Legend: `[x]` done · `[~]` in progress · `[ ]` todo · **(GPU)** needs a GPU to validate.
 
@@ -12,68 +12,56 @@ Only `dust.py` was modified in place (the estimate/apply split); everything else
 
 ---
 
-## Status on 2026-11-16 — what is left to code, what is left to run
+## Status on 2026-11-18 — what to fix, what to run
 
-**The first GPU run exists** (Patrick, branch `patrick-baseline`, not yet merged; report in
-`results/baseline-test/`). Slurm job 13891039, one NVIDIA L40S (48 GB, node `ins039`), torch
-2.10.0+cu128, 1M tokens, population 256, seed 42, batch 8 × 2,048, 61 steps per run, first 3 steps
-discarded, full replay then cached suffix on the same GPU.
+First GPU baseline ran (Patrick, job 13891039, 1 × L40S; merged in PR #8). **Results and what they
+mean: `tasks/ANALYSIS.md`.** Below are only the work items that came out of it.
 
-| | full replay | cached suffix | change |
-|---|---|---|---|
-| median step time | 9.319 s | 8.061 s | −13.5% |
-| training time | 568.3 s | 491.7 s | −76.6 s |
-| analytic FLOPs / step | 3.567e14 | 3.016e14 | −15.5% |
-| best val / test at best val | 6.0755 / 6.0605 | 6.0752 / 6.0601 | same within 0.006% |
-| peak training memory | 6.63 GiB | 6.63 GiB | none |
+### 1. What needs fixing, and why
 
-Where the suffix step's 8.06 s goes: direct 5.82 s (72%), hubs 0.59, local 0.57, scalars 0.47,
-embedding 0.30, head 0.28, clean 0.03. The saving is in direct (−15.3%) and hubs (−25.8%) only.
-All six preflight checks passed on the GPU, including resume (weights and generator identical).
+Done on branch `run-pipeline-fixes` (2026-11-18):
+- [x] **One GPU type for every run:** all GPU jobs pinned to `--constraint=l40s`, and the job refuses
+      any other GPU. *Why:* runs on different GPUs can't be compared.
+- [x] **Seed / W&B / backprop in the GPU job:** `baseline_gpu.sbatch` takes seed + execution order,
+      logs to W&B when asked, and runs `baselines/backprop.py` after the DUST pair.
+- [x] **Launcher `scripts/launch_baseline.sh`:** snapshots the commit, submits setup + one L40S job
+      per seed. *Why:* before this, nobody but Patrick could launch a run.
+- [x] **L40S in `roofline.py`** (now the default). Findings in `ANALYSIS.md`.
+- [x] **Preflight launch-bound check** now PASSes only for `gpu-bound`, WARN otherwise, and prints the verdict.
+- [x] **Failing W&B resume test:** test bug, not a resume bug: the new `phase_seconds` timings were
+      compared as if they were deterministic. Resume itself is fine.
+- [x] One median convention (conventional median) everywhere; memory fields renamed `*_gib` (old
+      `*_gb` still readable); the probe's own peak memory is logged (`probe.peak_memory_gib`, CUDA).
 
-What the run does **not** give: a backprop reference, a W&B run, more than one seed or repetition,
-the launch-bound verdict (see below), the SDPA kernel, a profiler trace, anything for B / C / D.
+- [x] **FLOP counts:** `flops` (needed: causal + window) and `flops_executed` (dense kernel) in every
+      record; executed matches PyTorch's own count exactly on full and sliding windows.
 
-**Left to code** (nothing below exists in the repo today), in the order it blocks runs:
+Still to build:
+- [ ] Experiment runner + plots (later), Track D (`dust.py:755`). Smaller model configs: not now.
 
-1. **Launcher for the Slurm pipeline.** `scripts/baseline_gpu.sbatch` expects `$experiment/source/`
-   (a repo snapshot) and `$experiment/check_baseline_results.py`; nothing committed creates them.
-   Add the wrapper, plus: pin `--constraint` to one GPU model (it is `h100|l40s|l40|A6000`, so two
-   jobs can land on different hardware and their timings are not comparable), pass `--wandb`, add a
-   `baselines/backprop.py` stage, take the seed as an argument, and save `preflight.json` with the
-   results.
-2. **L40S entry in `roofline.py`.** `HARDWARE` has only `a100` and `h100`, so the roofline prediction
-   (3.4 s on an A100) cannot be set against the measured 8.06 s on an L40S, and `mfu()` has no peak to
-   divide by.
-3. **Experiment runner + plots** (method × budget × seed, machine-readable output) — "Experiment
-   campaign" below. Needed before any B / C comparison is more than one hand-launched run.
-4. **Track D** — `dust.train` still raises on `allocation` + `multiplex` (`dust.py:755`).
-5. **Model sizes** — `GPTConfig` has the one 8×512 config; the two smaller ones and their recipes
-   are not written.
-6. **Masked-aware attention** (`--attention masked|flash`) — not started; `model.attention` still
-   passes the explicit mask.
-7. **FLOP convention** — `accounting` still logs the one hybrid count, not "needed" and "executed".
-8. **The launch-bound fix** (batched population, CUDA Graphs / `torch.compile`) — not started. Wait
-   for the double-batch verdict (run item 1 below) before spending time here.
-9. Smaller: profiling refinements (trace gaps, nsys + NVTX), the cost axis in `gradient_check`,
-   Track 3's higher-rate codes and learning-rate retune, `roofline.py` for shared passes and the
-   split-half products, resume for `baselines/backprop.py`, CI.
+### 2. Out of scope (decided 2026-11-18)
 
-**Left to run** (the code exists; needs GPU time), in the order the report needs it:
+Not in the DUST paper, not in the proposal, and `old/PROJECT_PLAN.md` excludes "compilation, kernel
+fusion, and attention-backend changes". Project stays on cached suffix, allocation, multiplexing.
 
-1. **Get `preflight.json` off the cluster** (`runs/baseline-gpu-20261112-224500/preflight/`). The
-   launch-bound check reports PASS whatever it finds; the ratio and verdict (launch-bound / mixed /
-   gpu-bound) are in that file and nowhere in the committed results. No GPU time needed.
-2. **Backprop reference**: `baselines/backprop.py --tokens 1M --wandb ...` on the same GPU model.
-3. **The baseline pair again with `--wandb`**, at least 3 seeds, alternating which mode runs first
-   (the one run we have is one seed, one repetition, full replay always first).
-4. **Profiler pass**: `profiling.py` table + trace on the GPU, which SDPA kernel runs, MFU.
-5. **Quality vs population** curve against the paper (`gradient_check.py`) — the gate for baseline A.
-6. **Track 2 comparison**: B `variance` and `agreement` against fixed at equal budget, then smaller
-   budgets, the interval sweep, and the measure-only overhead run (`--allocation-interval 0`).
-7. **Track 3 GPU half**: `multiplex_experiment.py` on the real model under bf16, per block, σ sweep.
-8. Still unrun on any GPU: `--adaptive`, `--multiplex`, `--probe-seeds` ≥ 2, the fused-vs-split
-   step equivalence, everything multi-GPU, the 10M budget.
+- Masked-aware / flash attention (`--attention masked|flash`).
+- The launch-bound fix (batched population, CUDA Graphs, `torch.compile`). Run is GPU-bound anyway.
+
+### 3. What needs to run (in report order)
+
+Launch from the repo root on the Insomnia login node (one-time setup in the script's header):
+`scripts/launch_baseline.sh --seeds "42 43 44" --order alternate --wandb PROJECT --wandb-entity TEAM`
+covers the first two items below in one go.
+
+- [ ] **Backprop reference**, 1M tokens, L40S (same GPU type as everything else), `--wandb`. *For:* the quality yardstick.
+- [ ] **Full replay vs cached suffix, 3 seeds, `--wandb`, alternate order.** *For:* error bars on the 13.5%.
+- [ ] **Profiler pass** (`profiling.py`): per-phase table, trace, MFU. *For:* the report's profiling section.
+- [ ] **Quality vs population** (`gradient_check.py`) against the paper. *For:* final gate for A.
+- [ ] **Track 2 (B):** `variance` + `agreement` vs fixed at equal budget, then smaller budgets,
+      interval sweep, overhead run (`--allocation-interval 0`).
+- [ ] **Track 3 (C) on GPU:** `multiplex_experiment.py`, real model, bf16, σ sweep. *For:* decides if C
+      is worth training (it loses on CPU).
+- Never run on GPU yet: `--adaptive`, `--multiplex`, multi-GPU, 10M tokens.
 
 ---
 
@@ -89,7 +77,7 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
       Multiplexing* (Team 27).
 - [x] Names + UNIs: Nikas Lukyanov (nl2951), David Fu (dyf2101), Junyang Ma (jm5914), Patrick Shen
       (pts2125), Srabon Nath (skn2134).
-- [ ] **Roles per member.** `PROJECT_PLAN.md` only has "Person 1–5" (cloud/runs, suffix replay,
+- [ ] **Roles per member.** `old/PROJECT_PLAN.md` only has "Person 1–5" (cloud/runs, suffix replay,
       diagnostics, allocation, multiplexing). Put a name on each.
 
 **Project Summary**
@@ -100,11 +88,11 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
       FineWeb 1M / 10M tokens, BPE-4096, seq 2,048, batch 8, 544 held-out sequences per split;
       hardware **as actually run**: one NVIDIA L40S 48 GB on the university Slurm cluster (node
       `ins039`), bf16 autocast, Python 3.11.5, torch 2.10.0 + cu128. The plan's GCP A100 40GB
-      (`a2-highgpu-1g`) was not used. **Team decision:** stay on the L40S for every run (then fix
-      `PROJECT_PLAN.md` and add the L40S to `roofline.py`) or move to the A100 and rerun the baseline.
+      (`a2-highgpu-1g`) was not used. **Decided 2026-11-18:** every run on the L40S (sbatch pinned,
+      roofline has it); the proposal already names the Insomnia cluster.
 - [ ] **Optimization methodology** — Track 1 cached-suffix replay (A), Track 2 adaptive allocation
-      (`variance` / `agreement`), Track 3 Hadamard multiplexing, D = B + C; engineering levers kept
-      separate (masked-aware attention, batched population, CUDA Graphs / `torch.compile`).
+      (`variance` / `agreement`), Track 3 Hadamard multiplexing, D = B + C. Engineering levers
+      (masked-aware attention, CUDA Graphs / `torch.compile`) are out of scope.
 - [ ] **Profiling / benchmarking / evaluation tools** — list what exists: `torch.profiler` harness with
       `dust/<phase>` labels (`profiling.py`), CUDA-event timing with warm-up discarded and
       median/p10/p90 (`accounting.py`), analytic FLOPs / forward-equivalents checked against
@@ -119,8 +107,7 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
 - [~] **(GPU) Baseline & experimental setup — the baseline must run on a GPU.** Done (job 13891039):
       `gpu_preflight.py` with all six checks passing; `dust.py --tokens 1M --population 256
       --full-replay` (upstream reference) and the same without `--full-replay` (A). **Still open:**
-      `baselines/backprop.py --tokens 1M`; every run again with `--wandb`; `preflight.json` copied
-      into `results/`. Then write up: pipeline, relevant papers (`lessons/literature-findings.md`,
+      `baselines/backprop.py --tokens 1M`; every run again with `--wandb`. Then write up: pipeline, relevant papers (`lessons/literature-findings.md`,
       the three `bibliography.md`), experiment design (A/B/C/D, equal budget, seeds).
 - [~] **Metric provenance table** — for every number in the report: GPU model + count, dtype/backend
       (bf16 autocast vs fp32; SDPA kernel), batch × context, warm-up steps discarded, repetitions /
@@ -131,8 +118,8 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
       `phase_seconds` breakdown (direct draws are 72% of the suffix step; table in the status
       section) and peak training memory 6.63 GiB. Predicted only: K=256 update bandwidth-bound,
       3.4 s GPU floor vs 0.34 s launch floor **on an A100**, 67% of GPU time in unfused elementwise
-      ops; ~32% of attention FLOPs spent on masked positions. **Still needed:** the launch-bound
-      ratio and verdict (in `preflight.json` on the cluster), `torch.profiler` table + trace, which
+      ops; ~32% of attention FLOPs spent on masked positions. Measured: GPU-bound (2× batch → 2.19× time). **Still needed:**
+      `torch.profiler` table + trace, which
       SDPA kernel runs, MFU, and an L40S roofline so prediction and measurement are on the same
       hardware. Measured 8.06 s is 2.4× the A100 `efficient`-kernel prediction and close to the
       A100 `math`-kernel one (8.2 s) — different GPU, so this is a pointer to check the kernel, not
@@ -147,8 +134,7 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
 
 **Future Work**
 - [ ] **Remaining work & experiments** — condense from the sections below: Track 2 comparison at equal
-      and smaller budgets, Track 3 GPU σ sweep, Track D, model sizes, launch-bound fix, masked-aware
-      attention, FLOP convention, runner / matrix / plots.
+      and smaller budgets, Track 3 GPU σ sweep, Track D, model sizes, runner / matrix / plots.
 - [ ] **Scope adjustments.** The GPU baseline exists, so this is no longer the fallback for having
       none; it is still the likely narrowing given what is left to code. Draft it:
       (1) 1M tokens / population 256 / single L40S only; (2) drop or shrink the model-size study;
@@ -167,7 +153,7 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
     fp32 CPU cannot test the bf16 readout regime where it might.
   - Half-to-half agreement signal is deep in noise (cosines 0.01–0.08) → needs EMA; allocation
     defaults untuned; the 1M run is only 61 steps.
-  - FLOP convention gap (accounting = 85% of executed on the base model). FLOP savings did show in
+  - FLOP convention: resolved 2026-11-18, both counts logged (needed = 76% of executed). FLOP savings did show in
     wall-clock for Track 1, but not in full: 15.5% fewer FLOPs gave 13.5% less step time.
   - Upstream omits its execution optimizations; README assumes 8 GPUs for the default population.
 
@@ -293,19 +279,16 @@ deliberately broken version of the code must fail it. Run: `python -m pytest new
       peak memory in the records, generator restore on resume. **Open:** multi-GPU (per-rank
       `state.pt`, rank-0 metrics); probe memory at batch 8 (the probe ran without running out of
       48 GB, but its peak is not recorded — the logged peak covers the training step only).
-- Note: the logged FLOPs depend on the FLOP convention (see "FLOP convention" below).
+- Note: `flops` = needed, `flops_executed` = executed (since 2026-11-18; older runs: one hybrid count).
 
-## Validation — todo (needs GPU time; launch-bound test ran, verdict not yet read)
+## Validation — todo (needs GPU time)
 
 - [ ] **(GPU)** Confirm the new two-half step gives identical numbers to the old fused step under a
       matched seed.
 - [ ] **(GPU)** Confirm our "quality improves with more draws" curve matches the paper's within noise.
       This is the cheapest convincing proof the estimator is faithful — the gate for baseline A.
-- [~] **(GPU)** Run the launch-bound test on real hardware, to settle GPU-bound vs launch-bound
-      **before** we trust any predicted FLOP saving. It ran in the baseline job's preflight, but the
-      check reports PASS whatever the outcome and the ratio / verdict were not committed — read them
-      from the cluster's `preflight.json`. Indirect evidence it is not launch-bound: a 15.5% FLOP cut
-      moved step time 13.5%.
+- [x] **(GPU)** Launch-bound test on real hardware: **GPU-bound** (2× batch → 2.19× step time;
+      `results/baseline-test/preflight/preflight.json`). FLOP savings show up in wall-clock.
 
 ## Track 1 — only re-run the part of the network a perturbation affects (baseline A) — done, GPU gate passed on one seed
 
@@ -326,7 +309,7 @@ tail.
       block fails the check. Predicted saving from `accounting.analytic_cost`: 15.5–17.9% of update
       FLOPs across the shipped recipes (16.4% at 1M/16k).
 - [x] **(GPU) Gate, GPU half** (job 13891039, one L40S, 1M / population 256 / seed 42; report in
-      `results/baseline-test/` on `patrick-baseline`). Equivalence under bf16: max relative
+      `results/baseline-test/`). Equivalence under bf16: max relative
       difference 1.5e-7 on one estimate, as expected small and not zero. Runtime vs `--full-replay`:
       median step 9.319 → 8.061 s (−13.5%), training time 568.3 → 491.7 s. Peak training memory:
       6.63 GiB in both — **no saving**. Loss: best val 6.0755 vs 6.0752; the two trajectories are
@@ -487,7 +470,7 @@ these are the refinements the lectures call for, grouped by file.
 
 - [x] **roofline + regimes — `new_implementation/roofline.py`.** Per-op FLOPs, dtype-aware bytes,
       kernel launches and host syncs for every phase of one update (the same phase names as the
-      profiler labels), placed on an **A100** (or H100) roofline: compute / bandwidth / launch floors,
+      profiler labels), placed on an **L40S** (default, since 2026-11-18), A100 or H100 roofline: compute / bandwidth / launch floors,
       the regime per phase, best-case MFU, plus `mfu()` and `amdahl()` for measured numbers. Models
       both SDPA kernels the explicit mask allows (`efficient`, `math`) and suffix vs full replay.
       `python new_implementation/roofline.py --population 256`. Checked on CPU
@@ -498,8 +481,7 @@ these are the refinements the lectures call for, grouped by file.
       relu², the fp32 logit cap every draw, norms, residual ops); weights are <1% of bytes, so they
       are not "re-streamed like decode". With the `math` attention kernel it is 8.2 s, dominated by
       the materialised [T, T] scores.
-- [ ] **(GPU) roofline calibration.** First add the L40S to `HARDWARE` (the runs are on it; only
-      `a100` / `h100` exist). Check which SDPA kernel runs; calibrate the per-launch latency
+- [ ] **(GPU) roofline calibration.** L40S added (2026-11-18). Check which SDPA kernel runs; calibrate the per-launch latency
       from a trace; compare predicted vs measured per-phase time; split measured step time into kernel
       compute / HBM / launch / other and feed the measured fractions to `amdahl()`.
 - [ ] **profiling — actually see the launch overhead.** Read the trace *gaps*, not just the per-op
@@ -509,13 +491,13 @@ these are the refinements the lectures call for, grouped by file.
 - [ ] **gradient_check — fair reference + a cost axis.** Reference under normal-grad FP32, DUST estimate
       under `inference_mode` (not the same memory profile — note it); fold a cost axis into the
       quality-vs-population curve; judge variants by steps/s **and** time-to-target, not step time alone.
-- [ ] **the launch-bound fix (biggest lever), GPU-validate.** Vectorize the population into one batched
+- **OUT OF SCOPE (2026-11-18) — the launch-bound fix.** Kept for reference only. Vectorize the population into one batched
       forward; keep the inner loop sync-free and shapes static; then CUDA Graphs /
       `torch.compile(mode="reduce-overhead")` on the fixed-shape forward. First audit the hooks for
       `.item()` / branch-on-tensor / arbitrary Python — those break fusion **and** CUDA-Graph capture at
       once. This supersedes the old "scope decision": the course is built on exactly this, so treat it as
       first-class, not out of scope.
-- [ ] **Masked-aware attention (skip masked positions), GPU-validate.** `model.attention` passes an
+- **OUT OF SCOPE (2026-11-18) — masked-aware attention.** Kept for reference only. `model.attention` passes an
       explicit boolean mask to SDPA, which rules out the flash kernel: every block computes all T×T
       scores, including the causal future and the keys outside the sliding window. On the 8×512 model at
       2048 tokens that is ~32% more attention-inclusive update FLOPs than needed (1M/K=256 update:
@@ -528,7 +510,7 @@ these are the refinements the lectures call for, grouped by file.
       (`--attention masked|flash`) so the upstream reference stays reproducible; A/B/C/D all use the
       fast path. Gate: CPU test that outputs match the masked path within tolerance; GPU check within
       bf16 tolerance + timing. Report it as an engineering speedup, separately from B/C.
-- [ ] **FLOP convention: log "needed" and "executed".** `accounting.attention_flops` is currently a
+- [x] **FLOP convention: log "needed" and "executed".** Done 2026-11-18 (see status section). Old note: `accounting.attention_flops` is currently a
       hybrid — full-window blocks charged all T keys (incl. the causal-masked half), sliding blocks
       charged window+1 keys (ignoring causality) — 85% of executed on the base model, pinned by
       `test_accounting.py::test_sliding_windows_are_counted_as_windowed`. Replace with two counts:

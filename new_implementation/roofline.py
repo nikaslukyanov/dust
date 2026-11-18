@@ -66,7 +66,11 @@ class Hardware:
 # Datasheet peaks, dense (no structured sparsity). a2-highgpu-1g is the SXM4 40 GB part.
 A100_40GB = Hardware('A100-SXM4-40GB', 312e12, 156e12, 19.5e12, 1.555e12)
 H100_SXM = Hardware('H100-SXM5-80GB', 989e12, 494e12, 67e12, 3.35e12)  # the lecture slides' numbers
-HARDWARE = {'a100': A100_40GB, 'h100': H100_SXM}
+# The GPU every project run uses (Insomnia, pinned in the sbatch files). Dense values from
+# https://www.nvidia.com/en-us/data-center/l40s/ (the page's starred values are with sparsity, 2x these);
+# memory is 48 GB GDDR6, not HBM, but hbm_bytes_per_s is simply DRAM bandwidth here.
+L40S = Hardware('L40S-48GB', 362.05e12, 183e12, 91.6e12, 0.864e12)
+HARDWARE = {'l40s': L40S, 'a100': A100_40GB, 'h100': H100_SXM}
 
 
 @dataclass
@@ -464,7 +468,7 @@ def _summarize(name, ops, hardware, top):
     )
 
 
-def roofline(recipe, config, hardware=A100_40GB, world=1, batch=8, suffix=True, attention='efficient', top=3):
+def roofline(recipe, config, hardware=L40S, world=1, batch=8, suffix=True, attention='efficient', top=3):
     """Place one DUST update on `hardware`'s roofline, per phase and in total.
 
     The total's predicted_s is max(sum of GPU floors, sum of launch floors) over the whole update
@@ -487,7 +491,7 @@ def roofline(recipe, config, hardware=A100_40GB, world=1, batch=8, suffix=True, 
     )
 
 
-def mfu(flops, seconds, hardware=A100_40GB, precision='bf16'):
+def mfu(flops, seconds, hardware=L40S, precision='bf16'):
     """Model FLOP utilisation: achieved FLOP/s over the peak. Pass analytic FLOPs and a measured time."""
     return flops / seconds / hardware.peak(precision)
 
@@ -541,7 +545,7 @@ def main():
     parser.add_argument('--tokens', choices=DEFAULT_CONFIGS, default='1M')
     parser.add_argument('--population', type=int, choices=DRAW_CHUNK_SIZES, default=256)
     parser.add_argument('--world', type=int, default=1)
-    parser.add_argument('--hardware', choices=HARDWARE, default='a100')
+    parser.add_argument('--hardware', choices=HARDWARE, default='l40s')
     parser.add_argument('--attention', choices=ATTENTION_KERNELS, default='efficient')
     parser.add_argument('--full-replay', action='store_true', help='model the public code (no cached suffix)')
     parser.add_argument('--json', action='store_true', help='print the full report as JSON')

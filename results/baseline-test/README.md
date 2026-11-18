@@ -142,10 +142,17 @@ for name, expected in metadata['artifact_sha256'].items():
 print(f"Verified {len(metadata['artifact_sha256'])} evidence files")
 PY
 
-python3 scripts/check_baseline_results.py results/baseline-test
-git diff --exit-code HEAD -- results/baseline-test/summary.json
+python3 scripts/check_baseline_results.py results/baseline-test --seed 42
+git diff HEAD -- results/baseline-test/summary.json
 
 python3 new_implementation/compare_runs.py \
   results/baseline-test/full-replay results/baseline-test/cached-suffix \
   | diff - results/baseline-test/comparison.txt
 ```
+
+**Expected differences since 2026-11-18.** The committed `summary.json` and `comparison.txt` are kept
+exactly as the job produced them. Two later tool fixes change what the commands above regenerate, and
+nothing else: memory fields are now named `*_gib` (they always held GiB), and `compare_runs.py` now
+uses the conventional median like every other tool (host median 9319.25 ms, matching `summary.json`,
+instead of the upper-middle 9321.1 ms). Restore the committed `summary.json` afterwards with
+`git checkout -- results/baseline-test/summary.json`.
