@@ -53,8 +53,11 @@ Launch from the repo root on the Insomnia login node (one-time setup in the scri
 `scripts/launch_baseline.sh --seeds "42 43 44" --order alternate --wandb PROJECT --wandb-entity TEAM`
 covers the first two items below in one go.
 
-- [ ] **Backprop reference**, 1M tokens, L40S (same GPU type as everything else), `--wandb`. *For:* the quality yardstick.
-- [ ] **Full replay vs cached suffix, 3 seeds, `--wandb`, alternate order.** *For:* error bars on the 13.5%.
+- [~] **Backprop reference**, 1M tokens, L40S (same GPU type as everything else), `--wandb`. *For:* the quality yardstick.
+- [~] **Full replay vs cached suffix, 3 seeds, `--wandb`, alternate order.** *For:* error bars on the 13.5%.
+      Submitted 2026-11-18: seeds 42/43/44, GPU jobs 13991787/13991788/13991789; setup job 13991786
+      passed 26 CPU tests. Source commit `0723bba`; artifacts in `runs/baseline-gpu-20261118-172822/`.
+      W&B logs are offline under project `dust-hpml`, awaiting a team login and sync.
 - [ ] **Profiler pass** (`profiling.py`): per-phase table, trace, MFU. *For:* the report's profiling section.
 - [ ] **Quality vs population** (`gradient_check.py`) against the paper. *For:* final gate for A.
 - [ ] **Track 2 (B):** `variance` + `agreement` vs fixed at equal budget, then smaller budgets,

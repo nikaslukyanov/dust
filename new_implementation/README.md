@@ -129,6 +129,17 @@ Run them one after the other on an otherwise idle GPU. A run that dies continues
 plus `--resume`. Analytic cost per update (forward-equivalents, full replay -> cached suffix):
 population 256: 288 -> 244 (15.5% fewer FLOPs); population 1024: 1102 -> 924 (16.2%).
 
+For a multi-seed batch launched with `scripts/launch_baseline.sh`, aggregate the completed jobs with:
+
+```bash
+python3 scripts/check_baseline_results.py runs/baseline-gpu-TIMESTAMP --sweep
+```
+
+This writes the batch's `summary.json` after checking completion, matching configurations and data,
+and identical L40S environments. It includes the backprop reference when enabled in `launch.json`.
+Step-time medians discard the first three updates; speedups are paired within each seed before
+averaging. Reported standard deviations describe variation across seeds, not confidence intervals.
+
 ## How it wires together
 
 `accounting` imports `groups`; `profiling` and `run_metrics` import `accounting`; `gradient_check`
