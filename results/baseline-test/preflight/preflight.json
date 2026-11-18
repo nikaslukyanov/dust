@@ -1,0 +1,303 @@
+{
+  "population": 256,
+  "recipe": {
+    "writers": [
+      38,
+      32,
+      16,
+      10,
+      6,
+      4,
+      2,
+      2
+    ],
+    "hidden": [
+      38,
+      32,
+      16,
+      10,
+      6,
+      4,
+      2,
+      2
+    ],
+    "hubs": [
+      6,
+      6,
+      4,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "embedding": 10,
+    "head": 1024,
+    "local": {
+      "q": 2,
+      "v": 20,
+      "gate": 6,
+      "k": 12,
+      "ve": 8
+    },
+    "nrep": 2,
+    "lr": 0.25,
+    "momentum": 0.95,
+    "gamma": 0.98
+  },
+  "model": {
+    "sequence_len": 2048,
+    "vocab_size": 4096,
+    "n_layer": 8,
+    "n_head": 8,
+    "n_kv_head": 8,
+    "n_embd": 512,
+    "window_pattern": "SSSL"
+  },
+  "checks": {
+    "environment": {
+      "status": "PASS",
+      "check_seconds": 0.00014797801850363612,
+      "python": "3.11.5",
+      "torch": "2.10.0+cu128",
+      "device": "cuda:0",
+      "gpu": "NVIDIA L40S",
+      "gpu_memory_gb": 44.52056884765625,
+      "gpus_visible": 1,
+      "cuda": "12.8",
+      "bf16": true,
+      "data_missing": [],
+      "notes": []
+    },
+    "equivalence": {
+      "status": "PASS",
+      "check_seconds": 26.967631700012134,
+      "cosine_suffix_vs_full": {
+        "embedding": 0.9999999999999999,
+        "gate": 1.0000000000000002,
+        "head": 1.0,
+        "hidden": 1.0000000000000002,
+        "k": 1.0,
+        "q": 1.0,
+        "scalars": 1.0000000000000002,
+        "v": 1.0,
+        "ve": 0.9999999999999896,
+        "writers": 1.0
+      },
+      "min_cosine": 0.9999999999999896,
+      "max_relative_difference": 1.4633192790824978e-07,
+      "cosine_between_seeds": {
+        "embedding": 0.03359271232795068,
+        "gate": 0.00988637150609355,
+        "head": 0.8684120710131533,
+        "hidden": 0.017998813580720134,
+        "k": 0.0019107122660272766,
+        "q": -0.004526527765675875,
+        "scalars": 0.3735371025582802,
+        "v": 0.0006864329933252365,
+        "ve": -0.00023412539248922066,
+        "writers": 0.043642770149814436
+      },
+      "note": "suffix and full replay consume the same noise; under bf16 they differ by rounding only. cosine_between_seeds is what two unrelated estimates look like."
+    },
+    "timing": {
+      "status": "PASS",
+      "check_seconds": 69.29873939900426,
+      "full_replay": {
+        "estimate_seconds_median": 9.289412657002686,
+        "estimate_seconds": [
+          9.286539716995321,
+          9.289412657002686,
+          9.315621386980638
+        ],
+        "phase_seconds_median": {
+          "clean": 0.03115274800802581,
+          "direct": 6.8540132679918315,
+          "embedding": 0.3036944850173313,
+          "hubs": 0.7926995330199134,
+          "head": 0.28071585498400964,
+          "local": 0.5638342949969228,
+          "scalars": 0.46449686199775897
+        },
+        "peak_memory_gb": 6.379476070404053,
+        "forward_equivalents": 288.33713045836726,
+        "flops": 356716831047680.0
+      },
+      "cached_suffix": {
+        "estimate_seconds_median": 8.041426488984143,
+        "estimate_seconds": [
+          8.041426488984143,
+          8.034456508990843,
+          8.045505749003496
+        ],
+        "phase_seconds_median": {
+          "clean": 0.031165697990218177,
+          "direct": 5.8104981780052185,
+          "embedding": 0.3038728139945306,
+          "hubs": 0.5876819780096412,
+          "head": 0.28168737099622376,
+          "local": 0.5640503299946431,
+          "scalars": 0.4623100839962717
+        },
+        "peak_memory_gb": 6.379476070404053,
+        "forward_equivalents": 243.77917005695687,
+        "flops": 301591865327616.0
+      },
+      "measured_time_saving": 0.13434500264963112,
+      "predicted_flop_saving": 0.15453424375340397,
+      "note": "measured_time_saving below predicted_flop_saving means part of the step is not GPU-bound (launch overhead, memory traffic); see --launch-bound."
+    },
+    "probe": {
+      "status": "PASS",
+      "check_seconds": 8.296244967990788,
+      "seconds": 8.285975540988147,
+      "peak_memory_gb": 6.649627208709717,
+      "mean_group_cosine": 0.22074308952205263,
+      "cosine_to_backprop": {
+        "embedding": 0.16455986244544657,
+        "gate": 0.0007223101033089563,
+        "head": 0.9295462509803176,
+        "hidden": 0.11755880878591957,
+        "k": 0.004215419591277176,
+        "q": 0.017922975920909738,
+        "scalars": 0.7598230345112876,
+        "v": 0.022490327283860176,
+        "ve": 0.003915674821058791,
+        "writers": 0.1866762307771399
+      },
+      "rel_norm": {
+        "embedding": 2.351202964782715,
+        "gate": 2.6976449489593506,
+        "head": 0.9374789595603943,
+        "hidden": 3.5712995529174805,
+        "k": 34.335872650146484,
+        "q": 23.328468322753906,
+        "scalars": 1.987266182899475,
+        "v": 2.3189992904663086,
+        "ve": 15.704585075378418,
+        "writers": 1.8981386423110962
+      },
+      "generator_restored": true,
+      "weights_untouched": true,
+      "model_left_frozen": true,
+      "note": "cosine_to_backprop at init on one batch; compare the ordering with the paper (head highest)."
+    },
+    "training": {
+      "status": "PASS",
+      "check_seconds": 72.54041520197643,
+      "record_keys_missing": [],
+      "phases_missing": [],
+      "files_missing": [],
+      "resume_max_relative_weight_difference": 0.0,
+      "resume_generator_identical": true,
+      "best_val": 7.802928447723389,
+      "timing": {
+        "steps_kept": 2,
+        "warmup_discarded": 2,
+        "host_median_ms": 8069.093842990696,
+        "host_p10_ms": 8069.093842990696,
+        "host_p90_ms": 8079.545433021849,
+        "gpu_median_ms": 8069.38037109375,
+        "gpu_p10_ms": 8069.38037109375,
+        "gpu_p90_ms": 8080.607421875,
+        "likely_launch_bound": false,
+        "wall_seconds": 16.148639276012545,
+        "gpu_hours": 0.004485733132225707,
+        "peak_memory_gb": 6.633514881134033,
+        "scope": "step only; excludes data load and host->device copy unless inside the measured block",
+        "totals": {
+          "flops": 603183730655232.0,
+          "forward_equivalents": 487.55834011391374,
+          "draws": 3232,
+          "train_seconds": 16.148639276012545,
+          "eval_seconds": 0.7894467290025204,
+          "probe_seconds": 16.47307290599565,
+          "checkpoint_seconds": 0.6068824690300971,
+          "allocation_seconds": 0.0
+        },
+        "elapsed_seconds": 35.13013073100592
+      },
+      "last_record": {
+        "step": 2,
+        "train_loss": 8.142861366271973,
+        "flops": 603183730655232.0,
+        "forward_equivalents": 487.55834011391374,
+        "draws": 3232,
+        "population": 256,
+        "train_seconds": 16.148639276012545,
+        "gpu_hours": 0.004485733132225707,
+        "elapsed_seconds": 25.667914874997223,
+        "step_host_ms": 8079.545433021849,
+        "direct_forwards": 256,
+        "step_gpu_ms": 8080.607421875,
+        "peak_memory_gb": 6.633514881134033,
+        "phase_seconds": {
+          "clean": 0.031380351982079446,
+          "direct": 5.819335159001639,
+          "embedding": 0.3037460090126842,
+          "hubs": 0.5887312410050072,
+          "head": 0.28868235601112247,
+          "local": 0.5682240030146204,
+          "scalars": 0.46933819499099627
+        },
+        "val_loss": 7.802928447723389,
+        "probe": {
+          "mean_group_cosine": 0.2925183940761368,
+          "min_group_cosine": 0.003930934351542303,
+          "per_group": {
+            "embedding": {
+              "cosine": 0.1536143078280035,
+              "rel_norm": 0.7868831753730774
+            },
+            "gate": {
+              "cosine": 0.03886330804975224,
+              "rel_norm": 0.4773993492126465
+            },
+            "head": {
+              "cosine": 0.9340434430651448,
+              "rel_norm": 0.9357312917709351
+            },
+            "hidden": {
+              "cosine": 0.36892917059383845,
+              "rel_norm": 0.8416847586631775
+            },
+            "k": {
+              "cosine": 0.003930934351542303,
+              "rel_norm": 9.665177345275879
+            },
+            "q": {
+              "cosine": 0.03581934759863023,
+              "rel_norm": 6.809635639190674
+            },
+            "scalars": {
+              "cosine": 0.7621930456255863,
+              "rel_norm": 1.8328222036361694
+            },
+            "v": {
+              "cosine": 0.08013864766024398,
+              "rel_norm": 0.42576467990875244
+            },
+            "ve": {
+              "cosine": 0.014088073068163905,
+              "rel_norm": 2.7067301273345947
+            },
+            "writers": {
+              "cosine": 0.5335636629204618,
+              "rel_norm": 0.45821961760520935
+            }
+          }
+        }
+      },
+      "note": "resume difference 0 = bit-exact. A tiny nonzero value on CUDA is kernel nondeterminism (index_add_ on the embeddings), not a lost generator state, as long as the generators match."
+    },
+    "launch-bound": {
+      "status": "PASS",
+      "check_seconds": 102.4793740340101,
+      "step_ms_1x": 8040.35791015625,
+      "step_ms_2x": 17576.283203125,
+      "ratio": 2.1860075632856293,
+      "verdict": "gpu-bound",
+      "note": "ratio ~1 => launch-bound (FLOP savings will not move wall-clock); ~2 => GPU-bound (FLOP savings do). Run before trusting analytic forward-equivalents."
+    }
+  }
+}

@@ -242,6 +242,8 @@ def main():
 
     device = torch.device(args.device or ('cuda' if torch.cuda.is_available() else 'cpu'))
     if device.type == 'cuda':
+        if device.index is None:
+            device = torch.device('cuda', torch.cuda.current_device())
         torch.cuda.set_device(device)
     torch.set_float32_matmul_precision('high')
     paths = [] if args.toy else [args.data_dir / f'train_{args.tokens}.pt', args.data_dir / 'val.pt',

@@ -1,0 +1,4 @@
+JobID|JobName|State|ExitCode|Start|End|Elapsed|ElapsedRaw|NodeList|AllocTRES|Timelimit
+13891039|dust-full-vs-suffix|COMPLETED|0:0|2026-11-13T00:43:15|2026-11-13T01:12:56|00:29:41|1781|ins039|billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1|10:00:00
+13891039.batch|batch|COMPLETED|0:0|2026-11-13T00:43:15|2026-11-13T01:12:56|00:29:41|1781|ins039|cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1|
+13891039.extern|extern|COMPLETED|0:0|2026-11-13T00:43:15|2026-11-13T01:12:56|00:29:41|1781|ins039|billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1|
