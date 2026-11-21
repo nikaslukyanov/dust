@@ -1,0 +1,16 @@
+{
+  "commit": "0723bbadf2e4e86d3731b862c3aa142b45750d17",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "order": "alternate",
+  "gpu": "l40s",
+  "wandb": {
+    "project": "dust-hpml",
+    "entity": null
+  },
+  "backprop": true,
+  "launched": "2026-11-18T17:28:22-05:00"
+}

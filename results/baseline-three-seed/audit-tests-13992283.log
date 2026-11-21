@@ -1,0 +1,9 @@
+........................................................................ [ 50%]
+........................................................................ [100%]
+=============================== warnings summary ===============================
+new_implementation/test_profiling.py::test_profile_estimate_labels_every_phase
+  /insomnia001/home/pts2125/hpml/dust/.venv/baseline-cu128/lib/python3.11/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+    _warn_once(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+144 passed, 1 warning in 341.35s (0:05:41)

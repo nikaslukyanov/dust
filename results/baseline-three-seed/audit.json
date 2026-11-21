@@ -1,0 +1,180 @@
+{
+  "status": "PASS",
+  "checks": [
+    "six GPU preflight checks per seed",
+    "finite metrics",
+    "61 ordered updates and 33 evaluations",
+    "validation-selected checkpoint",
+    "saved history equals raw records",
+    "matched training source hashes",
+    "999424 training tokens",
+    "cumulative timing and GPU-hours",
+    "analytic FLOPs, forward equivalents and draw counts",
+    "seven DUST gradient probes",
+    "nine unique offline W&B artifacts"
+  ],
+  "runs": [
+    {
+      "seed": 42,
+      "method": "full-replay",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "9e6d6201",
+      "wandb_file": "seed-42/full-replay/wandb/offline-run-20261118_173655-9e6d6201/run-9e6d6201.wandb",
+      "per_step_cost": {
+        "flops": 318589785604096.0,
+        "flops_executed": 420906795008000.0,
+        "draws": 1616,
+        "forward_equivalents": 285.2507998978534
+      },
+      "train_seconds": 571.8925629289588,
+      "elapsed_seconds": 726.5081812159624
+    },
+    {
+      "seed": 42,
+      "method": "cached-suffix",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "39cc9be4",
+      "wandb_file": "seed-42/cached-suffix/wandb/offline-run-20261118_174905-39cc9be4/run-39cc9be4.wandb",
+      "per_step_cost": {
+        "flops": 267762169544704.0,
+        "flops_executed": 353561707806720.0,
+        "draws": 1616,
+        "forward_equivalents": 239.74206486307853
+      },
+      "train_seconds": 493.93094815313816,
+      "elapsed_seconds": 636.3433798990445
+    },
+    {
+      "seed": 42,
+      "method": "backprop",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "dbe21546",
+      "wandb_file": "seed-42/backprop/wandb/offline-run-20261118_175946-dbe21546/run-dbe21546.wandb",
+      "per_step_cost": {
+        "flops": 3350628139008,
+        "flops_executed": 4329327034368,
+        "draws": 0,
+        "forward_equivalents": 3.0
+      },
+      "train_seconds": 5.716583922505379,
+      "elapsed_seconds": 88.36198698100634
+    },
+    {
+      "seed": 43,
+      "method": "full-replay",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "7cf72713",
+      "wandb_file": "seed-43/full-replay/wandb/offline-run-20261118_174731-7cf72713/run-7cf72713.wandb",
+      "per_step_cost": {
+        "flops": 318589785604096.0,
+        "flops_executed": 420906795008000.0,
+        "draws": 1616,
+        "forward_equivalents": 285.2507998978534
+      },
+      "train_seconds": 565.2501199562103,
+      "elapsed_seconds": 718.0447341270046
+    },
+    {
+      "seed": 43,
+      "method": "cached-suffix",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "bba35f44",
+      "wandb_file": "seed-43/cached-suffix/wandb/offline-run-20261118_173654-bba35f44/run-bba35f44.wandb",
+      "per_step_cost": {
+        "flops": 267762169544704.0,
+        "flops_executed": 353561707806720.0,
+        "draws": 1616,
+        "forward_equivalents": 239.74206486307853
+      },
+      "train_seconds": 489.03869738138746,
+      "elapsed_seconds": 636.2360648460453
+    },
+    {
+      "seed": 43,
+      "method": "backprop",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "a8be80e8",
+      "wandb_file": "seed-43/backprop/wandb/offline-run-20261118_175933-a8be80e8/run-a8be80e8.wandb",
+      "per_step_cost": {
+        "flops": 3350628139008,
+        "flops_executed": 4329327034368,
+        "draws": 0,
+        "forward_equivalents": 3.0
+      },
+      "train_seconds": 5.810748417978175,
+      "elapsed_seconds": 87.58643852907699
+    },
+    {
+      "seed": 44,
+      "method": "full-replay",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "af5c7598",
+      "wandb_file": "seed-44/full-replay/wandb/offline-run-20261118_173654-af5c7598/run-af5c7598.wandb",
+      "per_step_cost": {
+        "flops": 318589785604096.0,
+        "flops_executed": 420906795008000.0,
+        "draws": 1616,
+        "forward_equivalents": 285.2507998978534
+      },
+      "train_seconds": 560.4115798090352,
+      "elapsed_seconds": 720.0487495639827
+    },
+    {
+      "seed": 44,
+      "method": "cached-suffix",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "ce7681da",
+      "wandb_file": "seed-44/cached-suffix/wandb/offline-run-20261118_174853-ce7681da/run-ce7681da.wandb",
+      "per_step_cost": {
+        "flops": 267762169544704.0,
+        "flops_executed": 353561707806720.0,
+        "draws": 1616,
+        "forward_equivalents": 239.74206486307853
+      },
+      "train_seconds": 484.69912747037597,
+      "elapsed_seconds": 623.9945286449511
+    },
+    {
+      "seed": 44,
+      "method": "backprop",
+      "status": "PASS",
+      "steps": 61,
+      "validation_evaluations": 33,
+      "best_step": 61,
+      "wandb_id": "844ed7ba",
+      "wandb_file": "seed-44/backprop/wandb/offline-run-20261118_175920-844ed7ba/run-844ed7ba.wandb",
+      "per_step_cost": {
+        "flops": 3350628139008,
+        "flops_executed": 4329327034368,
+        "draws": 0,
+        "forward_equivalents": 3.0
+      },
+      "train_seconds": 6.289978809421882,
+      "elapsed_seconds": 87.55143657303415
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "corpus": "HuggingFaceFW/fineweb",
+  "subset": "sample-10BT",
+  "skipped_documents": 200000,
+  "tokenizer_sha256": "a15168ae52f4a1b1c80b270a5e18a2ce3e038b5e3772a1ad3982044602da0ae7",
+  "files": {
+    "train_1M.pt": {
+      "sequences": 488,
+      "prediction_tokens": 999424,
+      "sha256": "f9996e06a0a617c5acf25e3454ccfbbe550db89f1ab0d587fe7d48b7d38efd7d"
+    },
+    "train_10M.pt": {
+      "sequences": 4880,
+      "prediction_tokens": 9994240,
+      "sha256": "eae3a22f5d589c7c02d3aa135abc83b3e23eabc1c5697ec788cb908d675a1d45"
+    },
+    "val.pt": {
+      "sequences": 544,
+      "prediction_tokens": 1114112,
+      "sha256": "8d123afe426b7789a47e7959a17f912ee58436941fa02e32bf4662373cf1e52c"
+    },
+    "test.pt": {
+      "sequences": 544,
+      "prediction_tokens": 1114112,
+      "sha256": "cf7185682b3cae85d35024890f94fe6dd8192cad9122815a43fcccb6e61b9483"
+    }
+  }
+}

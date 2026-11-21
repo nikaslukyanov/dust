@@ -53,8 +53,14 @@ Launch from the repo root on the Insomnia login node (one-time setup in the scri
 `scripts/launch_baseline.sh --seeds "42 43 44" --order alternate --wandb PROJECT --wandb-entity TEAM`
 covers the first two items below in one go.
 
-- [ ] **Backprop reference**, 1M tokens, L40S (same GPU type as everything else), `--wandb`. *For:* the quality yardstick.
-- [ ] **Full replay vs cached suffix, 3 seeds, `--wandb`, alternate order.** *For:* error bars on the 13.5%.
+- [x] **Backprop reference**, 1M tokens, L40S (same GPU type as everything else), `--wandb`. *For:* the quality yardstick.
+- [x] **Full replay vs cached suffix, 3 seeds, `--wandb`, alternate order.** *For:* variation across seeds.
+      Completed 2026-11-18: seeds 42/43/44, GPU jobs 13991787/13991788/13991789, all exit 0.
+      Setup passed 26 CPU tests; the complete audit suite passed 144. Source commit `0723bba`.
+      Report and raw evidence: `results/baseline-three-seed/`; paired time reduction 13.54% ± 0.13
+      percentage points (sample SD). W&B logs are offline under project `dust-hpml`.
+- [ ] **W&B dashboard:** configure the shared team login, sync the nine offline artifacts from
+      `runs/baseline-gpu-20261118-172822/`, and record the accessible dashboard URL.
 - [ ] **Profiler pass** (`profiling.py`): per-phase table, trace, MFU. *For:* the report's profiling section.
 - [ ] **Quality vs population** (`gradient_check.py`) against the paper. *For:* final gate for A.
 - [ ] **Track 2 (B):** `variance` + `agreement` vs fixed at equal budget, then smaller budgets,
@@ -67,10 +73,10 @@ covers the first two items below in one go.
 
 ## Mid-point report — todo (course template; one item per required section)
 
-State on 2026-11-16: one GPU baseline run exists (section above); everything else below
-"Foundation" is still built and tested **on CPU only**, and there is no W&B run. The template
-requires every reported metric to carry exact hardware, dtype/backend, batch/context size, warm-up
-and repetitions — the GPU run has all of these except the SDPA kernel, and its repetition count is 1.
+State on 2026-11-18: the three-seed full-replay/suffix/backprop sweep is complete, with offline W&B
+logs and audited evidence in `results/baseline-three-seed/`. B and C still have CPU evidence only.
+The template requires hardware, dtype/backend, batch/context size, warm-up and repetitions for every
+metric. The new GPU sweep has three seeds and one repetition per seed; the SDPA kernel remains unknown.
 
 **Title & Team**
 - [x] Title: *Compute-Efficient DUST: Adaptive Population Allocation and Structured Perturbation
@@ -104,31 +110,25 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
       `--wandb`, make the project readable, paste the URL here.
 
 **Current Progress**
-- [~] **(GPU) Baseline & experimental setup — the baseline must run on a GPU.** Done (job 13891039):
-      `gpu_preflight.py` with all six checks passing; `dust.py --tokens 1M --population 256
-      --full-replay` (upstream reference) and the same without `--full-replay` (A). **Still open:**
-      `baselines/backprop.py --tokens 1M`; every run again with `--wandb`. Then write up: pipeline, relevant papers (`lessons/literature-findings.md`,
-      the three `bibliography.md`), experiment design (A/B/C/D, equal budget, seeds).
+- [x] **(GPU) Baseline & experimental setup.** Full replay, cached suffix, and backprop completed at
+      1M tokens on three L40S seeds, with all 18 preflight checks passing and offline W&B logs.
+      Report: `results/baseline-three-seed/README.md`. The course report still needs the broader
+      literature and A/B/C/D experiment-design write-up.
 - [~] **Metric provenance table** — for every number in the report: GPU model + count, dtype/backend
       (bf16 autocast vs fp32; SDPA kernel), batch × context, warm-up steps discarded, repetitions /
       seeds. For the GPU baseline: 1 × L40S, bf16 autocast, 8 × 2,048, 3 warm-up steps discarded,
-      58 steps kept, 1 seed, 1 repetition, SDPA kernel **unknown**. CPU toy numbers must be labelled
+      58 steps kept, 3 seeds, 1 repetition per seed, SDPA kernel **unknown**. CPU toy numbers must be labelled
       as such (CPU model, fp32, 4×64 model, seed counts as already recorded in Tracks 2–3).
 - [~] **(GPU) Profiling / baseline analysis** — limiting resource per phase. Measured now: the
-      `phase_seconds` breakdown (direct draws are 72% of the suffix step; table in the status
-      section) and peak training memory 6.63 GiB. Predicted only: K=256 update bandwidth-bound,
-      3.4 s GPU floor vs 0.34 s launch floor **on an A100**, 67% of GPU time in unfused elementwise
-      ops; ~32% of attention FLOPs spent on masked positions. Measured: GPU-bound (2× batch → 2.19× time). **Still needed:**
-      `torch.profiler` table + trace, which
-      SDPA kernel runs, MFU, and an L40S roofline so prediction and measurement are on the same
-      hardware. Measured 8.06 s is 2.4× the A100 `efficient`-kernel prediction and close to the
-      A100 `math`-kernel one (8.2 s) — different GPU, so this is a pointer to check the kernel, not
-      a finding.
+      `phase_seconds` breakdown and peak training memory 6.63 GiB. All three new launch-bound
+      checks report GPU-bound. The L40S roofline is implemented; its bandwidth and kernel conclusions
+      remain predictions. **Still needed:** `torch.profiler` table/trace, actual SDPA kernel,
+      and calibrated MFU. See `ANALYSIS.md`; timing alone does not establish which kernel ran.
 - [x] **First optimization status** — GPU result for Track 1: cached suffix cuts median step time
-      13.5% (9.319 → 8.061 s) for 15.5% fewer analytic FLOPs, held-out loss unchanged (best val
-      6.0755 vs 6.0752), **no** peak-memory saving. Not bit-identical under bf16: one estimate
-      differs by 1.5e-7 relative, and over 61 steps the validation losses drift apart by at most
-      1.3e-3 (bit-identical holds on CPU fp32 only). One seed, one repetition. CPU results to report
+      13.54% ± 0.13 percentage points across three seeds (mean step medians 9.273 → 8.018 s).
+      Mean test loss: 6.06783 vs 6.06719; **no** peak-memory saving. GPU trajectories are not
+      bit-identical: maximum validation difference 0.003874 across 99 paired evaluations.
+      Detailed provenance and compute conventions are in `results/baseline-three-seed/`. CPU results to report
       alongside: allocation measurement validated against seeds (variance ratio 1.01–1.02);
       multiplexing table (Hadamard > Rademacher, no win over plain DUST at nrep 8).
 
@@ -143,10 +143,9 @@ and repetitions — the GPU run has all of these except the SDPA kernel, and its
 
 **Blockers & Limitations**
 - [ ] **Write up, with resolution or plan for each:**
-  - GPU validation is partial: one single-GPU baseline run on an L40S (not the planned GCP A100).
-    Now exercised on CUDA: CUDA-event timing, peak memory, generator restore on resume, the
-    gradient probe. Still unrun: multi-GPU `all_reduce`, adaptive allocation, multiplexing, the
-    backprop baseline, W&B logging, more than one seed.
+  - GPU validation covers full replay, cached suffix, and backprop at 1M tokens across three L40S
+    seeds, including timing, peak memory, resume, probes and offline W&B logging. Still unrun:
+    multi-GPU `all_reduce`, adaptive allocation, multiplexing, 10M tokens. Online W&B sync remains open.
   - Bugs found by CPU tests and fixed (NaN variance, complex `c_max`, per-block draw counts, fp32
     cosine > 1, probe dtype crash on CUDA, checkpoint `set_state` on CUDA generators).
   - Multiplexing cannot beat plain DUST where direction count is the limit (Track 3 derivation);
@@ -290,7 +289,7 @@ deliberately broken version of the code must fail it. Run: `python -m pytest new
 - [x] **(GPU)** Launch-bound test on real hardware: **GPU-bound** (2× batch → 2.19× step time;
       `results/baseline-test/preflight/preflight.json`). FLOP savings show up in wall-clock.
 
-## Track 1 — only re-run the part of the network a perturbation affects (baseline A) — done, GPU gate passed on one seed
+## Track 1 — only re-run the part of the network a perturbation affects (baseline A) — done, three-seed GPU comparison passed
 
 A perturbation injected at some layer can only change the layers after it. Re-running the whole network
 to score it is wasted work. This track caches everything up to the injection point and re-runs just the
@@ -314,8 +313,8 @@ tail.
       median step 9.319 → 8.061 s (−13.5%), training time 568.3 → 491.7 s. Peak training memory:
       6.63 GiB in both — **no saving**. Loss: best val 6.0755 vs 6.0752; the two trajectories are
       not bit-identical (max validation difference 1.3e-3 over 33 evaluations).
-- [ ] **(GPU)** Repeat over at least 3 seeds with the execution order alternated, so the 13.5% has
-      a spread and the loss match is not a single-seed claim.
+- [x] **(GPU)** Repeated over seeds 42/43/44 with alternating execution order. Paired reduction
+      13.54% ± 0.13 percentage points; report and evidence in `results/baseline-three-seed/`.
 - Note: this is the **only** paper optimization still missing from the public code — the other two
   shortcuts are already in it. It's also the groundwork that multiplexing (Track 3) builds on.
 

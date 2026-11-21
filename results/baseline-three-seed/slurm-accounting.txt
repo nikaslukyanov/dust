@@ -1,0 +1,6 @@
+JobIDRaw|JobName|State|ExitCode|Start|End|ElapsedRaw|AllocTRES|NodeList
+13991786|dust-gpu-env|COMPLETED|0:0|2026-11-18T17:28:31|2026-11-18T17:31:06|155|billing=4,cpu=4,mem=16G,node=1|ins021
+13991787|dust-full-vs-suffix|COMPLETED|0:0|2026-11-18T17:31:32|2026-11-18T18:01:15|1783|billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1|ins057
+13991788|dust-full-vs-suffix|COMPLETED|0:0|2026-11-18T17:31:32|2026-11-18T18:01:01|1769|billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1|ins057
+13991789|dust-full-vs-suffix|COMPLETED|0:0|2026-11-18T17:31:32|2026-11-18T18:00:48|1756|billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1|ins060
+13992283|dust-audit-tests|COMPLETED|0:0|2026-11-18T17:49:13|2026-11-18T17:55:02|349|billing=4,cpu=4,mem=16G,node=1|ins054

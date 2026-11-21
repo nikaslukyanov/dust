@@ -1,0 +1,22 @@
+                                      full-replay     cached-suffix   vs first
+execution                             full-replay     cached-suffix
+steps                                          61                61     +0.0%
+best val                                  6.09875           6.09808     -0.0%
+test at best val                          6.08328           6.08291     -0.0%
+final train loss                          6.13112           6.13577     +0.1%
+forward-equivalents / step                285.251           239.742    -16.0%
+FLOPs / step                           3.1859e+14       2.67762e+14    -16.0%
+FLOPs executed / step                 4.20907e+14       3.53562e+14    -16.0%
+step host ms (median)                     9257.45           8017.58    -13.4%
+step gpu ms (median)                      9258.61            8018.5    -13.4%
+train seconds                              565.25           489.039    -13.5%
+peak memory GiB                           6.63046           6.63046     +0.0%
+  clean s (median)                      0.0311437         0.0311773     +0.1%
+  direct s (median)                       6.82742           5.78829    -15.2%
+  embedding s (median)                   0.302562          0.302875     +0.1%
+  hubs s (median)                        0.787633           0.58525    -25.7%
+  head s (median)                        0.281056          0.280935     -0.0%
+  local s (median)                       0.558604          0.559511     +0.2%
+  scalars s (median)                     0.462996           0.46286     -0.0%
+probe cosine (mean over probes)          0.265604           0.26414     -0.6%
+max |val diff| cached-suffix vs full-replay: 0.00387 over 33 evaluations

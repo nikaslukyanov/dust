@@ -1,0 +1,82 @@
+{
+  "tokens": "1M",
+  "population": 256,
+  "seed": 43,
+  "world": 1,
+  "steps": 61,
+  "training_tokens": 999424,
+  "validation_sequences": 544,
+  "test_sequences": 544,
+  "model": {
+    "sequence_len": 2048,
+    "vocab_size": 4096,
+    "n_layer": 8,
+    "n_head": 8,
+    "n_kv_head": 8,
+    "n_embd": 512,
+    "window_pattern": "SSSL"
+  },
+  "recipe": {
+    "writers": [
+      38,
+      32,
+      16,
+      10,
+      6,
+      4,
+      2,
+      2
+    ],
+    "hidden": [
+      38,
+      32,
+      16,
+      10,
+      6,
+      4,
+      2,
+      2
+    ],
+    "hubs": [
+      6,
+      6,
+      4,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "embedding": 10,
+    "head": 1024,
+    "local": {
+      "q": 2,
+      "v": 20,
+      "gate": 6,
+      "k": 12,
+      "ve": 8
+    },
+    "nrep": 2,
+    "lr": 0.25,
+    "momentum": 0.95,
+    "gamma": 0.98
+  },
+  "allocation": null,
+  "multiplex": null,
+  "reward_centering": "per-token local draw-chunk mean; skipped at nrep=1; no rescaling",
+  "execution": "cached-suffix",
+  "device": "cuda:0",
+  "checkpoint_interval": 10,
+  "probe_interval": 10,
+  "probe_seeds": 1,
+  "source_sha256": "82e4ba541e3e151437a3562009b9c699c9851988a40873a2cb1d9f393fd071e7",
+  "model_sha256": "96c83b63457035db87dd9bedba7935c0a15a0a0ed987a899e09d4a566ec35212",
+  "torch_version": "2.10.0+cu128",
+  "data": {
+    "sha256": {
+      "train": "f9996e06a0a617c5acf25e3454ccfbbe550db89f1ab0d587fe7d48b7d38efd7d",
+      "val": "8d123afe426b7789a47e7959a17f912ee58436941fa02e32bf4662373cf1e52c",
+      "test": "cf7185682b3cae85d35024890f94fe6dd8192cad9122815a43fcccb6e61b9483"
+    }
+  }
+}
