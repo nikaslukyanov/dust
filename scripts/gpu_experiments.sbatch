@@ -19,6 +19,7 @@
 #   track3   multiplexing sweep on the real model under bf16: blocks 0/3/6, sigma 0.05-0.8, nrep 2 and 8.
 #   track2   1M / population 256: fixed allocation, then --adaptive variance and agreement, same seed.
 #   track3train  cache vs cache + --multiplex hadamard training runs, writer/hidden draws rounded to 4.
+#   track2b  B retune round 1: objective gradient, FLOP budget, both, agreement + FLOP budget, measure-only.
 # Needs .venv/baseline-cu128 (built by scripts/launch_baseline.sh's setup job) and data/ from prepare_data.py.
 # Writes runs/midpoint-seed<SEED>/. A failed training run continues with the same command: each
 # dust.py call below adds --resume when its folder already holds a checkpoint.
@@ -81,6 +82,25 @@ for task in $tasks; do
         run hadamard --multiplex hadamard
         "$py" new_implementation/compare_runs.py \
             "$out/track3train/cache" "$out/track3train/hadamard" | tee "$out/track3train-comparison.txt"
+        ;;
+    track2b)
+        # B retune, round 1: existing flags only. Compared against track2/fixed (same seed, same recipe).
+        run() {
+            local name=$1; shift
+            local resume=()
+            if ls "$out/track2b/$name"/state*.pt >/dev/null 2>&1; then resume=(--resume); fi
+            "$py" -u dust.py --device cuda --tokens 1M --population 256 --seed "$seed" \
+                --probe-interval 10 --checkpoint-interval 10 --adaptive "$@" ${resume[@]+"${resume[@]}"} \
+                --output "$out/track2b/$name" 2>&1 | tee -a "$out/track2b-$name.log"
+        }
+        run variance-gradient --allocation-policy variance --allocation-objective gradient
+        run variance-flops --allocation-policy variance --allocation-budget flops
+        run variance-gradient-flops --allocation-policy variance --allocation-objective gradient --allocation-budget flops
+        run agreement-flops --allocation-policy agreement --allocation-budget flops
+        run measure-only --allocation-policy variance --allocation-interval 0
+        "$py" new_implementation/compare_runs.py "$out/track2/fixed" \
+            "$out/track2b/variance-gradient" "$out/track2b/variance-flops" "$out/track2b/variance-gradient-flops" \
+            "$out/track2b/agreement-flops" "$out/track2b/measure-only" | tee "$out/track2b-comparison.txt"
         ;;
     *) echo "Unknown task: $task" >&2; exit 2 ;;
     esac
