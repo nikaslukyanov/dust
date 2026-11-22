@@ -171,3 +171,55 @@ fp32 backprop reference. Cosine to backprop, writers / hidden, compute-matched c
   while loss depends on the groups it starved. Pooled cosine is not a sufficient objective.
 - Not tried yet: `--allocation-objective gradient`, a per-unit floor/cap, a longer recompute
   interval, longer runs. Defaults are untuned and the run is 61 steps.
+
+---
+
+## Run 4 — cache + C in training, and B retune round 1 (2026-11-21)
+
+Jobs 14048112 (`track3train`) and 14048126 (`track2b`), 1 × L40S, seed 42, 1M tokens, population 256,
+cached suffix in every run. Evidence: `results/midpoint-seed42/track3train/` and `track2b/`.
+
+### cache vs cache + C (training)
+
+`--multiplex` needs writer/hidden draws in multiples of the code length 4, so both runs use
+`--direct-multiple 4` (110 → 120 draws per type). That rounding alone moved cache's test loss from
+6.060 to 6.092: recipe-level changes of this size shift loss by ~0.03 at one seed.
+
+| | cache (rounded) | cache + hadamard |
+|---|---:|---:|
+| test at best val | **6.0923** | 6.1251 (+0.033) |
+| FLOPs / step | 2.797e14 | 1.721e14 (−38.5%) |
+| median step | 8.41 s | 5.47 s (−35.0%) |
+| peak memory | 6.63 GiB | 6.82 GiB |
+| probe cosine | 0.238 | 0.227 |
+
+- C trades a third of the step time for +0.5% loss. **Not yet a win:** at nrep 2 the gradient sweep
+  showed Hadamard ≈ plain DUST with half the writer/hidden draws, so the decisive control is cache with
+  those draws halved, at C's FLOPs. If that run matches C's loss, C adds nothing over using fewer draws.
+
+### B retune round 1 (vs cache, test 6.0601)
+
+| run | test at best val | FLOPs / step | step | where the draws went |
+|---|---:|---:|---:|---|
+| variance, objective gradient | 6.1083 (+0.048) | −8.7% | −5.8% | off the embedding (phase −59%) onto cheaper deep units |
+| variance, budget flops | 6.1984 (+0.138) | 0.0% | −0.6% | still to the embedding (phase +1448%) |
+| variance, gradient + flops | 6.1226 (+0.062) | 0.0% | +4.6% | off the embedding, onto shallow writers/hidden (direct +9%) |
+| agreement, budget flops | 6.2203 (+0.160) | 0.0% | +3.1% | to the hubs (phase +651%) |
+| measure-only (interval 0) | **6.0532 (−0.007)** | −2.3% | −0.2% | none after step 0 |
+
+- **No setting beats cache.** The best, objective `gradient`, gives −8.7% FLOPs for +0.8% loss, a
+  worse trade than C's.
+- The learning-rate weighting was the embedding bug: `gradient` fixes it, the FLOP budget alone does not.
+- Every adaptive run raised probe cosine (+2% to +20%) while loss got worse: minimizing pooled gradient
+  noise is not aligned with loss here. The paper's hand-tuned recipe front-loads shallow writers
+  (38 draws at block 0), which the noise-based policies undo.
+- Measure-only: the split-half measurement does not hurt training, and its overhead is within noise
+  (−0.2% step time). It is not an exact cache replay: the step-0 floor lifts units below two chunks,
+  hence −2.3% FLOPs and a max validation difference of 0.0115.
+
+### The missing control for both B and C
+
+Both methods are judged against one cache point. What they need is cache's **draw-count curve**: cache
+with writer/hidden draws scaled 0.5× and 0.75× (loss vs FLOPs). A method helps only if its point lies
+below that curve. C at −38.5% FLOPs and B (`gradient`) at −8.7% may be no better than spending fewer
+draws uniformly.

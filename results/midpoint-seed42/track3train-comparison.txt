@@ -1,0 +1,22 @@
+                                            cache          hadamard   vs first
+execution                           cached-suffix     cached-suffix
+steps                                          61                61     +0.0%
+best val                                  6.10852           6.14211     +0.5%
+test at best val                          6.09232           6.12511     +0.5%
+final train loss                          5.90014           5.95806     +1.0%
+forward-equivalents / step                250.419           154.112    -38.5%
+FLOPs / step                          2.79687e+14       1.72124e+14    -38.5%
+FLOPs executed / step                  3.6868e+14       2.30554e+14    -37.5%
+step host ms (median)                     8410.78           5465.09    -35.0%
+step gpu ms (median)                      8411.94            5466.3    -35.0%
+train seconds                             516.315           333.436    -35.4%
+peak memory GiB                           6.63046           6.81796     +2.8%
+  clean s (median)                       0.031138         0.0310891     -0.2%
+  direct s (median)                       6.17656           3.23319    -47.7%
+  embedding s (median)                    0.30396          0.303774     -0.1%
+  hubs s (median)                        0.587469           0.58694     -0.1%
+  head s (median)                        0.280695           0.28111     +0.1%
+  local s (median)                       0.562032          0.561072     -0.2%
+  scalars s (median)                      0.46328          0.462858     -0.1%
+probe cosine (mean over probes)          0.237941          0.226908     -4.6%
+max |val diff| hadamard vs cache: 0.301 over 33 evaluations
