@@ -19,6 +19,7 @@
 #   track3   multiplexing sweep on the real model under bf16: blocks 0/3/6, sigma 0.05-0.8, nrep 2 and 8.
 #   track2   1M / population 256: fixed allocation, then --adaptive variance and agreement, same seed.
 #   track3train  cache vs cache + --multiplex hadamard training runs, writer/hidden draws rounded to 4.
+#   track3control  cache with half the writer/hidden draws: the same forward passes as cache + C.
 #   track2b  B retune round 1: objective gradient, FLOP budget, both, agreement + FLOP budget, measure-only.
 # Needs .venv/baseline-cu128 (built by scripts/launch_baseline.sh's setup job) and data/ from prepare_data.py.
 # Writes runs/midpoint-seed<SEED>/. A failed training run continues with the same command: each
@@ -101,6 +102,16 @@ for task in $tasks; do
         "$py" new_implementation/compare_runs.py "$out/track2/fixed" \
             "$out/track2b/variance-gradient" "$out/track2b/variance-flops" "$out/track2b/variance-gradient-flops" \
             "$out/track2b/agreement-flops" "$out/track2b/measure-only" | tee "$out/track2b-comparison.txt"
+        ;;
+    track3control)
+        # The decisive control for C: plain cache DUST with the rounded recipe's writer/hidden draws halved,
+        # i.e. the same forward passes as cache + hadamard in track3train.
+        "$py" -u dust.py --device cuda --tokens 1M --population 256 --seed "$seed" --direct-multiple 4 \
+            --direct-scale 0.5 --probe-interval 10 --checkpoint-interval 10 \
+            $(ls "$out/track3train/cache-half"/state*.pt >/dev/null 2>&1 && echo --resume) \
+            --output "$out/track3train/cache-half" 2>&1 | tee -a "$out/track3train-cache-half.log"
+        "$py" new_implementation/compare_runs.py "$out/track3train/cache" \
+            "$out/track3train/cache-half" "$out/track3train/hadamard" | tee "$out/track3control-comparison.txt"
         ;;
     *) echo "Unknown task: $task" >&2; exit 2 ;;
     esac

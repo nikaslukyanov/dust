@@ -942,6 +942,10 @@ def main():
                         help='Round every block\'s writer and hidden draws up to a multiple of N (0: off). '
                              '--multiplex needs multiples of the code length 4, which the population-256 '
                              'recipe lacks; give the plain-DUST comparison run the same N so both match.')
+    parser.add_argument('--direct-scale', type=float, default=1.0,
+                        help='Scale every block\'s writer and hidden draws by this factor (after --direct-multiple), '
+                             'rounded to a multiple of the chunk size: the plain-DUST draw-count control, e.g. 0.5 '
+                             'runs the forward passes --multiplex uses.')
     parser.add_argument('--allocation-policy', choices=('variance', 'agreement'), default='variance',
                         help='With --adaptive: draws in proportion to per-draw noise (variance), or to equalize '
                              'the cosine between half-population estimates (agreement; also moves the hubs).')
@@ -993,6 +997,12 @@ def main():
         if args.direct_multiple:
             up = lambda counts: [-(-k // args.direct_multiple) * args.direct_multiple for k in counts]
             settings = dataclass_replace(settings, writers=up(settings.writers), hidden=up(settings.hidden))
+        if args.direct_scale != 1.0:
+            if args.direct_scale <= 0:
+                parser.error('--direct-scale must be positive')
+            step = world * settings.nrep
+            scale = lambda counts: [max(step, step * round(k * args.direct_scale / step)) for k in counts]
+            settings = dataclass_replace(settings, writers=scale(settings.writers), hidden=scale(settings.hidden))
         defaults = DEFAULT_CONFIGS[args.tokens]
         config, steps, interval = GPTConfig(), defaults['steps'], defaults['eval_interval']
         paths = dict(
