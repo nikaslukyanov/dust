@@ -1,0 +1,14 @@
+{
+  "commit": "6444d3c67bf3a0a07942eb842bde7452a5aa8434",
+  "seeds": [
+    42
+  ],
+  "order": "alternate",
+  "gpu": "l40s",
+  "wandb": {
+    "project": null,
+    "entity": null
+  },
+  "backprop": false,
+  "launched": "2026-11-21T16:24:23-05:00"
+}

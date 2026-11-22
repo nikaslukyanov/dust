@@ -1,0 +1,378 @@
+Python 3.11.5
+Processing ./.venv/wheelhouse-cu128/cuda_bindings-12.9.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cublas_cu12-12.8.4.1-py3-none-manylinux_2_27_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cuda_cupti_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cuda_nvrtc_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cuda_runtime_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cufile_cu12-1.13.1.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_curand_cu12-10.3.9.90-py3-none-manylinux_2_27_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_cusparselt_cu12-0.7.1-py3-none-manylinux2014_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_nccl_cu12-2.27.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_nvjitlink_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_nvshmem_cu12-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/nvidia_nvtx_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/torch-2.10.0+cu128-cp311-cp311-manylinux_2_28_x86_64.whl
+Processing ./.venv/wheelhouse-cu128/triton-3.6.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+Collecting cuda-pathfinder~=1.1 (from cuda-bindings==12.9.4)
+  Obtaining dependency information for cuda-pathfinder~=1.1 from https://files.pythonhosted.org/packages/62/8e/e6101ff068e7e78b362879ffc0c7cbfe68c9742943c9b034f009fe19f88f/cuda_pathfinder-1.9.1-py3-none-any.whl.metadata
+  Downloading cuda_pathfinder-1.9.1-py3-none-any.whl.metadata (1.9 kB)
+Collecting filelock (from torch==2.10.0+cu128)
+  Obtaining dependency information for filelock from https://files.pythonhosted.org/packages/8a/c9/eb6b6528c7edb958d4c24ac47a8b94113d9de36e4cfc6eecd599b1a4f349/filelock-4.2.12-py3-none-any.whl.metadata
+  Downloading filelock-4.2.12-py3-none-any.whl.metadata (2.3 kB)
+Collecting typing-extensions>=4.10.0 (from torch==2.10.0+cu128)
+  Obtaining dependency information for typing-extensions>=4.10.0 from https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl.metadata
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting sympy>=1.13.3 (from torch==2.10.0+cu128)
+  Obtaining dependency information for sympy>=1.13.3 from https://files.pythonhosted.org/packages/a2/09/77d55d46fd61b4a135c444fc97158ef34a095e5681d0a6c10b75bf356191/sympy-1.14.0-py3-none-any.whl.metadata
+  Downloading sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+Collecting networkx>=2.5.1 (from torch==2.10.0+cu128)
+  Obtaining dependency information for networkx>=2.5.1 from https://files.pythonhosted.org/packages/9e/c9/b2622292ea83fbb4ec318f5b9ab867d0a28ab43c5717bb85b0a5f6b3b0a4/networkx-3.6.1-py3-none-any.whl.metadata
+  Downloading networkx-3.6.1-py3-none-any.whl.metadata (6.8 kB)
+Collecting jinja2 (from torch==2.10.0+cu128)
+  Obtaining dependency information for jinja2 from https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl.metadata
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting fsspec>=0.8.5 (from torch==2.10.0+cu128)
+  Obtaining dependency information for fsspec>=0.8.5 from https://files.pythonhosted.org/packages/6c/c0/a98505f18594f1bce828bb159cec0fcf9860562f1a2c85913409fc8f3d9e/fsspec-2026.9.0-py3-none-any.whl.metadata
+  Downloading fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting mpmath<1.4,>=1.1.0 (from sympy>=1.13.3->torch==2.10.0+cu128)
+  Obtaining dependency information for mpmath<1.4,>=1.1.0 from https://files.pythonhosted.org/packages/43/e3/7d92a15f894aa0c9c4b49b8ee9ac9850d6e63b03c9c32c0367a13ae62209/mpmath-1.3.0-py3-none-any.whl.metadata
+  Downloading mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+Collecting MarkupSafe>=2.0 (from jinja2->torch==2.10.0+cu128)
+  Obtaining dependency information for MarkupSafe>=2.0 from https://files.pythonhosted.org/packages/81/a5/a513b76c139a3915b43404324e55c0b7979ae4f0d39eb6f075b0282e90a8/markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+Downloading cuda_pathfinder-1.9.1-py3-none-any.whl (63 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 63.5/63.5 kB 438.1 kB/s eta 0:00:00
+Downloading fsspec-2026.9.0-py3-none-any.whl (221 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.7/221.7 kB 1.2 MB/s eta 0:00:00
+Downloading networkx-3.6.1-py3-none-any.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 965.5 kB/s eta 0:00:00
+Downloading sympy-1.14.0-py3-none-any.whl (6.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.3/6.3 MB 1.2 MB/s eta 0:00:00
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 643.4 kB/s eta 0:00:00
+Downloading filelock-4.2.12-py3-none-any.whl (222 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 222.4/222.4 kB 688.5 kB/s eta 0:00:00
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.9/134.9 kB 39.1 kB/s eta 0:00:00
+Downloading markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+Downloading mpmath-1.3.0-py3-none-any.whl (536 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 536.2/536.2 kB 113.8 kB/s eta 0:00:00
+Installing collected packages: nvidia-cusparselt-cu12, mpmath, typing-extensions, triton, sympy, nvidia-nvtx-cu12, nvidia-nvshmem-cu12, nvidia-nvjitlink-cu12, nvidia-nccl-cu12, nvidia-curand-cu12, nvidia-cufile-cu12, nvidia-cuda-runtime-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-cupti-cu12, nvidia-cublas-cu12, networkx, MarkupSafe, fsspec, filelock, cuda-pathfinder, nvidia-cusparse-cu12, nvidia-cufft-cu12, nvidia-cudnn-cu12, jinja2, cuda-bindings, nvidia-cusolver-cu12, torch
+Successfully installed MarkupSafe-3.0.4 cuda-bindings-12.9.4 cuda-pathfinder-1.9.1 filelock-4.2.12 fsspec-2026.9.0 jinja2-3.1.6 mpmath-1.3.0 networkx-3.6.1 nvidia-cublas-cu12-12.8.4.1 nvidia-cuda-cupti-cu12-12.8.90 nvidia-cuda-nvrtc-cu12-12.8.93 nvidia-cuda-runtime-cu12-12.8.90 nvidia-cudnn-cu12-9.10.2.21 nvidia-cufft-cu12-11.3.3.83 nvidia-cufile-cu12-1.13.1.3 nvidia-curand-cu12-10.3.9.90 nvidia-cusolver-cu12-11.7.3.90 nvidia-cusparse-cu12-12.5.8.93 nvidia-cusparselt-cu12-0.7.1 nvidia-nccl-cu12-2.27.5 nvidia-nvjitlink-cu12-12.8.93 nvidia-nvshmem-cu12-3.4.5 nvidia-nvtx-cu12-12.8.90 sympy-1.14.0 torch-2.10.0+cu128 triton-3.6.0 typing-extensions-4.16.0
+Collecting pytest
+  Obtaining dependency information for pytest from https://files.pythonhosted.org/packages/51/39/1f5d8c8877a0fa327db959c19341d4be61660de1ab6b7391f9eb805bcd67/pytest-9.2.0-py3-none-any.whl.metadata
+  Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+Requirement already satisfied: torch==2.10.0 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from -r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (2.10.0+cu128)
+Collecting tokenizers==0.23.1 (from -r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 2))
+  Obtaining dependency information for tokenizers==0.23.1 from https://files.pythonhosted.org/packages/0d/d5/1353e5f677ec27c2494fb6a6725e82d56c985f53e90ec511369e7e4f02c6/tokenizers-0.23.1-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
+  Downloading tokenizers-0.23.1-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.8 kB)
+Collecting datasets==4.8.4 (from -r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for datasets==4.8.4 from https://files.pythonhosted.org/packages/b0/e5/247d094108e42ac26363ab8dc57f168840cf7c05774b40ffeb0d78868fcc/datasets-4.8.4-py3-none-any.whl.metadata
+  Downloading datasets-4.8.4-py3-none-any.whl.metadata (19 kB)
+Collecting wandb==0.31.0 (from -r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for wandb==0.31.0 from https://files.pythonhosted.org/packages/2a/07/5594faeaea9440be2ea01cee692573416b3997879df67f0e940bfbfc2d26/wandb-0.31.0-py3-none-manylinux_2_28_x86_64.whl.metadata
+  Downloading wandb-0.31.0-py3-none-manylinux_2_28_x86_64.whl.metadata (12 kB)
+Requirement already satisfied: filelock in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (4.2.12)
+Requirement already satisfied: typing-extensions>=4.10.0 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (4.16.0)
+Requirement already satisfied: sympy>=1.13.3 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (3.6.1)
+Requirement already satisfied: jinja2 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (3.1.6)
+Requirement already satisfied: fsspec>=0.8.5 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (2026.9.0)
+Requirement already satisfied: cuda-bindings==12.9.4 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.9.4)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.8.93 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.8.93)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.8.90 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.8.90)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.8.90 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.8.90)
+Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (9.10.2.21)
+Requirement already satisfied: nvidia-cublas-cu12==12.8.4.1 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.8.4.1)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.3.83 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (11.3.3.83)
+Requirement already satisfied: nvidia-curand-cu12==10.3.9.90 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (10.3.9.90)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.3.90 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (11.7.3.90)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.8.93 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.5.8.93)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (0.7.1)
+Requirement already satisfied: nvidia-nccl-cu12==2.27.5 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (2.27.5)
+Requirement already satisfied: nvidia-nvshmem-cu12==3.4.5 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (3.4.5)
+Requirement already satisfied: nvidia-nvtx-cu12==12.8.90 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.8.90)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.8.93 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (12.8.93)
+Requirement already satisfied: nvidia-cufile-cu12==1.13.1.3 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (1.13.1.3)
+Requirement already satisfied: triton==3.6.0 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (3.6.0)
+Collecting huggingface-hub<2.0,>=0.16.4 (from tokenizers==0.23.1->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 2))
+  Obtaining dependency information for huggingface-hub<2.0,>=0.16.4 from https://files.pythonhosted.org/packages/fc/16/963096d224b80909432dc16561a615fd33d2d13beef3ce4c63fa25e40867/huggingface_hub-1.33.0-py3-none-any.whl.metadata
+  Downloading huggingface_hub-1.33.0-py3-none-any.whl.metadata (16 kB)
+Collecting numpy>=1.17 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for numpy>=1.17 from https://files.pythonhosted.org/packages/02/03/74fe2a4cb3817d94d86402f2506554130a2f01414e299b5a843e5a8a957f/numpy-2.4.6-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading numpy-2.4.6-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting pyarrow>=21.0.0 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for pyarrow>=21.0.0 from https://files.pythonhosted.org/packages/e6/87/6bf528898ef82dc3e8d762cbec7b42ae127a543895cc78c5df26a1f497f5/pyarrow-26.0.1-cp311-cp311-manylinux_2_28_x86_64.whl.metadata
+  Downloading pyarrow-26.0.1-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting dill<0.4.2,>=0.3.0 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for dill<0.4.2,>=0.3.0 from https://files.pythonhosted.org/packages/1e/77/dc8c558f7593132cf8fefec57c4f60c83b16941c574ac5f619abb3ae7933/dill-0.4.1-py3-none-any.whl.metadata
+  Downloading dill-0.4.1-py3-none-any.whl.metadata (10 kB)
+Collecting pandas (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for pandas from https://files.pythonhosted.org/packages/3a/a9/0770e9316611d45b9eb7bc5d1266a327b21d3c237fb288aa679ce419296e/pandas-3.1.1-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading pandas-3.1.1-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (16 kB)
+Collecting requests>=2.32.2 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for requests>=2.32.2 from https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl.metadata
+  Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting httpx<1.0.0 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for httpx<1.0.0 from https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl.metadata
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting tqdm>=4.66.3 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for tqdm>=4.66.3 from https://files.pythonhosted.org/packages/a7/03/921a3d3c75785aca9ebfbfcabfbc3a1be12e2ab5265deb026d55a5a3f83e/tqdm-4.70.1-py3-none-any.whl.metadata
+  Downloading tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.4/57.4 kB 967.2 kB/s eta 0:00:00
+Collecting xxhash (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for xxhash from https://files.pythonhosted.org/packages/b6/4f/5b195a79fafb6e9ab8e95229cc5346572a6cc40d6d6ed9227183a25315ea/xxhash-4.1.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading xxhash-4.1.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (18 kB)
+Collecting multiprocess<0.70.20 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for multiprocess<0.70.20 from https://files.pythonhosted.org/packages/86/c2/dec9722dc3474c164a0b6bcd9a7ed7da542c98af8cabce05374abab35edd/multiprocess-0.70.19-py311-none-any.whl.metadata
+  Downloading multiprocess-0.70.19-py311-none-any.whl.metadata (7.5 kB)
+Collecting fsspec[http]<=2026.2.0,>=2023.1.0 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for fsspec[http]<=2026.2.0,>=2023.1.0 from https://files.pythonhosted.org/packages/e6/ab/fb21f4c939bb440104cc2b396d3be1d9b7a9fd3c6c2a53d98c45b3d7c954/fsspec-2026.2.0-py3-none-any.whl.metadata
+  Downloading fsspec-2026.2.0-py3-none-any.whl.metadata (10 kB)
+Collecting packaging (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for packaging from https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl.metadata
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pyyaml>=5.1 (from datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for pyyaml>=5.1 from https://files.pythonhosted.org/packages/9d/3e/c1c307b6c03e4ea7d86f166f14920ead07aecc35e88d873814d12aa2da66/pyyaml-6.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading pyyaml-6.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.3 kB)
+Collecting click>=8.2.0 (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for click>=8.2.0 from https://files.pythonhosted.org/packages/31/7d/164b7ffc8624fe9efb4221bf9af485d5c1e41b9ae118045d2b6dc5457d8b/click-8.5.1-py3-none-any.whl.metadata
+  Downloading click-8.5.1-py3-none-any.whl.metadata (2.6 kB)
+Collecting cwevals==0.0.1b1 (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for cwevals==0.0.1b1 from https://files.pythonhosted.org/packages/b5/96/b3b348954f88915e60e2f1fbe6d09250584e53a20d949e55786f31dbaeb0/cwevals-0.0.1b1-py3-none-any.whl.metadata
+  Downloading cwevals-0.0.1b1-py3-none-any.whl.metadata (13 kB)
+Collecting opentelemetry-api>=1.43.0 (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-api>=1.43.0 from https://files.pythonhosted.org/packages/a9/2d/610db864d7513158cebb8f36cc88e67e73bd6c7aa1905ef18d89e1281c81/opentelemetry_api-1.45.2-py3-none-any.whl.metadata
+  Downloading opentelemetry_api-1.45.2-py3-none-any.whl.metadata (1.4 kB)
+Collecting opentelemetry-exporter-otlp-proto-http>=1.43.0 (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-exporter-otlp-proto-http>=1.43.0 from https://files.pythonhosted.org/packages/32/65/f64d7d2450217e2989714e1dee15e19bf79a77a313387abac0cac77bc10e/opentelemetry_exporter_otlp_proto_http-1.45.2-py3-none-any.whl.metadata
+  Downloading opentelemetry_exporter_otlp_proto_http-1.45.2-py3-none-any.whl.metadata (3.0 kB)
+Collecting opentelemetry-sdk>=1.43.0 (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-sdk>=1.43.0 from https://files.pythonhosted.org/packages/9f/a5/9a3b793ef48245f2336a16beb2324c2397dbb3f987cd68942f77cca06156/opentelemetry_sdk-1.45.2-py3-none-any.whl.metadata
+  Downloading opentelemetry_sdk-1.45.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting platformdirs (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for platformdirs from https://files.pythonhosted.org/packages/5b/be/373cc7341f53bfd3acba3e5db62433fd960a45fcf73ad64a5f4d27e74910/platformdirs-4.14.8-py3-none-any.whl.metadata
+  Downloading platformdirs-4.14.8-py3-none-any.whl.metadata (5.7 kB)
+Collecting protobuf!=5.28.0,!=5.29.0,<8,>=5 (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for protobuf!=5.28.0,!=5.29.0,<8,>=5 from https://files.pythonhosted.org/packages/db/f3/3996583dd2906297a637af12114deddf7658af6e683fedb83be061983fb5/protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl.metadata
+  Downloading protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl.metadata (595 bytes)
+Collecting pydantic<3,>=2.6 (from wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for pydantic<3,>=2.6 from https://files.pythonhosted.org/packages/8a/8c/824a686c4ba815ddb0722f9e66272088bccd4e1ae1d2f7015375e4a4fc7f/pydantic-2.14.4-py3-none-any.whl.metadata
+  Downloading pydantic-2.14.4-py3-none-any.whl.metadata (143 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 144.0/144.0 kB 22.3 kB/s eta 0:00:00
+Requirement already satisfied: cuda-pathfinder~=1.1 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from cuda-bindings==12.9.4->torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (1.9.1)
+Collecting anyio<5,>=3.5.0 (from cwevals==0.0.1b1->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for anyio<5,>=3.5.0 from https://files.pythonhosted.org/packages/a9/16/7757fb84c819accc7d7e9af5291b261e4abb8627ee040f99e7d35ef2457a/anyio-4.16.0-py3-none-any.whl.metadata
+  Downloading anyio-4.16.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting distro<2,>=1.7.0 (from cwevals==0.0.1b1->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for distro<2,>=1.7.0 from https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl.metadata
+  Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting sniffio (from cwevals==0.0.1b1->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for sniffio from https://files.pythonhosted.org/packages/e9/44/75a9c9421471a6c4805dbf2356f7c181a29c1879239abab1ea2cc8f38b40/sniffio-1.3.1-py3-none-any.whl.metadata
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting iniconfig>=2 (from pytest)
+  Obtaining dependency information for iniconfig>=2 from https://files.pythonhosted.org/packages/56/43/4ca9e49d27a1fcf6bece6f6aec0ea46bb9112489b93d4b688fb415457bdb/iniconfig-2.3.1-py3-none-any.whl.metadata
+  Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+Collecting pluggy<2,>=1.6 (from pytest)
+  Obtaining dependency information for pluggy<2,>=1.6 from https://files.pythonhosted.org/packages/40/9e/2b38731e0fc536806f16490e1a12d7f0dc2a1235aa8cc07bcc75416a7daa/pluggy-1.7.0-py3-none-any.whl.metadata
+  Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting pygments>=2.15 (from pytest)
+  Obtaining dependency information for pygments>=2.15 from https://files.pythonhosted.org/packages/71/46/17f022dd3e953bf20a04a028a21ec746d942f8d2af30fa0f124fa0e6a684/pygments-2.21.0-py3-none-any.whl.metadata
+  Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting aiohttp!=4.0.0a0,!=4.0.0a1 (from fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for aiohttp!=4.0.0a0,!=4.0.0a1 from https://files.pythonhosted.org/packages/42/74/2a2b22953de15c6c8a80debf26db3047e4e8a5a5db6dd7c2c6c01eec0605/aiohttp-3.14.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading aiohttp-3.14.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Collecting certifi (from httpx<1.0.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for certifi from https://files.pythonhosted.org/packages/6d/39/5eec3296860b94ac20bb8ed807725b88f6adfab3f343df592afd975f5f86/certifi-2026.11.20-py3-none-any.whl.metadata
+  Downloading certifi-2026.11.20-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpcore==1.* (from httpx<1.0.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for httpcore==1.* from https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl.metadata
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting idna (from httpx<1.0.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for idna from https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl.metadata
+  Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting h11>=0.16 (from httpcore==1.*->httpx<1.0.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for h11>=0.16 from https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl.metadata
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting hf-xet<2.0.0,>=1.6.0 (from huggingface-hub<2.0,>=0.16.4->tokenizers==0.23.1->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 2))
+  Obtaining dependency information for hf-xet<2.0.0,>=1.6.0 from https://files.pythonhosted.org/packages/f8/1e/1e8ecc05ef034e9a95c18ed32d2ec07905a7cd2ca611a9d88e25ee1f4850/hf_xet-1.8.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata
+  Downloading hf_xet-1.8.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+Collecting googleapis-common-protos~=1.52 (from opentelemetry-exporter-otlp-proto-http>=1.43.0->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for googleapis-common-protos~=1.52 from https://files.pythonhosted.org/packages/05/6d/78dc67a9e779e594b49bf62604034d3a6aa428a55afc729cafda4b7333e1/googleapis_common_protos-1.76.0-py3-none-any.whl.metadata
+  Downloading googleapis_common_protos-1.76.0-py3-none-any.whl.metadata (8.5 kB)
+Collecting opentelemetry-exporter-http-transport[requests]==0.66b2 (from opentelemetry-exporter-otlp-proto-http>=1.43.0->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-exporter-http-transport[requests]==0.66b2 from https://files.pythonhosted.org/packages/a1/b2/c622a101f31c0e6670b82f4264c4e77c161bce415bc6fc158fda0b82e218/opentelemetry_exporter_http_transport-0.66b2-py3-none-any.whl.metadata
+  Downloading opentelemetry_exporter_http_transport-0.66b2-py3-none-any.whl.metadata (2.3 kB)
+Collecting opentelemetry-exporter-otlp-common==0.66b2 (from opentelemetry-exporter-otlp-proto-http>=1.43.0->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-exporter-otlp-common==0.66b2 from https://files.pythonhosted.org/packages/a8/47/b3049e30b339c82e3c7ec1fc692185a5d5a3ba65a94c570bb39b2c0b8424/opentelemetry_exporter_otlp_common-0.66b2-py3-none-any.whl.metadata
+  Downloading opentelemetry_exporter_otlp_common-0.66b2-py3-none-any.whl.metadata (1.9 kB)
+Collecting opentelemetry-exporter-otlp-proto-common==1.45.2 (from opentelemetry-exporter-otlp-proto-http>=1.43.0->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-exporter-otlp-proto-common==1.45.2 from https://files.pythonhosted.org/packages/e6/d6/0f30d38120a949aef70528f845bf539f80df62abb4b8e62fdf69c2b6df5a/opentelemetry_exporter_otlp_proto_common-1.45.2-py3-none-any.whl.metadata
+  Downloading opentelemetry_exporter_otlp_proto_common-1.45.2-py3-none-any.whl.metadata (1.8 kB)
+Collecting opentelemetry-proto==1.45.2 (from opentelemetry-exporter-otlp-proto-http>=1.43.0->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-proto==1.45.2 from https://files.pythonhosted.org/packages/7e/0d/a0b8f2b9efe2ec1abdf639d3696db9b1563ebeb11d91aac08ba7341e9122/opentelemetry_proto-1.45.2-py3-none-any.whl.metadata
+  Downloading opentelemetry_proto-1.45.2-py3-none-any.whl.metadata (2.3 kB)
+Collecting opentelemetry-semantic-conventions==0.66b2 (from opentelemetry-sdk>=1.43.0->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for opentelemetry-semantic-conventions==0.66b2 from https://files.pythonhosted.org/packages/67/bd/6bf33ed31521c565931c037e9e81bac47c1acb000e850c6e24220e2a0c00/opentelemetry_semantic_conventions-0.66b2-py3-none-any.whl.metadata
+  Downloading opentelemetry_semantic_conventions-0.66b2-py3-none-any.whl.metadata (2.4 kB)
+Collecting annotated-types>=0.6.0 (from pydantic<3,>=2.6->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for annotated-types>=0.6.0 from https://files.pythonhosted.org/packages/99/91/8acff4f5e50511b911bbccb72b8628a49c68ce14148cd9f6431094859a90/annotated_types-0.8.0-py3-none-any.whl.metadata
+  Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.50.5 (from pydantic<3,>=2.6->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for pydantic-core==2.50.5 from https://files.pythonhosted.org/packages/bd/77/9520ca4c8f9bac81c2c4124389a8413c9d0e97e054b1d0c854b71e104297/pydantic_core-2.50.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata
+  Downloading pydantic_core-2.50.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (6.6 kB)
+Collecting typing-inspection>=0.4.4 (from pydantic<3,>=2.6->wandb==0.31.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 4))
+  Obtaining dependency information for typing-inspection>=0.4.4 from https://files.pythonhosted.org/packages/de/0c/ea2544850a7c135e15033a5c7a8e7211136184b7ae63e2239d557c2b3019/typing_inspection-0.4.5-py3-none-any.whl.metadata
+  Downloading typing_inspection-0.4.5-py3-none-any.whl.metadata (2.6 kB)
+Collecting charset_normalizer<4,>=2 (from requests>=2.32.2->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for charset_normalizer<4,>=2 from https://files.pythonhosted.org/packages/e4/ed/cf505d3011ffceb12c2067a7a5d3cfe92b875d4d44bb0ff0d69375e2c184/charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.4/46.4 kB 212.8 kB/s eta 0:00:00
+Collecting urllib3<3,>=1.26 (from requests>=2.32.2->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for urllib3<3,>=1.26 from https://files.pythonhosted.org/packages/92/9d/c4e665119135114480843e7ab388fa94d8480650450e6f8e26b70d323a4c/urllib3-2.8.0-py3-none-any.whl.metadata
+  Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from sympy>=1.13.3->torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in ./.venv/baseline-cu128/lib/python3.11/site-packages (from jinja2->torch==2.10.0->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 1)) (3.0.4)
+Collecting python-dateutil>=2.9.0 (from pandas->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for python-dateutil>=2.9.0 from https://files.pythonhosted.org/packages/2f/a9/52b89563d154433d79b51ed1eb4842bf7334cb2696891a7fe135618853d7/python_dateutil-4.0.0-py3-none-any.whl.metadata
+  Downloading python_dateutil-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+Collecting aiohappyeyeballs>=2.5.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for aiohappyeyeballs>=2.5.0 from https://files.pythonhosted.org/packages/71/43/1947f06babed6b3f1d7f38b0c767f52df66bfb2bc10b468c4a7de9eceff2/aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata
+  Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiosignal>=1.4.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for aiosignal>=1.4.0 from https://files.pythonhosted.org/packages/fb/76/641ae371508676492379f16e2fa48f4e2c11741bd63c48be4b12a6b09cba/aiosignal-1.4.0-py3-none-any.whl.metadata
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting attrs>=17.3.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for attrs>=17.3.0 from https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl.metadata
+  Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting frozenlist>=1.1.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for frozenlist>=1.1.1 from https://files.pythonhosted.org/packages/11/b1/71a477adc7c36e5fb628245dfbdea2166feae310757dea848d02bd0689fd/frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata
+  Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+Collecting multidict<8.0,>=4.5 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for multidict<8.0,>=4.5 from https://files.pythonhosted.org/packages/d0/38/b8403d97ae5273002fa664c3c440c5cc186082fa0ba20fcc93885d13a686/multidict-7.2.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading multidict-7.2.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (6.1 kB)
+Collecting propcache>=0.2.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for propcache>=0.2.0 from https://files.pythonhosted.org/packages/c7/06/519a5ebb48b6f94beb48396e55c905f12246a25c3a3608a7ec7bceabf50e/propcache-0.5.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading propcache-0.5.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (25 kB)
+Collecting yarl<2.0,>=1.25.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.2.0,>=2023.1.0->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for yarl<2.0,>=1.25.1 from https://files.pythonhosted.org/packages/95/0c/a71501bbc1a674ff72c4d6c2b75f4d9a5af819f5244c3a7558080a8802c5/yarl-1.25.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata
+  Downloading yarl-1.25.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (111 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 111.6/111.6 kB 532.6 kB/s eta 0:00:00
+Collecting tzdata (from python-dateutil>=2.9.0->pandas->datasets==4.8.4->-r /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/source/requirements.txt (line 3))
+  Obtaining dependency information for tzdata from https://files.pythonhosted.org/packages/0a/66/9a06c2227fedfd4919f0eaaa8b94377d9730882a7e4f95823c9a331ab5e1/tzdata-2026.6-py2.py3-none-any.whl.metadata
+  Downloading tzdata-2026.6-py2.py3-none-any.whl.metadata (1.4 kB)
+Downloading tokenizers-0.23.1-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 594.2 kB/s eta 0:00:00
+Downloading datasets-4.8.4-py3-none-any.whl (526 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 527.0/527.0 kB 186.1 kB/s eta 0:00:00
+Downloading wandb-0.31.0-py3-none-manylinux_2_28_x86_64.whl (20.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 20.3/20.3 MB 670.1 kB/s eta 0:00:00
+Downloading cwevals-0.0.1b1-py3-none-any.whl (176 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 176.5/176.5 kB 485.7 kB/s eta 0:00:00
+Downloading pytest-9.2.0-py3-none-any.whl (411 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 411.8/411.8 kB 1.3 MB/s eta 0:00:00
+Downloading click-8.5.1-py3-none-any.whl (126 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 126.2/126.2 kB 1.6 MB/s eta 0:00:00
+Downloading dill-0.4.1-py3-none-any.whl (120 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 120.0/120.0 kB 1.7 MB/s eta 0:00:00
+Downloading fsspec-2026.2.0-py3-none-any.whl (202 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 202.5/202.5 kB 693.9 kB/s eta 0:00:00
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 15.6 kB/s eta 0:00:00
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.8/78.8 kB 47.6 kB/s eta 0:00:00
+Downloading huggingface_hub-1.33.0-py3-none-any.whl (846 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.4/846.4 kB 527.3 kB/s eta 0:00:00
+Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Downloading multiprocess-0.70.19-py311-none-any.whl (144 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 144.5/144.5 kB 1.5 MB/s eta 0:00:00
+Downloading numpy-2.4.6-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 635.7 kB/s eta 0:00:00
+Downloading opentelemetry_api-1.45.2-py3-none-any.whl (60 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.3/60.3 kB 1.8 MB/s eta 0:00:00
+Downloading opentelemetry_exporter_otlp_proto_http-1.45.2-py3-none-any.whl (22 kB)
+Downloading opentelemetry_exporter_otlp_common-0.66b2-py3-none-any.whl (12 kB)
+Downloading opentelemetry_exporter_otlp_proto_common-1.45.2-py3-none-any.whl (15 kB)
+Downloading opentelemetry_proto-1.45.2-py3-none-any.whl (72 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 72.5/72.5 kB 2.5 MB/s eta 0:00:00
+Downloading opentelemetry_sdk-1.45.2-py3-none-any.whl (141 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 141.8/141.8 kB 22.7 kB/s eta 0:00:00
+Downloading opentelemetry_semantic_conventions-0.66b2-py3-none-any.whl (206 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 206.3/206.3 kB 1.9 MB/s eta 0:00:00
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 130.0/130.0 kB 1.1 MB/s eta 0:00:00
+Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+Downloading protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl (343 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 343.2/343.2 kB 121.2 kB/s eta 0:00:00
+Downloading pyarrow-26.0.1-cp311-cp311-manylinux_2_28_x86_64.whl (55.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 55.0/55.0 MB 1.1 MB/s eta 0:00:00
+Downloading pydantic-2.14.4-py3-none-any.whl (494 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 494.9/494.9 kB 1.5 MB/s eta 0:00:00
+Downloading pydantic_core-2.50.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (2.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.3/2.3 MB 1.5 MB/s eta 0:00:00
+Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 597.4 kB/s eta 0:00:00
+Downloading pyyaml-6.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (828 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 828.0/828.0 kB 598.6 kB/s eta 0:00:00
+Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.1/73.1 kB 286.9 kB/s eta 0:00:00
+Downloading tqdm-4.70.1-py3-none-any.whl (80 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.2/80.2 kB 998.2 kB/s eta 0:00:00
+Downloading xxhash-4.1.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (471 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 471.4/471.4 kB 2.1 MB/s eta 0:00:00
+Downloading pandas-3.1.1-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (12.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.4/12.4 MB 1.7 MB/s eta 0:00:00
+Downloading platformdirs-4.14.8-py3-none-any.whl (94 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 94.3/94.3 kB 22.6 kB/s eta 0:00:00
+Downloading aiohttp-3.14.5-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 504.0 kB/s eta 0:00:00
+Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Downloading anyio-4.16.0-py3-none-any.whl (134 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.5/134.5 kB 780.3 kB/s eta 0:00:00
+Downloading certifi-2026.11.20-py3-none-any.whl (127 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 127.9/127.9 kB 834.8 kB/s eta 0:00:00
+Downloading charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (269 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 270.0/270.0 kB 1.6 MB/s eta 0:00:00
+Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+Downloading googleapis_common_protos-1.76.0-py3-none-any.whl (307 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 307.7/307.7 kB 2.2 MB/s eta 0:00:00
+Downloading hf_xet-1.8.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 821.9 kB/s eta 0:00:00
+Downloading idna-3.20-py3-none-any.whl (69 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.6/69.6 kB 617.5 kB/s eta 0:00:00
+Downloading python_dateutil-4.0.0-py3-none-any.whl (92 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 92.9/92.9 kB 1.2 MB/s eta 0:00:00
+Downloading typing_inspection-0.4.5-py3-none-any.whl (14 kB)
+Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 135.7/135.7 kB 283.6 kB/s eta 0:00:00
+Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 67.5/67.5 kB 28.0 kB/s eta 0:00:00
+Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (231 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 231.1/231.1 kB 2.0 MB/s eta 0:00:00
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading multidict-7.2.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (510 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 510.1/510.1 kB 622.4 kB/s eta 0:00:00
+Downloading propcache-0.5.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (235 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 235.4/235.4 kB 1.6 MB/s eta 0:00:00
+Downloading yarl-1.25.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (117 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 117.7/117.7 kB 1.8 MB/s eta 0:00:00
+Downloading opentelemetry_exporter_http_transport-0.66b2-py3-none-any.whl (12 kB)
+Downloading tzdata-2026.6-py2.py3-none-any.whl (348 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 348.2/348.2 kB 1.2 MB/s eta 0:00:00
+Installing collected packages: xxhash, urllib3, tzdata, typing-inspection, tqdm, sniffio, pyyaml, pygments, pydantic-core, pyarrow, protobuf, propcache, pluggy, platformdirs, packaging, opentelemetry-api, numpy, multidict, iniconfig, idna, hf-xet, h11, fsspec, frozenlist, distro, dill, click, charset_normalizer, certifi, attrs, annotated-types, aiohappyeyeballs, yarl, requests, python-dateutil, pytest, pydantic, opentelemetry-semantic-conventions, opentelemetry-proto, opentelemetry-exporter-http-transport, multiprocess, httpcore, googleapis-common-protos, anyio, aiosignal, pandas, opentelemetry-sdk, opentelemetry-exporter-otlp-proto-common, httpx, aiohttp, opentelemetry-exporter-otlp-common, huggingface-hub, cwevals, tokenizers, opentelemetry-exporter-otlp-proto-http, datasets, wandb
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2026.9.0
+    Uninstalling fsspec-2026.9.0:
+      Successfully uninstalled fsspec-2026.9.0
+Successfully installed aiohappyeyeballs-2.7.1 aiohttp-3.14.5 aiosignal-1.4.0 annotated-types-0.8.0 anyio-4.16.0 attrs-26.1.0 certifi-2026.11.20 charset_normalizer-3.5.2 click-8.5.1 cwevals-0.0.1b1 datasets-4.8.4 dill-0.4.1 distro-1.9.0 frozenlist-1.8.0 fsspec-2026.2.0 googleapis-common-protos-1.76.0 h11-0.16.0 hf-xet-1.8.0 httpcore-1.0.9 httpx-0.28.1 huggingface-hub-1.33.0 idna-3.20 iniconfig-2.3.1 multidict-7.2.1 multiprocess-0.70.19 numpy-2.4.6 opentelemetry-api-1.45.2 opentelemetry-exporter-http-transport-0.66b2 opentelemetry-exporter-otlp-common-0.66b2 opentelemetry-exporter-otlp-proto-common-1.45.2 opentelemetry-exporter-otlp-proto-http-1.45.2 opentelemetry-proto-1.45.2 opentelemetry-sdk-1.45.2 opentelemetry-semantic-conventions-0.66b2 packaging-26.3 pandas-3.1.1 platformdirs-4.14.8 pluggy-1.7.0 propcache-0.5.4 protobuf-7.36.2 pyarrow-26.0.1 pydantic-2.14.4 pydantic-core-2.50.5 pygments-2.21.0 pytest-9.2.0 python-dateutil-4.0.0 pyyaml-6.0.4 requests-2.34.2 sniffio-1.3.1 tokenizers-0.23.1 tqdm-4.70.1 typing-inspection-0.4.5 tzdata-2026.6 urllib3-2.8.0 wandb-0.31.0 xxhash-4.1.0 yarl-1.25.1
+No broken requirements found.
+CUDA wheel ready: 2.10.0+cu128 12.8
+..........................                                               [100%]
+26 passed in 145.11s (0:02:25)
