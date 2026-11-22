@@ -14,10 +14,11 @@
 # Midpoint GPU experiments on one L40S, run from the repository root:
 #   sbatch --output=runs/midpoint-%j.log scripts/gpu_experiments.sbatch "$PWD" [SEED] [TASKS]
 #
-# TASKS: any of profile track3 track2 (default: all three, cheapest first).
+# TASKS: any of profile track3 track2 track3train (default: the first three, cheapest first).
 #   profile  torch.profiler on one estimate, suffix + full replay: which SDPA kernel runs, per-phase GPU time.
 #   track3   multiplexing sweep on the real model under bf16: blocks 0/3/6, sigma 0.05-0.8, nrep 2 and 8.
 #   track2   1M / population 256: fixed allocation, then --adaptive variance and agreement, same seed.
+#   track3train  cache vs cache + --multiplex hadamard training runs, writer/hidden draws rounded to 4.
 # Needs .venv/baseline-cu128 (built by scripts/launch_baseline.sh's setup job) and data/ from prepare_data.py.
 # Writes runs/midpoint-seed<SEED>/. A failed training run continues with the same command: each
 # dust.py call below adds --resume when its folder already holds a checkpoint.
@@ -64,6 +65,22 @@ for task in $tasks; do
         run agreement --adaptive --allocation-policy agreement
         "$py" new_implementation/compare_runs.py \
             "$out/track2/fixed" "$out/track2/variance" "$out/track2/agreement" | tee "$out/track2-comparison.txt"
+        ;;
+    track3train)
+        # cache vs cache + C in training. --direct-multiple 4 rounds writer/hidden draws (110 -> 120 per
+        # type) so the code sequences fit; the cache run uses the same recipe, so the two match.
+        run() {
+            local name=$1; shift
+            local resume=()
+            if ls "$out/track3train/$name"/state*.pt >/dev/null 2>&1; then resume=(--resume); fi
+            "$py" -u dust.py --device cuda --tokens 1M --population 256 --seed "$seed" --direct-multiple 4 \
+                --probe-interval 10 --checkpoint-interval 10 "$@" ${resume[@]+"${resume[@]}"} \
+                --output "$out/track3train/$name" 2>&1 | tee -a "$out/track3train-$name.log"
+        }
+        run cache
+        run hadamard --multiplex hadamard
+        "$py" new_implementation/compare_runs.py \
+            "$out/track3train/cache" "$out/track3train/hadamard" | tee "$out/track3train-comparison.txt"
         ;;
     *) echo "Unknown task: $task" >&2; exit 2 ;;
     esac

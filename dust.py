@@ -17,7 +17,7 @@ No autograd or backward pass is used. One update (DUST.step):
 """
 import argparse
 from contextlib import contextmanager, nullcontext
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace as dataclass_replace
 from functools import partial
 import hashlib
 import json
@@ -938,6 +938,10 @@ def main():
                         help='Structured multiplexing (method C): estimate each block\'s writers and hidden layer '
                              'from shared sign-coded passes. hadamard: exactly orthogonal codes; rademacher: '
                              'random signs, the comparison. Needs writer draws that are multiples of 4.')
+    parser.add_argument('--direct-multiple', type=int, default=0,
+                        help='Round every block\'s writer and hidden draws up to a multiple of N (0: off). '
+                             '--multiplex needs multiples of the code length 4, which the population-256 '
+                             'recipe lacks; give the plain-DUST comparison run the same N so both match.')
     parser.add_argument('--allocation-policy', choices=('variance', 'agreement'), default='variance',
                         help='With --adaptive: draws in proportion to per-draw noise (variance), or to equalize '
                              'the cosine between half-population estimates (agreement; also moves the hubs).')
@@ -986,6 +990,9 @@ def main():
         data = dict(source='toy (new_implementation/toy.py)')
     else:
         settings = recipe(args.tokens, args.population)
+        if args.direct_multiple:
+            up = lambda counts: [-(-k // args.direct_multiple) * args.direct_multiple for k in counts]
+            settings = dataclass_replace(settings, writers=up(settings.writers), hidden=up(settings.hidden))
         defaults = DEFAULT_CONFIGS[args.tokens]
         config, steps, interval = GPTConfig(), defaults['steps'], defaults['eval_interval']
         paths = dict(
