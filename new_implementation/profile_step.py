@@ -37,7 +37,7 @@ SDPA_OPS = {
     'aten::_scaled_dot_product_flash_attention_for_cpu': 'flash (cpu)',
     'aten::_scaled_dot_product_attention_math': 'math',
 }
-PHASES = ('clean', 'direct', 'embedding', 'hubs', 'head', 'local', 'scalars')
+PHASES = ('clean', 'direct', 'embedding', 'hubs', 'head', 'local', 'scalars', 'allocator')
 
 
 def _us(event, name):
@@ -92,6 +92,12 @@ def main():
     parser.add_argument('--active', type=int, default=1, help='Estimates profiled.')
     parser.add_argument('--full-replay', action='store_true', help='Also profile full-replay (upstream) mode.')
     parser.add_argument('--row-limit', type=int, default=40)
+    parser.add_argument('--variant', choices=('plain', 'adaptive', 'multiplex'), default='plain',
+                        help='plain: DUST. adaptive: method B as in the midpoint slides (--adaptive defaults: '
+                             'variance policy, draw budget, update objective, interval 4); each estimate also '
+                             'runs the allocator observe/update (dust/allocator), and with --warmup 3 the '
+                             'profiled estimate is step 4, a reallocation step. multiplex: method C '
+                             '(--multiplex hadamard, writer/hidden draws rounded up to 4).')
     args = parser.parse_args()
 
     device = torch.device(args.device or ('cuda' if torch.cuda.is_available() else 'cpu'))
@@ -102,16 +108,21 @@ def main():
     torch.set_float32_matmul_precision('high')
     if args.toy:
         from toy import TOY_BATCH, TOY_CONFIG, toy_data, toy_recipe
-        config, settings = TOY_CONFIG, toy_recipe()
+        config, settings = TOY_CONFIG, toy_recipe(scale=1 if args.variant == 'plain' else 2)
         rows = toy_data(2, TOY_BATCH)[0][:TOY_BATCH]
     else:
         config, settings = GPTConfig(), dust.recipe(args.tokens, args.population)
         rows = dust.load_sequences(args.data_dir / f'train_{args.tokens}.pt', 8)
+        if args.variant == 'multiplex':
+            from dataclasses import replace
+            up = lambda counts: [-(-k // 4) * 4 for k in counts]
+            settings = replace(settings, writers=up(settings.writers), hidden=up(settings.hidden))
     rows = rows.to(device)
     x, y = rows[:, :-1].contiguous(), rows[:, 1:].contiguous()
     model = dust.make_model(config, device, seed=42)
 
-    environment = dict(torch=torch.__version__, device=str(device), population=args.population, toy=args.toy)
+    environment = dict(torch=torch.__version__, device=str(device), population=args.population, toy=args.toy,
+                       variant=args.variant, writers=list(settings.writers), hidden=list(settings.hidden))
     if device.type == 'cuda':
         environment.update(gpu=torch.cuda.get_device_name(device), cuda=torch.version.cuda,
                            flash_sdp=torch.backends.cuda.flash_sdp_enabled(),
@@ -122,7 +133,24 @@ def main():
     for mode, suffix in modes:
         folder = args.output / mode
         folder.mkdir(parents=True, exist_ok=True)
-        estimator = dust.DUST(model, settings, seed=7, suffix=suffix)
+        estimator = dust.DUST(model, settings, seed=7, suffix=suffix,
+                              multiplex='hadamard' if args.variant == 'multiplex' else None)
+        if args.variant == 'adaptive':
+            optimizer = dust.make_optimizer(model, settings)
+            allocator = dust.make_allocator(model, optimizer, config, settings, suffix=suffix)
+            estimator.settings = allocator.recipe(settings)
+            estimator.measure_split = True
+            plain_estimate, calls = estimator.estimate, [0]
+
+            def estimate_and_allocate(x, y):  # the per-step work of a B training step, minus the SGD update
+                out = plain_estimate(x, y)
+                calls[0] += 1
+                with torch.profiler.record_function('dust/allocator'):
+                    allocator.observe(estimator.split_statistics())
+                    if allocator.update(calls[0]):
+                        estimator.settings = allocator.recipe(estimator.settings)
+                return out
+            estimator.estimate = estimate_and_allocate
         try:
             sort = 'self_cuda_time_total' if device.type == 'cuda' else 'self_cpu_time_total'
             start = time.monotonic()

@@ -16,6 +16,7 @@
 #
 # TASKS: any of profile track3 track2 track3train (default: the first three, cheapest first).
 #   profile  torch.profiler on one estimate, suffix + full replay: which SDPA kernel runs, per-phase GPU time.
+#   profilebc  the same for method B (--adaptive defaults, a reallocation step) and C (--multiplex hadamard).
 #   track3   multiplexing sweep on the real model under bf16: blocks 0/3/6, sigma 0.05-0.8, nrep 2 and 8.
 #   track2   1M / population 256: fixed allocation, then --adaptive variance and agreement, same seed.
 #   track3train  cache vs cache + --multiplex hadamard training runs, writer/hidden draws rounded to 4.
@@ -45,6 +46,13 @@ for task in $tasks; do
     profile)
         "$py" -u new_implementation/profile_step.py --device cuda --tokens 1M --population 256 \
             --full-replay --output "$out/profile" 2>&1 | tee "$out/profile.log"
+        ;;
+    profilebc)
+        # Cached suffix, slide defaults. --warmup 3: B's profiled estimate is step 4, where it reallocates.
+        for variant in adaptive multiplex; do
+            "$py" -u new_implementation/profile_step.py --device cuda --tokens 1M --population 256 \
+                --variant "$variant" --warmup 3 --output "$out/profile-$variant" 2>&1 | tee "$out/profile-$variant.log"
+        done
         ;;
     track3)
         for nrep in 2 8; do
