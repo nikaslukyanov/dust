@@ -1,0 +1,12 @@
+/insomnia001/depts/edu/users/nl2951/dust-prof/.venv/baseline-cu128/lib/python3.11/site-packages/torch/profiler/profiler.py:217: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+[cached-suffix] SDPA kernel: efficient
+  dust/clean      gpu       32.8 ms   cpu        0.0 ms
+  dust/direct     gpu     5662.2 ms   cpu        0.0 ms
+  dust/embedding  gpu      300.9 ms   cpu        0.0 ms
+  dust/hubs       gpu      583.8 ms   cpu        0.0 ms
+  dust/head       gpu      452.2 ms   cpu        0.0 ms
+  dust/local      gpu      556.2 ms   cpu        0.0 ms
+  dust/scalars    gpu      463.3 ms   cpu        0.0 ms
+  dust/allocator  gpu        0.1 ms   cpu        0.0 ms
+Wrote /insomnia001/depts/edu/users/nl2951/dust-prof/runs/midpoint-seed42/profile-adaptive/profile.json and per-mode tables + traces
