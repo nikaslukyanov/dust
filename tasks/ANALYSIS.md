@@ -104,3 +104,65 @@ and Slurm provenance: [`results/baseline-three-seed/`](../results/baseline-three
 - W&B logging works offline under `dust-hpml`; a team login and sync remain necessary for an online
   dashboard. The actual SDPA kernel still needs profiling. Hardware/model/population scaling and
   broader training conclusions remain outside this three-seed, 1M-token comparison.
+
+---
+
+## Run 3 — midpoint experiments: profiler, Track 3 GPU sweep, Track 2 (2026-11-21)
+
+Slurm jobs 14040948 (baseline rerun, `ins056`) and 14040949 (`scripts/gpu_experiments.sbatch`,
+`ins038`), 1 × L40S each, torch 2.10.0+cu128, bf16 autocast, 1M tokens, population 256, seed 42,
+commit `6444d3c`. One seed, one repetition. Evidence: `results/midpoint-seed42/` and
+`results/baseline-seed42-rerun/` (checkpoints and the Perfetto trace stay on the cluster).
+
+### Baseline rerun
+
+Reproduces runs 1–2: cached suffix −13.4% step time (9.296 → 8.053 s), −16.0% FLOPs, best val
+6.07518 vs 6.07512, peak memory 6.63 GiB in both, max validation difference 0.000814 over 33 evals.
+
+### Profiler — the SDPA kernel is `efficient`
+
+`profile_step.py`, one estimate after two warm-ups, both modes. Every attention call ran
+`aten::_scaled_dot_product_efficient_attention` (CUTLASS `fmha_cutlassF_bf16_aligned_64x64`), not
+flash (ruled out by the explicit mask) and not math — confirms the roofline's hypothesis.
+Attention ≈ 1.4 s of the suffix estimate's GPU time; the rest is dominated by elementwise traffic
+(`copy_`, `mul`, `pow`), as the bandwidth-bound roofline predicts. "Command Buffer Full" stalls
+(~3.3 s) mean the CPU is waiting on a full GPU queue: GPU-bound, as the double-batch test said.
+Profiler overhead inflates wall time; use the profile for shares and kernel identity only.
+
+### Track 3 on GPU — C does not beat plain DUST at equal forward passes
+
+`multiplex_experiment.py --real`, blocks 0/3/6, σ ∈ {0.05, 0.1, 0.2, 0.4, 0.8}, 16 passes, 16 seeds,
+fp32 backprop reference. Cosine to backprop, writers / hidden, compute-matched comparison:
+
+| | separate/2 (A, same passes) | hadamard | rademacher |
+|---|---|---|---|
+| nrep 2, block 6, σ 0.2 | 0.294 / 0.161 | 0.288 / 0.166 | 0.222 / 0.146 |
+| nrep 8, block 6, σ 0.2 | 0.374 / 0.209 | 0.288 / 0.166 | 0.222 / 0.146 |
+| nrep 8, block 3, σ 0.2 | 0.275 / 0.170 | 0.212 / 0.125 | 0.171 / 0.114 |
+
+- nrep 2: a tie, at every block and σ. nrep 8 (the shipped recipes from population 1024 up):
+  Hadamard is clearly behind. Raising σ to 0.8 narrows the hidden-layer gap slightly but never
+  closes it. Hadamard is also 4–10% slower per estimate than separate/2.
+- Matches the CPU result and the direction-count derivation (Track 3). The bf16-readout escape
+  hatch does not appear. **Verdict: C is not a speedup; report it as a negative result and a
+  gradient-quality diagnostic. D (B + C) is dropped.**
+
+### Track 2 on GPU — B is worse than fixed allocation with the default settings
+
+| | fixed (A) | variance | agreement |
+|---|---:|---:|---:|
+| best val | **6.07518** | 6.15693 | 6.30006 |
+| test at best val | **6.06012** | 6.14268 | 6.28338 |
+| FLOPs / step (needed) | 2.678e14 | 2.785e14 (+4.0%) | 2.163e14 (−19.2%) |
+| median step | 8.00 s | 8.24 s | 6.56 s |
+| mean probe cosine | 0.238 | 0.285 | 0.272 |
+
+- Loss gaps (0.08, 0.22) are 6–15× the three-seed SD of A (~0.014): one seed is enough to call it.
+- `variance` (default `--allocation-objective update`) moved almost every spare draw to the token
+  embedding (phase time 0.30 → 4.94 s): its learning rate (1000) multiplies its weight, as the
+  Track 2 notes warned. Embedding draws rerun the whole network, so FLOPs rose.
+- `agreement` moved draws to the hubs (0.58 → 3.29 s) and spent 19% fewer FLOPs, at a worse loss.
+- Probe cosine rose while loss worsened: the pooled cosine is dominated by the groups B favoured,
+  while loss depends on the groups it starved. Pooled cosine is not a sufficient objective.
+- Not tried yet: `--allocation-objective gradient`, a per-unit floor/cap, a longer recompute
+  interval, longer runs. Defaults are untuned and the run is 61 steps.

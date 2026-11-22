@@ -1,0 +1,159 @@
+[environment] running...
+[environment] PASS (0.0s)
+{
+  "python": "3.11.5",
+  "torch": "2.10.0+cu128",
+  "device": "cuda:0",
+  "gpu": "NVIDIA L40S",
+  "gpu_memory_gib": 44.52056884765625,
+  "gpus_visible": 1,
+  "cuda": "12.8",
+  "bf16": true,
+  "data_missing": [],
+  "notes": []
+}
+[equivalence] running...
+[equivalence] PASS (54.8s)
+{
+  "cosine_suffix_vs_full": {
+    "embedding": 1.0,
+    "gate": 1.0000000000000002,
+    "head": 1.0,
+    "hidden": 1.0000000000000002,
+    "k": 1.0,
+    "q": 1.0,
+    "scalars": 1.0000000000000002,
+    "v": 1.0,
+    "ve": 0.9999999999999892,
+    "writers": 1.0
+  },
+  "min_cosine": 0.9999999999999892,
+  "max_relative_difference": 1.5155868027250108e-07,
+  "cosine_between_seeds": {
+    "embedding": 0.033592712547351744,
+    "gate": 0.00988637150609355,
+    "head": 0.8684120710131533,
+    "hidden": 0.017998813580720134,
+    "k": 0.0019107122660272766,
+    "q": -0.004526527765675875,
+    "scalars": 0.3735371025582802,
+    "v": 0.0006864329933252365,
+    "ve": -0.0002341258955719654,
+    "writers": 0.043642770149814436
+  },
+  "note": "suffix and full replay consume the same noise; under bf16 they differ by rounding only. cosine_between_seeds is what two unrelated estimates look like."
+}
+[timing] running...
+[timing] PASS (68.9s)
+{
+  "full_replay": {
+    "estimate_seconds_median": 9.228108820039779,
+    "estimate_seconds": [
+      9.228108820039779,
+      9.2240434079431,
+      9.24908332398627
+    ],
+    "phase_seconds_median": {
+      "clean": 0.03102890297304839,
+      "direct": 6.810658694012091,
+      "embedding": 0.302062920993194,
+      "hubs": 0.7877144339727238,
+      "head": 0.28061010292731225,
+      "local": 0.5573481150204316,
+      "scalars": 0.4614881440065801
+    },
+    "peak_memory_gib": 6.379476070404053,
+    "forward_equivalents": 291.6666666666667,
+    "flops": 420906795008000.0
+  },
+  "cached_suffix": {
+    "estimate_seconds_median": 8.005116172949784,
+    "estimate_seconds": [
+      8.005116172949784,
+      7.9997915549902245,
+      8.012381023028865
+    ],
+    "phase_seconds_median": {
+      "clean": 0.03104437200818211,
+      "direct": 5.785169063950889,
+      "embedding": 0.3029993310337886,
+      "hubs": 0.5859335430432111,
+      "head": 0.28155856498051435,
+      "local": 0.5595086149405688,
+      "scalars": 0.4597370990086347
+    },
+    "peak_memory_gib": 6.379476070404053,
+    "forward_equivalents": 245.0,
+    "flops": 353561707806720.0
+  },
+  "measured_time_saving": 0.13252906645770612,
+  "predicted_flop_saving": 0.16000000000000003,
+  "note": "measured_time_saving below predicted_flop_saving means part of the step is not GPU-bound (launch overhead, memory traffic); see --launch-bound."
+}
+[probe] running...
+[probe] PASS (11.5s)
+{
+  "seconds": 11.482133768964559,
+  "peak_memory_gib": 6.649627208709717,
+  "mean_group_cosine": 0.22074302128067486,
+  "cosine_to_backprop": {
+    "embedding": 0.16455982940095937,
+    "gate": 0.0007224824249121801,
+    "head": 0.9295462509803176,
+    "hidden": 0.11755887593110353,
+    "k": 0.004215554042656296,
+    "q": 0.017922738911013404,
+    "scalars": 0.7598223749960433,
+    "v": 0.022490166289662383,
+    "ve": 0.003915706263733053,
+    "writers": 0.18667623356634772
+  },
+  "rel_norm": {
+    "embedding": 2.3512024879455566,
+    "gate": 2.6976397037506104,
+    "head": 0.9374789595603943,
+    "hidden": 3.5712993144989014,
+    "k": 34.33587646484375,
+    "q": 23.3284912109375,
+    "scalars": 1.9872865676879883,
+    "v": 2.3189995288848877,
+    "ve": 15.704585075378418,
+    "writers": 1.8981386423110962
+  },
+  "generator_restored": true,
+  "weights_untouched": true,
+  "model_left_frozen": true,
+  "note": "cosine_to_backprop at init on one batch; compare the ordering with the paper (head highest)."
+}
+[training] running...
+[training] PASS (99.1s)
+{
+  "record_keys_missing": [],
+  "phases_missing": [],
+  "files_missing": [],
+  "resume_max_relative_weight_difference": 0.0,
+  "resume_generator_identical": true,
+  "best_val": 7.802928447723389,
+  "note": "resume difference 0 = bit-exact. A tiny nonzero value on CUDA is kernel nondeterminism (index_add_ on the embeddings), not a lost generator state, as long as the generators match."
+}
+[launch-bound] running...
+[launch-bound] PASS (102.2s)
+{
+  "step_ms_1x": 8001.892578125,
+  "step_ms_2x": 17560.08203125,
+  "ratio": 2.194491098175261,
+  "verdict": "gpu-bound",
+  "note": "ratio ~1 => launch-bound (FLOP savings will not move wall-clock); ~2 => GPU-bound (FLOP savings do). Run before trusting analytic forward-equivalents."
+}
+
+Summary
+  PASS  environment
+  PASS  equivalence
+  PASS  timing
+  PASS  probe
+  PASS  training
+  PASS  launch-bound
+
+  estimate: full replay 9.23s, cached suffix 8.01s -> 13.3% faster (FLOP model predicts 16.0%)
+  launch-bound test: 2x batch -> 2.19x step time, verdict gpu-bound
+  report: /insomnia001/depts/edu/users/nl2951/dust/runs/baseline-gpu-20261121-162352/seed-42/preflight/preflight.json

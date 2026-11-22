@@ -1,0 +1,1677 @@
+{
+  "real": true,
+  "device": "cuda:0",
+  "nrep": 2,
+  "passes": 16,
+  "seeds": 16,
+  "batch": 8,
+  "reference": "fp32",
+  "results": [
+    {
+      "layer": 0,
+      "sigma": 0.05,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.9837145090568811,
+          "groups": {
+            "writers": {
+              "cosine": 0.0982242435573107,
+              "mean_cosine": 0.3452217409741698,
+              "rel_bias": 1.0054892707636802,
+              "variance": 6.034148100497811,
+              "rel_norm": 2.480963348467674
+            },
+            "hidden": {
+              "cosine": 0.10977130774562138,
+              "mean_cosine": 0.39951749752465004,
+              "rel_bias": 1.1521382690171127,
+              "variance": 15.730878970182145,
+              "rel_norm": 3.9939862439076026
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.4952367260120809,
+          "groups": {
+            "writers": {
+              "cosine": 0.06713734884639622,
+              "mean_cosine": 0.251040568258583,
+              "rel_bias": 1.1853636496799407,
+              "variance": 12.129136426414899,
+              "rel_norm": 3.4993396361125004
+            },
+            "hidden": {
+              "cosine": 0.07813753965757127,
+              "mean_cosine": 0.29725012791777317,
+              "rel_bias": 1.5203365424201838,
+              "variance": 31.493390617886153,
+              "rel_norm": 5.631713816674511
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5109584669116884,
+          "groups": {
+            "writers": {
+              "cosine": 0.07124855610517555,
+              "mean_cosine": 0.2635810351310527,
+              "rel_bias": 1.1506544102169947,
+              "variance": 10.74813715489612,
+              "rel_norm": 3.2969056219595525
+            },
+            "hidden": {
+              "cosine": 0.07417666835379089,
+              "mean_cosine": 0.2831733281924912,
+              "rel_bias": 1.5834640639146302,
+              "variance": 34.475508374213966,
+              "rel_norm": 5.8908223985318235
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5131891800556332,
+          "groups": {
+            "writers": {
+              "cosine": 0.07003831711066712,
+              "mean_cosine": 0.26312632250770557,
+              "rel_bias": 1.837536940102833,
+              "variance": 46.71903546124362,
+              "rel_norm": 6.865488767934922
+            },
+            "hidden": {
+              "cosine": 0.07823734851308767,
+              "mean_cosine": 0.2971119067697455,
+              "rel_bias": 2.7894480897827174,
+              "variance": 121.89864052201104,
+              "rel_norm": 11.081259565761238
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5139727649511769,
+          "groups": {
+            "writers": {
+              "cosine": 0.06101972595526731,
+              "mean_cosine": 0.23390255778502977,
+              "rel_bias": 1.7357651365576812,
+              "variance": 40.798484608170156,
+              "rel_norm": 6.380876141718578
+            },
+            "hidden": {
+              "cosine": 0.060817341562757934,
+              "mean_cosine": 0.23488610155249562,
+              "rel_bias": 2.6485465711617424,
+              "variance": 109.21221734079062,
+              "rel_norm": 10.402456646252457
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 0,
+      "sigma": 0.1,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.9891999199753627,
+          "groups": {
+            "writers": {
+              "cosine": 0.10033329154128053,
+              "mean_cosine": 0.3520101556833741,
+              "rel_bias": 0.9962722715921773,
+              "variance": 5.7967189049870855,
+              "rel_norm": 2.432037599711658
+            },
+            "hidden": {
+              "cosine": 0.11062133242089417,
+              "mean_cosine": 0.4019490072439255,
+              "rel_bias": 1.138145827740459,
+              "variance": 15.12343089788361,
+              "rel_norm": 3.9166408125849244
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.49725575000047684,
+          "groups": {
+            "writers": {
+              "cosine": 0.06827702481008846,
+              "mean_cosine": 0.2550144264369878,
+              "rel_bias": 1.1720763714834428,
+              "variance": 11.640254640466894,
+              "rel_norm": 3.4284295834052445
+            },
+            "hidden": {
+              "cosine": 0.07899321099318145,
+              "mean_cosine": 0.30015799255371306,
+              "rel_bias": 1.4964122039889598,
+              "variance": 30.27029312671463,
+              "rel_norm": 5.521740421017916
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5127797259483486,
+          "groups": {
+            "writers": {
+              "cosine": 0.07140473281976356,
+              "mean_cosine": 0.2635473006893536,
+              "rel_bias": 1.1421239447412765,
+              "variance": 10.313196450101218,
+              "rel_norm": 3.2301688173470176
+            },
+            "hidden": {
+              "cosine": 0.0741288201513102,
+              "mean_cosine": 0.28295228784061205,
+              "rel_bias": 1.5589915487468158,
+              "variance": 33.08819905864684,
+              "rel_norm": 5.771138137506966
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5149551450740546,
+          "groups": {
+            "writers": {
+              "cosine": 0.07077788264583254,
+              "mean_cosine": 0.26533132248241087,
+              "rel_bias": 1.7998137811761392,
+              "variance": 44.39232687280554,
+              "rel_norm": 6.693445937836861
+            },
+            "hidden": {
+              "cosine": 0.07866192709647399,
+              "mean_cosine": 0.2986362937986872,
+              "rel_bias": 2.72048709988365,
+              "variance": 115.89665078238038,
+              "rel_norm": 10.805253906096405
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5155928999884054,
+          "groups": {
+            "writers": {
+              "cosine": 0.06226667951345605,
+              "mean_cosine": 0.23868119527962317,
+              "rel_bias": 1.697353533596601,
+              "variance": 38.82280922212332,
+              "rel_norm": 6.224563410594374
+            },
+            "hidden": {
+              "cosine": 0.0609738667957022,
+              "mean_cosine": 0.23546623404882752,
+              "rel_bias": 2.5882224366722597,
+              "variance": 104.0120497056007,
+              "rel_norm": 10.152361779496335
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 0,
+      "sigma": 0.2,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.9911817170213908,
+          "groups": {
+            "writers": {
+              "cosine": 0.10231344361210311,
+              "mean_cosine": 0.35757814128225207,
+              "rel_bias": 0.9862888830773445,
+              "variance": 5.445180039082146,
+              "rel_norm": 2.357954383171558
+            },
+            "hidden": {
+              "cosine": 0.10926158161970063,
+              "mean_cosine": 0.39767883630760126,
+              "rel_bias": 1.1247009960541108,
+              "variance": 14.351679843506208,
+              "rel_norm": 3.814872241591996
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.4979105159873143,
+          "groups": {
+            "writers": {
+              "cosine": 0.07032555257484044,
+              "mean_cosine": 0.2619014171392154,
+              "rel_bias": 1.1526101676531755,
+              "variance": 10.93568867513589,
+              "rel_norm": 3.3238084657585425
+            },
+            "hidden": {
+              "cosine": 0.07804319094698474,
+              "mean_cosine": 0.296814777341459,
+              "rel_bias": 1.4697248906561602,
+              "variance": 28.71946407608645,
+              "rel_norm": 5.378075518090333
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5134094569366425,
+          "groups": {
+            "writers": {
+              "cosine": 0.07213654891752388,
+              "mean_cosine": 0.2652315410528956,
+              "rel_bias": 1.1205690882287658,
+              "variance": 9.341503317161996,
+              "rel_norm": 3.0751760344437598
+            },
+            "hidden": {
+              "cosine": 0.07207088263516849,
+              "mean_cosine": 0.2756171306764489,
+              "rel_bias": 1.5068789693589844,
+              "variance": 29.970495826444868,
+              "rel_norm": 5.49175924276
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5156545040663332,
+          "groups": {
+            "writers": {
+              "cosine": 0.07412756082421752,
+              "mean_cosine": 0.2759450402393935,
+              "rel_bias": 1.689570276985975,
+              "variance": 38.063864141870226,
+              "rel_norm": 6.201367603928887
+            },
+            "hidden": {
+              "cosine": 0.07836187516594043,
+              "mean_cosine": 0.29746611411876145,
+              "rel_bias": 2.5362994323677746,
+              "variance": 100.23227573441046,
+              "rel_norm": 10.048629344634024
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.516022786963731,
+          "groups": {
+            "writers": {
+              "cosine": 0.06434424924876389,
+              "mean_cosine": 0.24592941634683338,
+              "rel_bias": 1.6047226556075782,
+              "variance": 33.72119276512084,
+              "rel_norm": 5.802487445362323
+            },
+            "hidden": {
+              "cosine": 0.060703730969737246,
+              "mean_cosine": 0.23451872724256384,
+              "rel_bias": 2.427072590280929,
+              "variance": 90.58921267525946,
+              "rel_norm": 9.476067527768253
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 0,
+      "sigma": 0.4,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.9917994460556656,
+          "groups": {
+            "writers": {
+              "cosine": 0.10754476444740664,
+              "mean_cosine": 0.37117561927931986,
+              "rel_bias": 0.9617089710123499,
+              "variance": 4.494323233200698,
+              "rel_norm": 2.144637134620899
+            },
+            "hidden": {
+              "cosine": 0.10255433458477986,
+              "mean_cosine": 0.3759896374223626,
+              "rel_bias": 1.0960887149589678,
+              "variance": 12.267440905053265,
+              "rel_norm": 3.524923757877303
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.498103933990933,
+          "groups": {
+            "writers": {
+              "cosine": 0.07485885918787959,
+              "mean_cosine": 0.2772653329566601,
+              "rel_bias": 1.1011161435127128,
+              "variance": 9.021292457484225,
+              "rel_norm": 3.0202143641013874
+            },
+            "hidden": {
+              "cosine": 0.07327511830425551,
+              "mean_cosine": 0.27971782176898907,
+              "rel_bias": 1.4026175239618992,
+              "variance": 24.551904345644544,
+              "rel_norm": 4.971222111725633
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5137449139729142,
+          "groups": {
+            "writers": {
+              "cosine": 0.07229704156709854,
+              "mean_cosine": 0.26379786896544055,
+              "rel_bias": 1.0706916678758696,
+              "variance": 6.97045925699487,
+              "rel_norm": 2.658089298270178
+            },
+            "hidden": {
+              "cosine": 0.06472901367369385,
+              "mean_cosine": 0.24872171433493317,
+              "rel_bias": 1.3811616616696432,
+              "variance": 22.333170289539243,
+              "rel_norm": 4.739020575351915
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5156072980025783,
+          "groups": {
+            "writers": {
+              "cosine": 0.08234446340699471,
+              "mean_cosine": 0.3013835591118466,
+              "rel_bias": 1.430419734805682,
+              "variance": 24.74826769264342,
+              "rel_norm": 5.007074105104726
+            },
+            "hidden": {
+              "cosine": 0.0739994312068346,
+              "mean_cosine": 0.281223794331352,
+              "rel_bias": 2.119950303587745,
+              "variance": 67.60962870091106,
+              "rel_norm": 8.25221538817443
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5162047640187666,
+          "groups": {
+            "writers": {
+              "cosine": 0.06880850715416151,
+              "mean_cosine": 0.26037873342648515,
+              "rel_bias": 1.3947617455844192,
+              "variance": 22.734227132248094,
+              "rel_norm": 4.767831336571002
+            },
+            "hidden": {
+              "cosine": 0.057308496774280786,
+              "mean_cosine": 0.22162198017909185,
+              "rel_bias": 2.0558332256571403,
+              "variance": 61.882061440878694,
+              "rel_norm": 7.834502343505517
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 0,
+      "sigma": 0.8,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.9919869150035083,
+          "groups": {
+            "writers": {
+              "cosine": 0.11953749515469574,
+              "mean_cosine": 0.3951810590682127,
+              "rel_bias": 0.9254285785763617,
+              "variance": 2.725848526085619,
+              "rel_norm": 1.677129033076754
+            },
+            "hidden": {
+              "cosine": 0.08148244461974521,
+              "mean_cosine": 0.30273363820557475,
+              "rel_bias": 1.061463772117653,
+              "variance": 8.09754540392066,
+              "rel_norm": 2.860827865922504
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.4983393420698121,
+          "groups": {
+            "writers": {
+              "cosine": 0.08433109509196265,
+              "mean_cosine": 0.3044637637296924,
+              "rel_bias": 1.0139603291743826,
+              "variance": 5.4568663909344295,
+              "rel_norm": 2.353892580662144
+            },
+            "hidden": {
+              "cosine": 0.05803240823021169,
+              "mean_cosine": 0.22324417079357411,
+              "rel_bias": 1.277796468014521,
+              "variance": 16.207903780674076,
+              "rel_norm": 4.03683359697404
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.513916980009526,
+          "groups": {
+            "writers": {
+              "cosine": 0.06963358919225232,
+              "mean_cosine": 0.25073664065847545,
+              "rel_bias": 1.0092842317768325,
+              "variance": 3.667506613410077,
+              "rel_norm": 1.930226536409712
+            },
+            "hidden": {
+              "cosine": 0.04855627150005973,
+              "mean_cosine": 0.18736373846079382,
+              "rel_bias": 1.2070892363265244,
+              "variance": 11.706514627480631,
+              "rel_norm": 3.4300112845653854
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5159086920320988,
+          "groups": {
+            "writers": {
+              "cosine": 0.0922802890625369,
+              "mean_cosine": 0.3257305284467706,
+              "rel_bias": 1.1216122222024434,
+              "variance": 10.553977325138934,
+              "rel_norm": 3.2798145121232234
+            },
+            "hidden": {
+              "cosine": 0.057140746871625445,
+              "mean_cosine": 0.2177001520227968,
+              "rel_bias": 1.622428088834407,
+              "variance": 33.02919842934181,
+              "rel_norm": 5.7667925543218335
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.5164622360607609,
+          "groups": {
+            "writers": {
+              "cosine": 0.07231775279679395,
+              "mean_cosine": 0.2671547053490473,
+              "rel_bias": 1.1412203340827096,
+              "variance": 10.365207360206758,
+              "rel_norm": 3.224877288903983
+            },
+            "hidden": {
+              "cosine": 0.045094441361263754,
+              "mean_cosine": 0.1744223822179009,
+              "rel_bias": 1.581135196066677,
+              "variance": 29.8576473138754,
+              "rel_norm": 5.444186654820036
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 3,
+      "sigma": 0.05,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.6864765560021624,
+          "groups": {
+            "writers": {
+              "cosine": 0.27653022827415846,
+              "mean_cosine": 0.6917758668903446,
+              "rel_bias": 0.7354382342199889,
+              "variance": 1.7102355555376434,
+              "rel_norm": 1.3813581637349177
+            },
+            "hidden": {
+              "cosine": 0.17019434705622333,
+              "mean_cosine": 0.5490730124936068,
+              "rel_bias": 0.8571537277695274,
+              "variance": 5.483623025223592,
+              "rel_norm": 2.384820774009289
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.34478791896253824,
+          "groups": {
+            "writers": {
+              "cosine": 0.20292819562129866,
+              "mean_cosine": 0.6027875696824391,
+              "rel_bias": 0.7987546263330516,
+              "variance": 3.412777751673669,
+              "rel_norm": 1.8994638757941542
+            },
+            "hidden": {
+              "cosine": 0.12253025587818184,
+              "mean_cosine": 0.4289289737341945,
+              "rel_bias": 1.0452996022369188,
+              "variance": 10.941622001385499,
+              "rel_norm": 3.3420152443725835
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.36065095802769065,
+          "groups": {
+            "writers": {
+              "cosine": 0.172004525236521,
+              "mean_cosine": 0.5508524285321241,
+              "rel_bias": 0.8456950397267882,
+              "variance": 4.655394447178163,
+              "rel_norm": 2.1991765467857625
+            },
+            "hidden": {
+              "cosine": 0.13286283881454436,
+              "mean_cosine": 0.45911988453753094,
+              "rel_bias": 0.9638653874935645,
+              "variance": 8.095942786293419,
+              "rel_norm": 2.878129916919463
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3631247089942917,
+          "groups": {
+            "writers": {
+              "cosine": 0.206734681493022,
+              "mean_cosine": 0.6100099618394093,
+              "rel_bias": 1.0094062838850504,
+              "variance": 12.527902997186088,
+              "rel_norm": 3.642747678522065
+            },
+            "hidden": {
+              "cosine": 0.12248298874149834,
+              "mean_cosine": 0.4327034405628172,
+              "rel_bias": 1.6753498204716748,
+              "variance": 41.65234557128203,
+              "rel_norm": 6.515395392165524
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3634356070542708,
+          "groups": {
+            "writers": {
+              "cosine": 0.16774168328298802,
+              "mean_cosine": 0.5389465588143727,
+              "rel_bias": 1.0544693867343586,
+              "variance": 13.862015920400209,
+              "rel_norm": 3.7688686022330633
+            },
+            "hidden": {
+              "cosine": 0.11157258032104611,
+              "mean_cosine": 0.4045536295184096,
+              "rel_bias": 1.4669409382362886,
+              "variance": 30.966379828688854,
+              "rel_norm": 5.574385548436949
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 3,
+      "sigma": 0.1,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.6860520450863987,
+          "groups": {
+            "writers": {
+              "cosine": 0.28812805099392447,
+              "mean_cosine": 0.700110876474445,
+              "rel_bias": 0.7306887377223943,
+              "variance": 1.5524468685707364,
+              "rel_norm": 1.323669559596124
+            },
+            "hidden": {
+              "cosine": 0.1734824971678709,
+              "mean_cosine": 0.5545630601746042,
+              "rel_bias": 0.8502330413157374,
+              "variance": 5.224958343682725,
+              "rel_norm": 2.3301911355010416
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.3445916350465268,
+          "groups": {
+            "writers": {
+              "cosine": 0.20898926227477788,
+              "mean_cosine": 0.6099720192001372,
+              "rel_bias": 0.7925173166786516,
+              "variance": 3.1045747705404394,
+              "rel_norm": 1.8158348108557032
+            },
+            "hidden": {
+              "cosine": 0.12750108314411684,
+              "mean_cosine": 0.44271110235227784,
+              "rel_bias": 1.026254051879249,
+              "variance": 10.458848282441519,
+              "rel_norm": 3.2698278974565307
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3605164090404287,
+          "groups": {
+            "writers": {
+              "cosine": 0.17626553823452237,
+              "mean_cosine": 0.5603459399172179,
+              "rel_bias": 0.8369001341047559,
+              "variance": 4.485478880273698,
+              "rel_norm": 2.160422483823316
+            },
+            "hidden": {
+              "cosine": 0.13624811560951466,
+              "mean_cosine": 0.4670515635090215,
+              "rel_bias": 0.9538455676056717,
+              "variance": 7.798183304294512,
+              "rel_norm": 2.8267910435352768
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3630887019680813,
+          "groups": {
+            "writers": {
+              "cosine": 0.20937313734686552,
+              "mean_cosine": 0.6162186396358189,
+              "rel_bias": 0.99220517097566,
+              "variance": 12.146183112829563,
+              "rel_norm": 3.587945024511446
+            },
+            "hidden": {
+              "cosine": 0.1237299717774386,
+              "mean_cosine": 0.4366827188879093,
+              "rel_bias": 1.6571554480406259,
+              "variance": 40.830487499540546,
+              "rel_norm": 6.451332402613638
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.36349287000484765,
+          "groups": {
+            "writers": {
+              "cosine": 0.1698908368402086,
+              "mean_cosine": 0.5423898563582689,
+              "rel_bias": 1.0440115073980973,
+              "variance": 13.427029063104646,
+              "rel_norm": 3.711203618311624
+            },
+            "hidden": {
+              "cosine": 0.11272775725342729,
+              "mean_cosine": 0.40821056938479594,
+              "rel_bias": 1.451380798623859,
+              "variance": 30.2295054136493,
+              "rel_norm": 5.50847893683734
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 3,
+      "sigma": 0.2,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.6861343049677089,
+          "groups": {
+            "writers": {
+              "cosine": 0.2911269350681349,
+              "mean_cosine": 0.7031242958239173,
+              "rel_bias": 0.7294897055227906,
+              "variance": 1.5031173739615469,
+              "rel_norm": 1.3041030166280403
+            },
+            "hidden": {
+              "cosine": 0.17442722544159334,
+              "mean_cosine": 0.5560995327161493,
+              "rel_bias": 0.8486228630860964,
+              "variance": 5.174052723157982,
+              "rel_norm": 2.319471416695132
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.3445688469801098,
+          "groups": {
+            "writers": {
+              "cosine": 0.21253628086973594,
+              "mean_cosine": 0.6137427327854524,
+              "rel_bias": 0.7895273356035036,
+              "variance": 3.003831282083839,
+              "rel_norm": 1.7886982637531879
+            },
+            "hidden": {
+              "cosine": 0.1278354688665988,
+              "mean_cosine": 0.4433677839212741,
+              "rel_bias": 1.023749656650813,
+              "variance": 10.345778684056269,
+              "rel_norm": 3.252449704066735
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.36042147502303123,
+          "groups": {
+            "writers": {
+              "cosine": 0.17604604033261778,
+              "mean_cosine": 0.5590262456143051,
+              "rel_bias": 0.8372342889278737,
+              "variance": 4.4055710176445615,
+              "rel_norm": 2.1413430869073906
+            },
+            "hidden": {
+              "cosine": 0.13759944117027145,
+              "mean_cosine": 0.47044300241873416,
+              "rel_bias": 0.9491677703074533,
+              "variance": 7.665143504525035,
+              "rel_norm": 2.803263910118961
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3630249369889498,
+          "groups": {
+            "writers": {
+              "cosine": 0.21161641911587725,
+              "mean_cosine": 0.6196809546863672,
+              "rel_bias": 0.981478418454903,
+              "variance": 11.796577022259747,
+              "rel_norm": 3.5383153818970756
+            },
+            "hidden": {
+              "cosine": 0.12512585683709512,
+              "mean_cosine": 0.44008693460239756,
+              "rel_bias": 1.6414238097419336,
+              "variance": 39.8933505669208,
+              "rel_norm": 6.378811439132738
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.36342056503053755,
+          "groups": {
+            "writers": {
+              "cosine": 0.17088458608297252,
+              "mean_cosine": 0.5445200720493775,
+              "rel_bias": 1.0343398627778173,
+              "variance": 13.088316200133411,
+              "rel_norm": 3.664690339859381
+            },
+            "hidden": {
+              "cosine": 0.11390577148949119,
+              "mean_cosine": 0.41131677420748475,
+              "rel_bias": 1.4372431562698376,
+              "variance": 29.498577735346412,
+              "rel_norm": 5.442829034256276
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 3,
+      "sigma": 0.4,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.6859406589064747,
+          "groups": {
+            "writers": {
+              "cosine": 0.29282323649163533,
+              "mean_cosine": 0.7044651092518261,
+              "rel_bias": 0.7294383033401842,
+              "variance": 1.466394841609053,
+              "rel_norm": 1.2891072942738473
+            },
+            "hidden": {
+              "cosine": 0.17376868345298827,
+              "mean_cosine": 0.5537442081368582,
+              "rel_bias": 0.8510137154428485,
+              "variance": 5.194745556523673,
+              "rel_norm": 2.324219009233322
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.3445208598859608,
+          "groups": {
+            "writers": {
+              "cosine": 0.21327943796714127,
+              "mean_cosine": 0.6140859551753979,
+              "rel_bias": 0.789239199766708,
+              "variance": 2.929361065513946,
+              "rel_norm": 1.7670925415529186
+            },
+            "hidden": {
+              "cosine": 0.12718492100140957,
+              "mean_cosine": 0.4410761831683625,
+              "rel_bias": 1.0266894916272835,
+              "variance": 10.381369488436718,
+              "rel_norm": 3.2580754810375527
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.360397543059662,
+          "groups": {
+            "writers": {
+              "cosine": 0.1735126277058042,
+              "mean_cosine": 0.5529842149749211,
+              "rel_bias": 0.8403525929403426,
+              "variance": 4.276869228423134,
+              "rel_norm": 2.1089893215152054
+            },
+            "hidden": {
+              "cosine": 0.13812494770316455,
+              "mean_cosine": 0.4705508754801805,
+              "rel_bias": 0.9458003369989667,
+              "variance": 7.439644517598448,
+              "rel_norm": 2.762644220910539
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3630222709616646,
+          "groups": {
+            "writers": {
+              "cosine": 0.2153684208779796,
+              "mean_cosine": 0.6252761881862032,
+              "rel_bias": 0.9528243852760216,
+              "variance": 10.870987077576464,
+              "rel_norm": 3.400566662463987
+            },
+            "hidden": {
+              "cosine": 0.12863248380025336,
+              "mean_cosine": 0.4490173602794274,
+              "rel_bias": 1.5912333860431367,
+              "variance": 37.17864873717824,
+              "rel_norm": 6.162061432048842
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3633431949419901,
+          "groups": {
+            "writers": {
+              "cosine": 0.17284428905704735,
+              "mean_cosine": 0.5480102701489679,
+              "rel_bias": 1.0112362073311747,
+              "variance": 12.181795159472866,
+              "rel_norm": 3.5376815613881236
+            },
+            "hidden": {
+              "cosine": 0.11630981044914623,
+              "mean_cosine": 0.4181843619652169,
+              "rel_bias": 1.3947040348065618,
+              "variance": 27.502807295231552,
+              "rel_norm": 5.257492775036642
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 3,
+      "sigma": 0.8,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.6858562519773841,
+          "groups": {
+            "writers": {
+              "cosine": 0.2960422435794586,
+              "mean_cosine": 0.7062320701168506,
+              "rel_bias": 0.7313208051496315,
+              "variance": 1.3671113647049056,
+              "rel_norm": 1.2469224666790888
+            },
+            "hidden": {
+              "cosine": 0.17069394016892,
+              "mean_cosine": 0.5427697849876363,
+              "rel_bias": 0.8600414533690539,
+              "variance": 5.148853373783939,
+              "rel_norm": 2.314465762833143
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.3444538910407573,
+          "groups": {
+            "writers": {
+              "cosine": 0.21583172646026139,
+              "mean_cosine": 0.6170208403282471,
+              "rel_bias": 0.7871895286175644,
+              "variance": 2.730958633264564,
+              "rel_norm": 1.7078811766541326
+            },
+            "hidden": {
+              "cosine": 0.12464027869961153,
+              "mean_cosine": 0.4318063915684993,
+              "rel_bias": 1.0328766172087975,
+              "variance": 10.255718139089847,
+              "rel_norm": 3.238628936613431
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3603292480111122,
+          "groups": {
+            "writers": {
+              "cosine": 0.16483249085192467,
+              "mean_cosine": 0.533006077977976,
+              "rel_bias": 0.8501885228693702,
+              "variance": 3.8223959405417687,
+              "rel_norm": 1.990655914734378
+            },
+            "hidden": {
+              "cosine": 0.13867986700171997,
+              "mean_cosine": 0.46729555255146726,
+              "rel_bias": 0.9363972914993054,
+              "variance": 6.647084134133076,
+              "rel_norm": 2.614060358889653
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.3630147179355845,
+          "groups": {
+            "writers": {
+              "cosine": 0.2222847648278409,
+              "mean_cosine": 0.6323572978175829,
+              "rel_bias": 0.8767929600592164,
+              "variance": 8.221260664896594,
+              "rel_norm": 2.9655355150666285
+            },
+            "hidden": {
+              "cosine": 0.13652114690481124,
+              "mean_cosine": 0.4653803414568351,
+              "rel_bias": 1.4671075162690363,
+              "variance": 30.292103960936796,
+              "rel_norm": 5.574238096929778
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.36330802110023797,
+          "groups": {
+            "writers": {
+              "cosine": 0.17330294392091133,
+              "mean_cosine": 0.5462520093768978,
+              "rel_bias": 0.9524090310929128,
+              "variance": 9.629663682397457,
+              "rel_norm": 3.146756804252627
+            },
+            "hidden": {
+              "cosine": 0.12241880714612857,
+              "mean_cosine": 0.43325770719644424,
+              "rel_bias": 1.286875594161764,
+              "variance": 22.319926330354466,
+              "rel_norm": 4.742614950554031
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 6,
+      "sigma": 0.05,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.37602504598908126,
+          "groups": {
+            "writers": {
+              "cosine": 0.3820978931045507,
+              "mean_cosine": 0.8344281779587541,
+              "rel_bias": 0.6103325600305461,
+              "variance": 1.3159475328609211,
+              "rel_norm": 1.2493327241478096
+            },
+            "hidden": {
+              "cosine": 0.2202350313526171,
+              "mean_cosine": 0.6641693605093684,
+              "rel_bias": 0.7492474794718346,
+              "variance": 4.402815394845695,
+              "rel_norm": 2.1534819334121953
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.18928973097354174,
+          "groups": {
+            "writers": {
+              "cosine": 0.283237130867741,
+              "mean_cosine": 0.7502138563712514,
+              "rel_bias": 0.6701463905744496,
+              "variance": 2.6361557096464847,
+              "rel_norm": 1.6976884484586963
+            },
+            "hidden": {
+              "cosine": 0.15861961778361108,
+              "mean_cosine": 0.5379180955860724,
+              "rel_bias": 0.9130476053146496,
+              "variance": 8.842491861605598,
+              "rel_norm": 3.0131609176834986
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20518557308241725,
+          "groups": {
+            "writers": {
+              "cosine": 0.23259807861810608,
+              "mean_cosine": 0.6854067615301304,
+              "rel_bias": 0.7281633977180899,
+              "variance": 3.8715419463640943,
+              "rel_norm": 2.025298067233238
+            },
+            "hidden": {
+              "cosine": 0.17741616878269145,
+              "mean_cosine": 0.5742043048297047,
+              "rel_bias": 0.848286837080241,
+              "variance": 6.405789378671512,
+              "rel_norm": 2.576669247534186
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20787419006228447,
+          "groups": {
+            "writers": {
+              "cosine": 0.2845137197530684,
+              "mean_cosine": 0.7502964495031974,
+              "rel_bias": 0.8270775151935624,
+              "variance": 9.867909850364471,
+              "rel_norm": 3.2871244051618898
+            },
+            "hidden": {
+              "cosine": 0.16345180673864546,
+              "mean_cosine": 0.547844319234618,
+              "rel_bias": 1.4794752650879108,
+              "variance": 34.119388230677835,
+              "rel_norm": 5.9254838987873875
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.2081683719297871,
+          "groups": {
+            "writers": {
+              "cosine": 0.21769108456592565,
+              "mean_cosine": 0.6489065536137628,
+              "rel_bias": 0.9042180245869351,
+              "variance": 11.145632046057777,
+              "rel_norm": 3.4052533735812776
+            },
+            "hidden": {
+              "cosine": 0.14410216360195166,
+              "mean_cosine": 0.5010132224290359,
+              "rel_bias": 1.2903266738080437,
+              "variance": 25.171834145647995,
+              "rel_norm": 5.043261282488497
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 6,
+      "sigma": 0.1,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.3760260830167681,
+          "groups": {
+            "writers": {
+              "cosine": 0.3950912608820001,
+              "mean_cosine": 0.843785937799091,
+              "rel_bias": 0.6046097076789091,
+              "variance": 1.2136481754920105,
+              "rel_norm": 1.2071416819847156
+            },
+            "hidden": {
+              "cosine": 0.22388208894454695,
+              "mean_cosine": 0.6695546329501927,
+              "rel_bias": 0.7438455281862456,
+              "variance": 4.267619615455898,
+              "rel_norm": 2.122371061355552
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.18941715301480144,
+          "groups": {
+            "writers": {
+              "cosine": 0.2932200397803787,
+              "mean_cosine": 0.7602484702509744,
+              "rel_bias": 0.6623499213878513,
+              "variance": 2.4299498816454284,
+              "rel_norm": 1.6358869865136465
+            },
+            "hidden": {
+              "cosine": 0.1604634976372777,
+              "mean_cosine": 0.5428119895869186,
+              "rel_bias": 0.9039861011465935,
+              "variance": 8.569822635915045,
+              "rel_norm": 2.9670479665823497
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20514711504802108,
+          "groups": {
+            "writers": {
+              "cosine": 0.2361245371397772,
+              "mean_cosine": 0.6901044453710675,
+              "rel_bias": 0.72373801283004,
+              "variance": 3.7581654838812732,
+              "rel_norm": 1.9976004346294747
+            },
+            "hidden": {
+              "cosine": 0.17933268242258724,
+              "mean_cosine": 0.5779775001929346,
+              "rel_bias": 0.8427730459371555,
+              "variance": 6.224238394927544,
+              "rel_norm": 2.541024258461379
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20785852801054716,
+          "groups": {
+            "writers": {
+              "cosine": 0.2860132759447453,
+              "mean_cosine": 0.7511847689427981,
+              "rel_bias": 0.8195070487239277,
+              "variance": 9.61048165219103,
+              "rel_norm": 3.246205454738845
+            },
+            "hidden": {
+              "cosine": 0.1648770096258601,
+              "mean_cosine": 0.5515338257008604,
+              "rel_bias": 1.4695939442647707,
+              "variance": 33.719037535444116,
+              "rel_norm": 5.891729205458427
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20807338692247868,
+          "groups": {
+            "writers": {
+              "cosine": 0.22082998073899482,
+              "mean_cosine": 0.6535947316390216,
+              "rel_bias": 0.8943691928461136,
+              "variance": 10.847403447219554,
+              "rel_norm": 3.361739056549725
+            },
+            "hidden": {
+              "cosine": 0.1457130057632496,
+              "mean_cosine": 0.5062891113974239,
+              "rel_bias": 1.2767738944071716,
+              "variance": 24.770062607402632,
+              "rel_norm": 5.0032115755037045
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 6,
+      "sigma": 0.2,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.375871357973665,
+          "groups": {
+            "writers": {
+              "cosine": 0.3967661758694665,
+              "mean_cosine": 0.8432715301536038,
+              "rel_bias": 0.6063444045225382,
+              "variance": 1.1872346863176575,
+              "rel_norm": 1.195541366571786
+            },
+            "hidden": {
+              "cosine": 0.22413046714945,
+              "mean_cosine": 0.670188916213594,
+              "rel_bias": 0.7432489694980164,
+              "variance": 4.2679150812600675,
+              "rel_norm": 2.122492086121958
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.18938751297537237,
+          "groups": {
+            "writers": {
+              "cosine": 0.2941882574485693,
+              "mean_cosine": 0.7603271916670873,
+              "rel_bias": 0.6631819249534793,
+              "variance": 2.377270612094895,
+              "rel_norm": 1.6189597591079878
+            },
+            "hidden": {
+              "cosine": 0.16092003750798922,
+              "mean_cosine": 0.5437738452571628,
+              "rel_bias": 0.9033289189847004,
+              "variance": 8.563866911628455,
+              "rel_norm": 2.966313234332237
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.2051154220243916,
+          "groups": {
+            "writers": {
+              "cosine": 0.23562351059500336,
+              "mean_cosine": 0.6879380505714758,
+              "rel_bias": 0.7257948641171453,
+              "variance": 3.7294061193109953,
+              "rel_norm": 1.9902073653766859
+            },
+            "hidden": {
+              "cosine": 0.18060887448548785,
+              "mean_cosine": 0.5802918754161333,
+              "rel_bias": 0.8405174598874183,
+              "variance": 6.176306913548607,
+              "rel_norm": 2.5320570770568835
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20780786802060902,
+          "groups": {
+            "writers": {
+              "cosine": 0.28812874765820495,
+              "mean_cosine": 0.7536504312790954,
+              "rel_bias": 0.8130597140071618,
+              "variance": 9.447736017452591,
+              "rel_norm": 3.220856758540573
+            },
+            "hidden": {
+              "cosine": 0.16637872718966698,
+              "mean_cosine": 0.5548818357705492,
+              "rel_bias": 1.4631865977293772,
+              "variance": 33.387540464463186,
+              "rel_norm": 5.864430030356663
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20820774394087493,
+          "groups": {
+            "writers": {
+              "cosine": 0.22227656498934512,
+              "mean_cosine": 0.6571140743051664,
+              "rel_bias": 0.8866389091156729,
+              "variance": 10.69715307406262,
+              "rel_norm": 3.338945036462732
+            },
+            "hidden": {
+              "cosine": 0.14647998752447183,
+              "mean_cosine": 0.5079475850347261,
+              "rel_bias": 1.2717273839091257,
+              "variance": 24.50923212474485,
+              "rel_norm": 4.977832297217913
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 6,
+      "sigma": 0.4,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.37583899998571724,
+          "groups": {
+            "writers": {
+              "cosine": 0.3986474667934158,
+              "mean_cosine": 0.8445607418061332,
+              "rel_bias": 0.6059081307828047,
+              "variance": 1.1707038304647412,
+              "rel_norm": 1.1882821659667357
+            },
+            "hidden": {
+              "cosine": 0.22247884644968924,
+              "mean_cosine": 0.6674818500568386,
+              "rel_bias": 0.7463102449748064,
+              "variance": 4.39427191172214,
+              "rel_norm": 2.152787549001159
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.1893277409253642,
+          "groups": {
+            "writers": {
+              "cosine": 0.295451194888264,
+              "mean_cosine": 0.7622326575633552,
+              "rel_bias": 0.6620309284025712,
+              "variance": 2.34375374546379,
+              "rel_norm": 1.6080134722141415
+            },
+            "hidden": {
+              "cosine": 0.15991013563852347,
+              "mean_cosine": 0.5403971432928745,
+              "rel_bias": 0.911556887262022,
+              "variance": 8.822425173273851,
+              "rel_norm": 3.0107305746092647
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20511736499611288,
+          "groups": {
+            "writers": {
+              "cosine": 0.2324989050993249,
+              "mean_cosine": 0.6826334847047911,
+              "rel_bias": 0.7307742485486529,
+              "variance": 3.736389904160689,
+              "rel_norm": 1.9906021281517452
+            },
+            "hidden": {
+              "cosine": 0.18139690964841002,
+              "mean_cosine": 0.5818627984875144,
+              "rel_bias": 0.8396972964269187,
+              "variance": 6.195746688421057,
+              "rel_norm": 2.5364775913134507
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.2079389049904421,
+          "groups": {
+            "writers": {
+              "cosine": 0.28838361015790326,
+              "mean_cosine": 0.753474727607822,
+              "rel_bias": 0.8001659834867642,
+              "variance": 9.078961042480577,
+              "rel_norm": 3.1579793737980735
+            },
+            "hidden": {
+              "cosine": 0.16929965349085188,
+              "mean_cosine": 0.5612090335461675,
+              "rel_bias": 1.446063961584482,
+              "variance": 32.512610068038576,
+              "rel_norm": 5.79058178458573
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20814627700019628,
+          "groups": {
+            "writers": {
+              "cosine": 0.22167952100449162,
+              "mean_cosine": 0.6567110640213192,
+              "rel_bias": 0.876194028986585,
+              "variance": 10.351576301032674,
+              "rel_norm": 3.283597387326966
+            },
+            "hidden": {
+              "cosine": 0.1489669499494657,
+              "mean_cosine": 0.5142533301565856,
+              "rel_bias": 1.2550470301152388,
+              "variance": 23.83932142698983,
+              "rel_norm": 4.9113662665946505
+            }
+          }
+        }
+      }
+    },
+    {
+      "layer": 6,
+      "sigma": 0.8,
+      "methods": {
+        "separate": {
+          "forwards": 32,
+          "draws_per_group": 16,
+          "seconds": 0.37583603092934936,
+          "groups": {
+            "writers": {
+              "cosine": 0.3997468501805407,
+              "mean_cosine": 0.8451126187614879,
+              "rel_bias": 0.6093735436725526,
+              "variance": 1.12987730258957,
+              "rel_norm": 1.1680841555545758
+            },
+            "hidden": {
+              "cosine": 0.21670601265849415,
+              "mean_cosine": 0.6549930385904149,
+              "rel_bias": 0.7607905735928929,
+              "variance": 4.79507379394332,
+              "rel_norm": 2.2467664360879787
+            }
+          }
+        },
+        "separate/2": {
+          "forwards": 16,
+          "draws_per_group": 8,
+          "seconds": 0.18935915909241885,
+          "groups": {
+            "writers": {
+              "cosine": 0.2962901892102571,
+              "mean_cosine": 0.7627812183434602,
+              "rel_bias": 0.6635819965445612,
+              "variance": 2.261634351309066,
+              "rel_norm": 1.5801818608325389
+            },
+            "hidden": {
+              "cosine": 0.15557407145670377,
+              "mean_cosine": 0.5274295887436504,
+              "rel_bias": 0.939146466097538,
+              "variance": 9.62947432484028,
+              "rel_norm": 3.1444475214302563
+            }
+          }
+        },
+        "joint": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20516069198492914,
+          "groups": {
+            "writers": {
+              "cosine": 0.21719915481114416,
+              "mean_cosine": 0.6561685431952089,
+              "rel_bias": 0.7546145404458265,
+              "variance": 3.723380793016044,
+              "rel_norm": 1.9799555775874436
+            },
+            "hidden": {
+              "cosine": 0.18259954676603724,
+              "mean_cosine": 0.5826943373048956,
+              "rel_bias": 0.8400218989600926,
+              "variance": 6.194187184585576,
+              "rel_norm": 2.537572766113879
+            }
+          }
+        },
+        "hadamard": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.2078811510000378,
+          "groups": {
+            "writers": {
+              "cosine": 0.28811794903485444,
+              "mean_cosine": 0.7524612978716465,
+              "rel_bias": 0.7531033634541024,
+              "variance": 7.743967246242573,
+              "rel_norm": 2.9167934216618585
+            },
+            "hidden": {
+              "cosine": 0.17534379033336406,
+              "mean_cosine": 0.572023669948961,
+              "rel_bias": 1.4079839151416782,
+              "variance": 30.297416667503125,
+              "rel_norm": 5.598971879211495
+            }
+          }
+        },
+        "rademacher": {
+          "forwards": 16,
+          "draws_per_group": 16,
+          "seconds": 0.20813197898678482,
+          "groups": {
+            "writers": {
+              "cosine": 0.21739618252259393,
+              "mean_cosine": 0.6502188132993337,
+              "rel_bias": 0.8481173381006791,
+              "variance": 9.191211742717547,
+              "rel_norm": 3.089257460357398
+            },
+            "hidden": {
+              "cosine": 0.1546616364761167,
+              "mean_cosine": 0.5273870975357204,
+              "rel_bias": 1.2133817553844657,
+              "variance": 22.02183681306907,
+              "rel_norm": 4.725786846094504
+            }
+          }
+        }
+      }
+    }
+  ],
+  "gpu": "NVIDIA L40S"
+}

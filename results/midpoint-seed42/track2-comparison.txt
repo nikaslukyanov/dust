@@ -1,0 +1,23 @@
+                                            fixed          variance         agreement   vs first
+execution                           cached-suffix     cached-suffix     cached-suffix
+steps                                          61                61                61     +0.0%     +0.0%
+best val                                  6.07518           6.15693           6.30006     +1.3%     +3.7%
+test at best val                          6.06012           6.14268           6.28338     +1.4%     +3.7%
+final train loss                          5.88235           5.99628            6.1372     +1.9%     +4.3%
+forward-equivalents / step                239.742           249.346           193.652     +4.0%    -19.2%
+FLOPs / step                          2.67762e+14       2.78488e+14       2.16286e+14     +4.0%    -19.2%
+FLOPs executed / step                 3.53562e+14       3.67914e+14       2.85783e+14     +4.1%    -19.2%
+step host ms (median)                     8000.35           8243.33           6556.53     +3.0%    -18.0%
+step gpu ms (median)                      8001.46           8243.25           6556.48     +3.0%    -18.1%
+train seconds                             488.124           500.462           408.418     +2.5%    -16.3%
+peak memory GiB                           6.63046           6.72543           6.72543     +1.4%     +1.4%
+  clean s (median)                      0.0310303         0.0309859         0.0309505     -0.1%     -0.3%
+  direct s (median)                       5.77698           1.36949           1.68804    -76.3%    -70.8%
+  embedding s (median)                    0.30213           4.94468          0.181534  +1536.6%    -39.9%
+  hubs s (median)                        0.583996          0.585886             3.294     +0.3%   +464.0%
+  head s (median)                        0.281378           0.28106           0.28109     -0.1%     -0.1%
+  local s (median)                       0.557406          0.557097          0.556653     -0.1%     -0.1%
+  scalars s (median)                     0.461336          0.460692           0.46024     -0.1%     -0.2%
+probe cosine (mean over probes)          0.237821          0.285099          0.271943    +19.9%    +14.3%
+max |val diff| variance vs fixed: 0.17 over 33 evaluations
+max |val diff| agreement vs fixed: 0.574 over 33 evaluations

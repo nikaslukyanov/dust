@@ -1,0 +1,1966 @@
+{
+  "best_val": 6.075182886684642,
+  "best_step": 61,
+  "test_at_best_val": 6.060117300818948,
+  "history": [
+    {
+      "step": 0,
+      "val_loss": 8.318351745605469
+    },
+    {
+      "step": 1,
+      "train_loss": 8.318382263183594,
+      "flops": 318589785604096.0,
+      "flops_executed": 420906795008000.0,
+      "forward_equivalents": 285.2507998978534,
+      "draws": 1616,
+      "population": 256,
+      "train_seconds": 9.388576986035332,
+      "gpu_hours": 0.002607938051676481,
+      "elapsed_seconds": 13.583703100914136,
+      "step_host_ms": 9388.576986035332,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9388.7080078125,
+      "peak_memory_gib": 6.379842758178711,
+      "allocation": {
+        "writers": [
+          38,
+          32,
+          16,
+          10,
+          6,
+          4,
+          2,
+          2
+        ],
+        "hidden": [
+          38,
+          32,
+          16,
+          10,
+          6,
+          4,
+          2,
+          2
+        ],
+        "hubs": [
+          6,
+          6,
+          4,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "embedding": 10,
+        "head": 1024,
+        "local": {
+          "q": 2,
+          "v": 20,
+          "gate": 6,
+          "k": 12,
+          "ve": 8
+        },
+        "nrep": 2
+      },
+      "phase_seconds": {
+        "clean": 0.031304461997933686,
+        "direct": 6.845911002950743,
+        "embedding": 0.3064940960612148,
+        "hubs": 0.7890053109731525,
+        "head": 0.2978490740060806,
+        "local": 0.563551796018146,
+        "scalars": 0.5280837499303743
+      },
+      "val_loss": 8.144673291374655
+    },
+    {
+      "step": 2,
+      "train_loss": 8.1414155960083,
+      "flops": 637179571208192.0,
+      "flops_executed": 841813590016000.0,
+      "forward_equivalents": 570.5015997957069,
+      "draws": 3232,
+      "population": 256,
+      "train_seconds": 18.663286110037006,
+      "gpu_hours": 0.005184246141676946,
+      "elapsed_seconds": 25.865271418937482,
+      "step_host_ms": 9274.709124001674,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9275.7724609375,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.03098669706378132,
+        "direct": 6.844985589967109,
+        "embedding": 0.30350891896523535,
+        "hubs": 0.7884896690957248,
+        "head": 0.2710470389574766,
+        "local": 0.5624955050880089,
+        "scalars": 0.46444742602761835
+      },
+      "val_loss": 7.8133302856894105
+    },
+    {
+      "step": 3,
+      "train_loss": 7.781055927276611,
+      "flops": 955769356812288.0,
+      "flops_executed": 1262720385024000.0,
+      "forward_equivalents": 855.7523996935603,
+      "draws": 4848,
+      "population": 256,
+      "train_seconds": 27.945682266028598,
+      "gpu_hours": 0.007762689518341278,
+      "elapsed_seconds": 42.01633954094723,
+      "step_host_ms": 9282.396155991592,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9283.501953125,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.03115789801813662,
+        "direct": 6.8553303859662265,
+        "embedding": 0.30329578602686524,
+        "hubs": 0.7874252749606967,
+        "head": 0.27947173395659775,
+        "local": 0.5608225530013442,
+        "scalars": 0.4599378230050206
+      }
+    },
+    {
+      "step": 4,
+      "train_loss": 7.695855140686035,
+      "flops": 1274359142416384.0,
+      "flops_executed": 1683627180032000.0,
+      "forward_equivalents": 1141.0031995914137,
+      "draws": 6464,
+      "population": 256,
+      "train_seconds": 37.23940300999675,
+      "gpu_hours": 0.010344278613887986,
+      "elapsed_seconds": 51.3120278759161,
+      "step_host_ms": 9293.720743968152,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9294.8525390625,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.031087868032045662,
+        "direct": 6.853239726042375,
+        "embedding": 0.3040000459877774,
+        "hubs": 0.7910746450070292,
+        "head": 0.2810930620180443,
+        "local": 0.5628193159354851,
+        "scalars": 0.4656729029957205
+      },
+      "val_loss": 7.493502757128547
+    },
+    {
+      "step": 5,
+      "train_loss": 7.541345596313477,
+      "flops": 1592948928020480.0,
+      "flops_executed": 2104533975040000.0,
+      "forward_equivalents": 1426.2539994892672,
+      "draws": 8080,
+      "population": 256,
+      "train_seconds": 46.52166768000461,
+      "gpu_hours": 0.012922685466667947,
+      "elapsed_seconds": 71.69152079499327,
+      "step_host_ms": 9282.264670007862,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9283.3974609375,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.031242092954926193,
+        "direct": 6.8335882920073345,
+        "embedding": 0.3035791430156678,
+        "hubs": 0.7908055150182918,
+        "head": 0.29097680503036827,
+        "local": 0.5621923200087622,
+        "scalars": 0.4648646570276469
+      }
+    },
+    {
+      "step": 6,
+      "train_loss": 7.364474296569824,
+      "flops": 1911538713624576.0,
+      "flops_executed": 2525440770048000.0,
+      "forward_equivalents": 1711.5047993871208,
+      "draws": 9696,
+      "population": 256,
+      "train_seconds": 55.825216450029984,
+      "gpu_hours": 0.015507004569452773,
+      "elapsed_seconds": 80.99700161791407,
+      "step_host_ms": 9303.548770025373,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9304.671875,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.031171347945928574,
+        "direct": 6.865888010011986,
+        "embedding": 0.30447502597235143,
+        "hubs": 0.792630514013581,
+        "head": 0.2811097770463675,
+        "local": 0.5620103069813922,
+        "scalars": 0.46148742793593556
+      },
+      "val_loss": 7.398975119871252
+    },
+    {
+      "step": 7,
+      "train_loss": 7.4744977951049805,
+      "flops": 2230128499228672.0,
+      "flops_executed": 2946347565056000.0,
+      "forward_equivalents": 1996.7555992849743,
+      "draws": 11312,
+      "population": 256,
+      "train_seconds": 65.09933402203023,
+      "gpu_hours": 0.018083148339452845,
+      "elapsed_seconds": 103.54801857902203,
+      "step_host_ms": 9274.11757200025,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9275.2373046875,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.031072098994627595,
+        "direct": 6.829989841906354,
+        "embedding": 0.302333994070068,
+        "hubs": 0.7891530810156837,
+        "head": 0.2901247799163684,
+        "local": 0.5607078860048205,
+        "scalars": 0.46566021197941154
+      }
+    },
+    {
+      "step": 8,
+      "train_loss": 7.3922038078308105,
+      "flops": 2548718284832768.0,
+      "flops_executed": 3367254360064000.0,
+      "forward_equivalents": 2282.006399182828,
+      "draws": 12928,
+      "population": 256,
+      "train_seconds": 74.37300888693426,
+      "gpu_hours": 0.020659169135259517,
+      "elapsed_seconds": 112.82360991591122,
+      "step_host_ms": 9273.674864904024,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9274.783203125,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.031113645061850548,
+        "direct": 6.828696285956539,
+        "embedding": 0.30370380100794137,
+        "hubs": 0.7894603790482506,
+        "head": 0.2892203968949616,
+        "local": 0.561481797019951,
+        "scalars": 0.46517208602745086
+      },
+      "val_loss": 7.215150159948013
+    },
+    {
+      "step": 9,
+      "train_loss": 7.1697845458984375,
+      "flops": 2867308070436864.0,
+      "flops_executed": 3788161155072000.0,
+      "forward_equivalents": 2567.2571990806814,
+      "draws": 14544,
+      "population": 256,
+      "train_seconds": 83.65687877882738,
+      "gpu_hours": 0.023238021883007606,
+      "elapsed_seconds": 124.46273666992784,
+      "step_host_ms": 9283.869891893119,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9284.9794921875,
+      "peak_memory_gib": 6.622039794921875,
+      "phase_seconds": {
+        "clean": 0.03120959096122533,
+        "direct": 6.846030031098053,
+        "embedding": 0.30335582804400474,
+        "hubs": 0.7910286029800773,
+        "head": 0.28044687409419566,
+        "local": 0.5626101329689845,
+        "scalars": 0.46441754698753357
+      }
+    },
+    {
+      "step": 10,
+      "train_loss": 7.124703407287598,
+      "flops": 3185897856040960.0,
+      "flops_executed": 4209067950080000.0,
+      "forward_equivalents": 2852.507998978535,
+      "draws": 16160,
+      "population": 256,
+      "train_seconds": 92.95142162381671,
+      "gpu_hours": 0.025819839339949087,
+      "elapsed_seconds": 133.75921292393468,
+      "step_host_ms": 9294.542844989337,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9295.6162109375,
+      "peak_memory_gib": 6.622528076171875,
+      "phase_seconds": {
+        "clean": 0.031152019975706935,
+        "direct": 6.8523415519157425,
+        "embedding": 0.3044979349942878,
+        "hubs": 0.7914386340416968,
+        "head": 0.2802018530201167,
+        "local": 0.5618391119642183,
+        "scalars": 0.46780609199777246
+      },
+      "val_loss": 7.106558911940631,
+      "probe": {
+        "mean_group_cosine": 0.2614156862893588,
+        "min_group_cosine": -0.02823017520393129,
+        "per_group": {
+          "embedding": {
+            "cosine": 0.22969694775555005,
+            "rel_norm": 1.403692364692688
+          },
+          "gate": {
+            "cosine": -0.02823017520393129,
+            "rel_norm": 0.7796484231948853
+          },
+          "head": {
+            "cosine": 0.9374694902883208,
+            "rel_norm": 0.9372546076774597
+          },
+          "hidden": {
+            "cosine": 0.2223540961441171,
+            "rel_norm": 1.7243068218231201
+          },
+          "k": {
+            "cosine": 0.0017315402415073304,
+            "rel_norm": 15.992530822753906
+          },
+          "q": {
+            "cosine": 0.03733845391803746,
+            "rel_norm": 11.491983413696289
+          },
+          "scalars": {
+            "cosine": 0.7891130800981819,
+            "rel_norm": 1.7880233526229858
+          },
+          "v": {
+            "cosine": 0.033785448375115906,
+            "rel_norm": 1.0593290328979492
+          },
+          "ve": {
+            "cosine": 0.008630943143369554,
+            "rel_norm": 5.494193077087402
+          },
+          "writers": {
+            "cosine": 0.38226703813331897,
+            "rel_norm": 0.8412136435508728
+          }
+        },
+        "peak_memory_gib": 6.649749755859375
+      }
+    },
+    {
+      "step": 11,
+      "train_loss": 7.104663848876953,
+      "flops": 3504487641645056.0,
+      "flops_executed": 4629974745088000.0,
+      "forward_equivalents": 3137.7587988763885,
+      "draws": 17776,
+      "population": 256,
+      "train_seconds": 102.26108041475527,
+      "gpu_hours": 0.028405855670765354,
+      "elapsed_seconds": 157.33776848192792,
+      "step_host_ms": 9309.658790938556,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9310.7822265625,
+      "peak_memory_gib": 6.622528076171875,
+      "phase_seconds": {
+        "clean": 0.03134708292782307,
+        "direct": 6.860381926991977,
+        "embedding": 0.3037554289912805,
+        "hubs": 0.7914464470231906,
+        "head": 0.2899116149637848,
+        "local": 0.5633265470387414,
+        "scalars": 0.46477938001044095
+      }
+    },
+    {
+      "step": 12,
+      "train_loss": 7.004180908203125,
+      "flops": 3823077427249152.0,
+      "flops_executed": 5050881540096000.0,
+      "forward_equivalents": 3423.009598774242,
+      "draws": 19392,
+      "population": 256,
+      "train_seconds": 111.56464831077028,
+      "gpu_hours": 0.030990180086325078,
+      "elapsed_seconds": 166.64329628890846,
+      "step_host_ms": 9303.56789601501,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9304.697265625,
+      "peak_memory_gib": 6.629486083984375,
+      "phase_seconds": {
+        "clean": 0.03128653403837234,
+        "direct": 6.852923930040561,
+        "embedding": 0.30405838694423437,
+        "hubs": 0.7919697290053591,
+        "head": 0.2898439390119165,
+        "local": 0.5622598869958892,
+        "scalars": 0.46647137904074043
+      },
+      "val_loss": 7.006121607387767
+    },
+    {
+      "step": 13,
+      "train_loss": 6.912306785583496,
+      "flops": 4141667212853248.0,
+      "flops_executed": 5471788335104000.0,
+      "forward_equivalents": 3708.2603986720956,
+      "draws": 21008,
+      "population": 256,
+      "train_seconds": 120.866177732707,
+      "gpu_hours": 0.03357393825908528,
+      "elapsed_seconds": 182.5762183769839,
+      "step_host_ms": 9301.52942193672,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9302.640625,
+      "peak_memory_gib": 6.629974365234375,
+      "phase_seconds": {
+        "clean": 0.03116266499273479,
+        "direct": 6.841394641902298,
+        "embedding": 0.3043326949700713,
+        "hubs": 0.7901937459828332,
+        "head": 0.30099847295787185,
+        "local": 0.5626451270654798,
+        "scalars": 0.46582330390810966
+      }
+    },
+    {
+      "step": 14,
+      "train_loss": 7.0010528564453125,
+      "flops": 4460256998457344.0,
+      "flops_executed": 5892695130112000.0,
+      "forward_equivalents": 3993.511198569949,
+      "draws": 22624,
+      "population": 256,
+      "train_seconds": 130.17173481872305,
+      "gpu_hours": 0.03615881522742307,
+      "elapsed_seconds": 191.88367030397058,
+      "step_host_ms": 9305.557086016051,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9306.6884765625,
+      "peak_memory_gib": 6.629974365234375,
+      "phase_seconds": {
+        "clean": 0.031173811061307788,
+        "direct": 6.8652019060682505,
+        "embedding": 0.3041988939512521,
+        "hubs": 0.792128270957619,
+        "head": 0.28086945496033877,
+        "local": 0.5630994759267196,
+        "scalars": 0.4641206110827625
+      },
+      "val_loss": 6.965575891382554
+    },
+    {
+      "step": 15,
+      "train_loss": 6.940595626831055,
+      "flops": 4778846784061440.0,
+      "flops_executed": 6313601925120000.0,
+      "forward_equivalents": 4278.761998467802,
+      "draws": 24240,
+      "population": 256,
+      "train_seconds": 139.46502750972286,
+      "gpu_hours": 0.038740285419367464,
+      "elapsed_seconds": 205.096587848966,
+      "step_host_ms": 9293.292690999806,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9294.416015625,
+      "peak_memory_gib": 6.629974365234375,
+      "phase_seconds": {
+        "clean": 0.031231965054757893,
+        "direct": 6.8558937079505995,
+        "embedding": 0.3031182569684461,
+        "hubs": 0.7905269470065832,
+        "head": 0.28077817207667977,
+        "local": 0.5615328139392659,
+        "scalars": 0.46537449094466865
+      }
+    },
+    {
+      "step": 16,
+      "train_loss": 6.81632137298584,
+      "flops": 5097436569665536.0,
+      "flops_executed": 6734508720128000.0,
+      "forward_equivalents": 4564.012798365656,
+      "draws": 25856,
+      "population": 256,
+      "train_seconds": 148.74916835478507,
+      "gpu_hours": 0.041319213431884744,
+      "elapsed_seconds": 214.3825950549217,
+      "step_host_ms": 9284.140845062211,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9285.248046875,
+      "peak_memory_gib": 6.629974365234375,
+      "phase_seconds": {
+        "clean": 0.03115106897894293,
+        "direct": 6.850179816014133,
+        "embedding": 0.3029778680065647,
+        "hubs": 0.7906207800842822,
+        "head": 0.27809707494452596,
+        "local": 0.5618635370628908,
+        "scalars": 0.46441900392528623
+      },
+      "val_loss": 6.85691078971414
+    },
+    {
+      "step": 17,
+      "train_loss": 6.818666458129883,
+      "flops": 5416026355269632.0,
+      "flops_executed": 7155415515136000.0,
+      "forward_equivalents": 4849.263598263509,
+      "draws": 27472,
+      "population": 256,
+      "train_seconds": 158.05839444987942,
+      "gpu_hours": 0.04390510956941095,
+      "elapsed_seconds": 226.45418402797077,
+      "step_host_ms": 9309.226095094346,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9310.3515625,
+      "peak_memory_gib": 6.629974365234375,
+      "phase_seconds": {
+        "clean": 0.03127770102582872,
+        "direct": 6.8665580690139905,
+        "embedding": 0.3041662530740723,
+        "hubs": 0.7911438889568672,
+        "head": 0.28151452797465026,
+        "local": 0.5630336019676179,
+        "scalars": 0.4666834840318188
+      }
+    },
+    {
+      "step": 18,
+      "train_loss": 6.822885513305664,
+      "flops": 5734616140873728.0,
+      "flops_executed": 7576322310144000.0,
+      "forward_equivalents": 5134.514398161363,
+      "draws": 29088,
+      "population": 256,
+      "train_seconds": 167.3621680479264,
+      "gpu_hours": 0.046489491124424,
+      "elapsed_seconds": 235.75985817995388,
+      "step_host_ms": 9303.773598046973,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9304.8876953125,
+      "peak_memory_gib": 6.629974365234375,
+      "phase_seconds": {
+        "clean": 0.031203584047034383,
+        "direct": 6.86024411697872,
+        "embedding": 0.3047035299241543,
+        "hubs": 0.7920021860627457,
+        "head": 0.2804444319335744,
+        "local": 0.5628763560671359,
+        "scalars": 0.4673577689100057
+      },
+      "val_loss": 6.778659792507396
+    },
+    {
+      "step": 19,
+      "train_loss": 6.705349922180176,
+      "flops": 6053205926477824.0,
+      "flops_executed": 7997229105152000.0,
+      "forward_equivalents": 5419.765198059216,
+      "draws": 30704,
+      "population": 256,
+      "train_seconds": 176.67646755184978,
+      "gpu_hours": 0.049076796542180494,
+      "elapsed_seconds": 247.43656482594088,
+      "step_host_ms": 9314.299503923394,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9315.4228515625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031295661930926144,
+        "direct": 6.8702991410391405,
+        "embedding": 0.304797878023237,
+        "hubs": 0.7916440350236371,
+        "head": 0.28097163198981434,
+        "local": 0.5632289369823411,
+        "scalars": 0.4672472010133788
+      }
+    },
+    {
+      "step": 20,
+      "train_loss": 6.781416893005371,
+      "flops": 6371795712081920.0,
+      "flops_executed": 8418135900160000.0,
+      "forward_equivalents": 5705.01599795707,
+      "draws": 32320,
+      "population": 256,
+      "train_seconds": 185.9885317418957,
+      "gpu_hours": 0.051663481039415475,
+      "elapsed_seconds": 256.75049775396474,
+      "step_host_ms": 9312.06419004593,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9313.1962890625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03125057101715356,
+        "direct": 6.862009088974446,
+        "embedding": 0.30388998391572386,
+        "hubs": 0.7931176120182499,
+        "head": 0.2880942529300228,
+        "local": 0.5635638919193298,
+        "scalars": 0.4655801809858531
+      },
+      "val_loss": 6.74520066205193,
+      "probe": {
+        "mean_group_cosine": 0.24136987482392236,
+        "min_group_cosine": -0.0019659793959472837,
+        "per_group": {
+          "embedding": {
+            "cosine": 0.24164308755541736,
+            "rel_norm": 1.7916361093521118
+          },
+          "gate": {
+            "cosine": 0.09363509103274785,
+            "rel_norm": 1.562856674194336
+          },
+          "head": {
+            "cosine": 0.868774488318477,
+            "rel_norm": 1.012152910232544
+          },
+          "hidden": {
+            "cosine": 0.18351619206453984,
+            "rel_norm": 2.417848825454712
+          },
+          "k": {
+            "cosine": 0.0036531190697949288,
+            "rel_norm": 21.829992294311523
+          },
+          "q": {
+            "cosine": 0.035202044760450774,
+            "rel_norm": 15.287473678588867
+          },
+          "scalars": {
+            "cosine": 0.6560186930568738,
+            "rel_norm": 1.596959114074707
+          },
+          "v": {
+            "cosine": 0.020868245373340144,
+            "rel_norm": 1.7987041473388672
+          },
+          "ve": {
+            "cosine": -0.0019659793959472837,
+            "rel_norm": 8.70440673828125
+          },
+          "writers": {
+            "cosine": 0.31235376640352924,
+            "rel_norm": 1.2087737321853638
+          }
+        },
+        "peak_memory_gib": 6.648773193359375
+      }
+    },
+    {
+      "step": 21,
+      "train_loss": 6.715646743774414,
+      "flops": 6690385497686016.0,
+      "flops_executed": 8839042695168000.0,
+      "forward_equivalents": 5990.266797854923,
+      "draws": 33936,
+      "population": 256,
+      "train_seconds": 195.28242670185864,
+      "gpu_hours": 0.05424511852829406,
+      "elapsed_seconds": 282.03539279999677,
+      "step_host_ms": 9293.894959962927,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9295.0166015625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031221823999658227,
+        "direct": 6.852070268942043,
+        "embedding": 0.30431337794288993,
+        "hubs": 0.7909413309535012,
+        "head": 0.28050714498385787,
+        "local": 0.5639302510535344,
+        "scalars": 0.46611349808517843
+      }
+    },
+    {
+      "step": 22,
+      "train_loss": 6.681463241577148,
+      "flops": 7008975283290112.0,
+      "flops_executed": 9259949490176000.0,
+      "forward_equivalents": 6275.517597752777,
+      "draws": 35552,
+      "population": 256,
+      "train_seconds": 204.59416477079503,
+      "gpu_hours": 0.056831712436331956,
+      "elapsed_seconds": 291.34897530591115,
+      "step_host_ms": 9311.738068936393,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9312.8369140625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03125589597038925,
+        "direct": 6.8678816630272195,
+        "embedding": 0.30445778707508,
+        "hubs": 0.7920650209998712,
+        "head": 0.28216865798458457,
+        "local": 0.5637934349942952,
+        "scalars": 0.4652888810960576
+      },
+      "val_loss": 6.677105258492863
+    },
+    {
+      "step": 23,
+      "train_loss": 6.651762008666992,
+      "flops": 7327565068894208.0,
+      "flops_executed": 9680856285184000.0,
+      "forward_equivalents": 6560.7683976506305,
+      "draws": 37168,
+      "population": 256,
+      "train_seconds": 213.8993644437287,
+      "gpu_hours": 0.059416490123257976,
+      "elapsed_seconds": 304.32325609901454,
+      "step_host_ms": 9305.199672933668,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9306.3046875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03132164210546762,
+        "direct": 6.863873175927438,
+        "embedding": 0.30458374705631286,
+        "hubs": 0.7918285870691761,
+        "head": 0.28067565499804914,
+        "local": 0.5619816640391946,
+        "scalars": 0.4659480049740523
+      }
+    },
+    {
+      "step": 24,
+      "train_loss": 6.636151313781738,
+      "flops": 7646154854498304.0,
+      "flops_executed": 1.0101763080192e+16,
+      "forward_equivalents": 6846.019197548484,
+      "draws": 38784,
+      "population": 256,
+      "train_seconds": 223.19043393270113,
+      "gpu_hours": 0.06199734275908365,
+      "elapsed_seconds": 313.61624232900795,
+      "step_host_ms": 9291.069488972425,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9292.1884765625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03118058806285262,
+        "direct": 6.850091059925035,
+        "embedding": 0.30440473195631057,
+        "hubs": 0.7918442789232358,
+        "head": 0.27958470897283405,
+        "local": 0.5641670299228281,
+        "scalars": 0.46505285799503326
+      },
+      "val_loss": 6.635981391457951
+    },
+    {
+      "step": 25,
+      "train_loss": 6.539704322814941,
+      "flops": 7964744640102400.0,
+      "flops_executed": 1.05226698752e+16,
+      "forward_equivalents": 7131.269997446338,
+      "draws": 40400,
+      "population": 256,
+      "train_seconds": 232.48844974371605,
+      "gpu_hours": 0.06458012492881002,
+      "elapsed_seconds": 329.0730592450127,
+      "step_host_ms": 9298.01581101492,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9299.1396484375,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03152967896312475,
+        "direct": 6.855407180963084,
+        "embedding": 0.3039934600237757,
+        "hubs": 0.7920751110650599,
+        "head": 0.2813456100411713,
+        "local": 0.5622546420199797,
+        "scalars": 0.46650440094526857
+      }
+    },
+    {
+      "step": 26,
+      "train_loss": 6.650842666625977,
+      "flops": 8283334425706496.0,
+      "flops_executed": 1.0943576670208e+16,
+      "forward_equivalents": 7416.520797344191,
+      "draws": 42016,
+      "population": 256,
+      "train_seconds": 241.7752398827579,
+      "gpu_hours": 0.06715978885632164,
+      "elapsed_seconds": 338.36172903701663,
+      "step_host_ms": 9286.790139041841,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9287.9228515625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03123596601653844,
+        "direct": 6.848475069971755,
+        "embedding": 0.3044593089725822,
+        "hubs": 0.7913779700174928,
+        "head": 0.27920704800635576,
+        "local": 0.5632415729342028,
+        "scalars": 0.46417939593084157
+      },
+      "val_loss": 6.57188429551966
+    },
+    {
+      "step": 27,
+      "train_loss": 6.5326104164123535,
+      "flops": 8601924211310592.0,
+      "flops_executed": 1.1364483465216e+16,
+      "forward_equivalents": 7701.771597242045,
+      "draws": 43632,
+      "population": 256,
+      "train_seconds": 251.0696754247183,
+      "gpu_hours": 0.06974157650686619,
+      "elapsed_seconds": 350.14740645198617,
+      "step_host_ms": 9294.43554196041,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9295.5517578125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03129135398194194,
+        "direct": 6.8486167209921405,
+        "embedding": 0.3051181259797886,
+        "hubs": 0.7914150040596724,
+        "head": 0.28120396099984646,
+        "local": 0.5642335599986836,
+        "scalars": 0.4676671379711479
+      }
+    },
+    {
+      "step": 28,
+      "train_loss": 6.532956123352051,
+      "flops": 8920513996914688.0,
+      "flops_executed": 1.1785390260224e+16,
+      "forward_equivalents": 7987.022397139898,
+      "draws": 45248,
+      "population": 256,
+      "train_seconds": 260.3869989576051,
+      "gpu_hours": 0.07232972193266808,
+      "elapsed_seconds": 359.4666013249662,
+      "step_host_ms": 9317.323532886803,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9318.4482421875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03130354406312108,
+        "direct": 6.874628827092238,
+        "embedding": 0.3043396130669862,
+        "hubs": 0.7932490080129355,
+        "head": 0.2802091980120167,
+        "local": 0.5641480940394104,
+        "scalars": 0.4647556859999895
+      },
+      "val_loss": 6.552295348223518
+    },
+    {
+      "step": 29,
+      "train_loss": 6.624686241149902,
+      "flops": 9239103782518784.0,
+      "flops_executed": 1.2206297055232e+16,
+      "forward_equivalents": 8272.273197037752,
+      "draws": 46864,
+      "population": 256,
+      "train_seconds": 269.69756028649863,
+      "gpu_hours": 0.07491598896847185,
+      "elapsed_seconds": 372.28069432999473,
+      "step_host_ms": 9310.561328893527,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9311.6796875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03126960794907063,
+        "direct": 6.867565151071176,
+        "embedding": 0.30356389901135117,
+        "hubs": 0.7924581379629672,
+        "head": 0.281560737057589,
+        "local": 0.5635735220275819,
+        "scalars": 0.46550604805815965
+      }
+    },
+    {
+      "step": 30,
+      "train_loss": 6.374698162078857,
+      "flops": 9557693568122880.0,
+      "flops_executed": 1.262720385024e+16,
+      "forward_equivalents": 8557.523996935604,
+      "draws": 48480,
+      "population": 256,
+      "train_seconds": 279.0080045935465,
+      "gpu_hours": 0.07750222349820736,
+      "elapsed_seconds": 381.59310794295743,
+      "step_host_ms": 9310.444307047874,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9311.5693359375,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031287677004002035,
+        "direct": 6.866828707046807,
+        "embedding": 0.30406181002035737,
+        "hubs": 0.793182821944356,
+        "head": 0.28162985807284713,
+        "local": 0.5623057989869267,
+        "scalars": 0.4663466369966045
+      },
+      "val_loss": 6.504528943230124,
+      "probe": {
+        "mean_group_cosine": 0.24737326300977008,
+        "min_group_cosine": 0.008625705014246086,
+        "per_group": {
+          "embedding": {
+            "cosine": 0.22699835385119224,
+            "rel_norm": 1.9632512331008911
+          },
+          "gate": {
+            "cosine": 0.012030846783365915,
+            "rel_norm": 1.4842250347137451
+          },
+          "head": {
+            "cosine": 0.868179058186141,
+            "rel_norm": 1.0144658088684082
+          },
+          "hidden": {
+            "cosine": 0.19198877690244104,
+            "rel_norm": 2.4796786308288574
+          },
+          "k": {
+            "cosine": 0.008625705014246086,
+            "rel_norm": 22.768747329711914
+          },
+          "q": {
+            "cosine": 0.035326140191969765,
+            "rel_norm": 16.63656234741211
+          },
+          "scalars": {
+            "cosine": 0.7735732349849043,
+            "rel_norm": 1.8508341312408447
+          },
+          "v": {
+            "cosine": 0.03353369952267067,
+            "rel_norm": 1.9171653985977173
+          },
+          "ve": {
+            "cosine": 0.008785140473808638,
+            "rel_norm": 9.633252143859863
+          },
+          "writers": {
+            "cosine": 0.31469167418696076,
+            "rel_norm": 1.3767482042312622
+          }
+        },
+        "peak_memory_gib": 6.649261474609375
+      }
+    },
+    {
+      "step": 31,
+      "train_loss": 6.480722427368164,
+      "flops": 9876283353726976.0,
+      "flops_executed": 1.3048110645248e+16,
+      "forward_equivalents": 8842.774796833457,
+      "draws": 50096,
+      "population": 256,
+      "train_seconds": 288.3010021445807,
+      "gpu_hours": 0.08008361170682797,
+      "elapsed_seconds": 406.7992325410014,
+      "step_host_ms": 9292.997551034205,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9294.1064453125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03126385004725307,
+        "direct": 6.852278625941835,
+        "embedding": 0.30503676494117826,
+        "hubs": 0.7897230159724131,
+        "head": 0.2811480180826038,
+        "local": 0.5630900739924982,
+        "scalars": 0.4656630589161068
+      }
+    },
+    {
+      "step": 32,
+      "train_loss": 6.456978797912598,
+      "flops": 1.0194873139331072e+16,
+      "flops_executed": 1.3469017440256e+16,
+      "forward_equivalents": 9128.02559673131,
+      "draws": 51712,
+      "population": 256,
+      "train_seconds": 297.6197568025673,
+      "gpu_hours": 0.0826721546673798,
+      "elapsed_seconds": 416.12250028096605,
+      "step_host_ms": 9318.754657986574,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9319.8818359375,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03128901799209416,
+        "direct": 6.855482209008187,
+        "embedding": 0.30414345010649413,
+        "hubs": 0.7924322739709169,
+        "head": 0.30165388400200754,
+        "local": 0.5631780739640817,
+        "scalars": 0.46572085993830115
+      },
+      "val_loss": 6.4727463722229
+    },
+    {
+      "step": 33,
+      "train_loss": 6.484376907348633,
+      "flops": 1.0513462924935168e+16,
+      "flops_executed": 1.3889924235264e+16,
+      "forward_equivalents": 9413.276396629162,
+      "draws": 53328,
+      "population": 256,
+      "train_seconds": 306.9104481465183,
+      "gpu_hours": 0.08525290226292176,
+      "elapsed_seconds": 436.053456034977,
+      "step_host_ms": 9290.691343951039,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9291.830078125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03137017600238323,
+        "direct": 6.849808968021534,
+        "embedding": 0.3039787869201973,
+        "hubs": 0.7913821659749374,
+        "head": 0.2808355949819088,
+        "local": 0.5619350479682907,
+        "scalars": 0.46659153304062784
+      }
+    },
+    {
+      "step": 34,
+      "train_loss": 6.3949079513549805,
+      "flops": 1.0832052710539264e+16,
+      "flops_executed": 1.4310831030272e+16,
+      "forward_equivalents": 9698.527196527015,
+      "draws": 54944,
+      "population": 256,
+      "train_seconds": 316.21422466251533,
+      "gpu_hours": 0.08783728462847648,
+      "elapsed_seconds": 445.359132106998,
+      "step_host_ms": 9303.776515997015,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9304.9013671875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031122067011892796,
+        "direct": 6.85692868498154,
+        "embedding": 0.30356004799250513,
+        "hubs": 0.7908843819750473,
+        "head": 0.28915539907757193,
+        "local": 0.5628828739281744,
+        "scalars": 0.46434588299598545
+      },
+      "val_loss": 6.431688168469598
+    },
+    {
+      "step": 35,
+      "train_loss": 6.441464900970459,
+      "flops": 1.115064249614336e+16,
+      "flops_executed": 1.473173782528e+16,
+      "forward_equivalents": 9983.777996424868,
+      "draws": 56560,
+      "population": 256,
+      "train_seconds": 325.51072630647104,
+      "gpu_hours": 0.09041964619624196,
+      "elapsed_seconds": 459.411887257942,
+      "step_host_ms": 9296.501643955708,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9297.5986328125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031317290966399014,
+        "direct": 6.850947856088169,
+        "embedding": 0.30369420000351965,
+        "hubs": 0.7905094099696726,
+        "head": 0.28821676096413285,
+        "local": 0.5629707380430773,
+        "scalars": 0.46358778805006295
+      }
+    },
+    {
+      "step": 36,
+      "train_loss": 6.432838439941406,
+      "flops": 1.1469232281747456e+16,
+      "flops_executed": 1.5152644620288e+16,
+      "forward_equivalents": 10269.02879632272,
+      "draws": 58176,
+      "population": 256,
+      "train_seconds": 334.8254815634573,
+      "gpu_hours": 0.09300707821207146,
+      "elapsed_seconds": 468.72860800498165,
+      "step_host_ms": 9314.755256986246,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9315.828125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03110677597578615,
+        "direct": 6.853233236004598,
+        "embedding": 0.3042557130102068,
+        "hubs": 0.791447218041867,
+        "head": 0.3010925150010735,
+        "local": 0.563444548053667,
+        "scalars": 0.4648206270067021
+      },
+      "val_loss": 6.386403869180119
+    },
+    {
+      "step": 37,
+      "train_loss": 6.241457462310791,
+      "flops": 1.1787822067351552e+16,
+      "flops_executed": 1.5573551415296e+16,
+      "forward_equivalents": 10554.279596220573,
+      "draws": 59792,
+      "population": 256,
+      "train_seconds": 344.1215452324832,
+      "gpu_hours": 0.09558931812013421,
+      "elapsed_seconds": 487.74923266796395,
+      "step_host_ms": 9296.063669025898,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9296.5400390625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031410138006322086,
+        "direct": 6.844860728015192,
+        "embedding": 0.3042630150448531,
+        "hubs": 0.7897666629869491,
+        "head": 0.29127494303975254,
+        "local": 0.562127331038937,
+        "scalars": 0.46508470899425447
+      }
+    },
+    {
+      "step": 38,
+      "train_loss": 6.287110328674316,
+      "flops": 1.2106411852955648e+16,
+      "flops_executed": 1.5994458210304e+16,
+      "forward_equivalents": 10839.530396118425,
+      "draws": 61408,
+      "population": 256,
+      "train_seconds": 353.4228216045303,
+      "gpu_hours": 0.09817300600125843,
+      "elapsed_seconds": 497.0524914970156,
+      "step_host_ms": 9301.276372047141,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9302.3916015625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03125590295530856,
+        "direct": 6.860719789983705,
+        "embedding": 0.30435801099520177,
+        "hubs": 0.79050936200656,
+        "head": 0.28078836807981133,
+        "local": 0.5627466180594638,
+        "scalars": 0.46576463198289275
+      },
+      "val_loss": 6.390055880827062
+    },
+    {
+      "step": 39,
+      "train_loss": 6.193024635314941,
+      "flops": 1.2425001638559744e+16,
+      "flops_executed": 1.6415365005312e+16,
+      "forward_equivalents": 11124.781196016278,
+      "draws": 63024,
+      "population": 256,
+      "train_seconds": 362.7258843955351,
+      "gpu_hours": 0.10075719010987086,
+      "elapsed_seconds": 508.58894297597,
+      "step_host_ms": 9303.062791004777,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9304.1494140625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031187308952212334,
+        "direct": 6.8617239280138165,
+        "embedding": 0.3042329659219831,
+        "hubs": 0.7916021089768037,
+        "head": 0.28296818502712995,
+        "local": 0.5613614800386131,
+        "scalars": 0.4645809099311009
+      }
+    },
+    {
+      "step": 40,
+      "train_loss": 6.231878280639648,
+      "flops": 1.274359142416384e+16,
+      "flops_executed": 1.683627180032e+16,
+      "forward_equivalents": 11410.03199591413,
+      "draws": 64640,
+      "population": 256,
+      "train_seconds": 372.01940871356055,
+      "gpu_hours": 0.10333872464265571,
+      "elapsed_seconds": 517.8844813489122,
+      "step_host_ms": 9293.524318025447,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9294.6259765625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031201967038214207,
+        "direct": 6.853206592029892,
+        "embedding": 0.3044775710441172,
+        "hubs": 0.7903800620697439,
+        "head": 0.28118576598353684,
+        "local": 0.5613439810695127,
+        "scalars": 0.4665847809519619
+      },
+      "val_loss": 6.325512212865493,
+      "probe": {
+        "mean_group_cosine": 0.22510179019276894,
+        "min_group_cosine": 0.006055785313286418,
+        "per_group": {
+          "embedding": {
+            "cosine": 0.22847454622568952,
+            "rel_norm": 2.023653745651245
+          },
+          "gate": {
+            "cosine": 0.013026774340724667,
+            "rel_norm": 1.83827805519104
+          },
+          "head": {
+            "cosine": 0.8440745937614501,
+            "rel_norm": 1.0501340627670288
+          },
+          "hidden": {
+            "cosine": 0.19340960266382623,
+            "rel_norm": 2.485642671585083
+          },
+          "k": {
+            "cosine": 0.0080218147620733,
+            "rel_norm": 22.943317413330078
+          },
+          "q": {
+            "cosine": 0.0375781984701762,
+            "rel_norm": 17.030004501342773
+          },
+          "scalars": {
+            "cosine": 0.6265238181277661,
+            "rel_norm": 1.2564952373504639
+          },
+          "v": {
+            "cosine": 0.01685446843189258,
+            "rel_norm": 2.3740944862365723
+          },
+          "ve": {
+            "cosine": 0.006055785313286418,
+            "rel_norm": 11.602365493774414
+          },
+          "writers": {
+            "cosine": 0.27699829983080476,
+            "rel_norm": 1.623408317565918
+          }
+        },
+        "peak_memory_gib": 6.649261474609375
+      }
+    },
+    {
+      "step": 41,
+      "train_loss": 6.130496501922607,
+      "flops": 1.3062181209767936e+16,
+      "flops_executed": 1.7257178595328e+16,
+      "forward_equivalents": 11695.282795811983,
+      "draws": 66256,
+      "population": 256,
+      "train_seconds": 381.3173610136146,
+      "gpu_hours": 0.1059214891704485,
+      "elapsed_seconds": 547.1367208670126,
+      "step_host_ms": 9297.952300054021,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9299.02734375,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03132785693742335,
+        "direct": 6.856451094034128,
+        "embedding": 0.3038643990876153,
+        "hubs": 0.7891840820666403,
+        "head": 0.2892522990005091,
+        "local": 0.5608618860132992,
+        "scalars": 0.461923627066426
+      }
+    },
+    {
+      "step": 42,
+      "train_loss": 6.28330135345459,
+      "flops": 1.3380770995372032e+16,
+      "flops_executed": 1.7678085390336e+16,
+      "forward_equivalents": 11980.533595709836,
+      "draws": 67872,
+      "population": 256,
+      "train_seconds": 390.6093660915503,
+      "gpu_hours": 0.10850260169209731,
+      "elapsed_seconds": 556.4307217349997,
+      "step_host_ms": 9292.005077935755,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9293.123046875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031203957041725516,
+        "direct": 6.853666987968609,
+        "embedding": 0.3043260760605335,
+        "hubs": 0.7911832859972492,
+        "head": 0.28062257810961455,
+        "local": 0.5629495410248637,
+        "scalars": 0.46300114202313125
+      },
+      "val_loss": 6.304555416107178
+    },
+    {
+      "step": 43,
+      "train_loss": 6.245484352111816,
+      "flops": 1.3699360780976128e+16,
+      "flops_executed": 1.8098992185344e+16,
+      "forward_equivalents": 12265.784395607689,
+      "draws": 69488,
+      "population": 256,
+      "train_seconds": 399.9123366175918,
+      "gpu_hours": 0.11108676017155328,
+      "elapsed_seconds": 570.479975678958,
+      "step_host_ms": 9302.970526041463,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9304.0986328125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031188988010399044,
+        "direct": 6.852352557005361,
+        "embedding": 0.30449309397954494,
+        "hubs": 0.791506984969601,
+        "head": 0.2900476249633357,
+        "local": 0.5631755059584975,
+        "scalars": 0.4653267969843
+      }
+    },
+    {
+      "step": 44,
+      "train_loss": 6.244024276733398,
+      "flops": 1.4017950566580224e+16,
+      "flops_executed": 1.8519898980352e+16,
+      "forward_equivalents": 12551.035195505541,
+      "draws": 71104,
+      "population": 256,
+      "train_seconds": 409.2077095066197,
+      "gpu_hours": 0.11366880819628325,
+      "elapsed_seconds": 579.7789882560028,
+      "step_host_ms": 9295.37288902793,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9296.4990234375,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031176205025985837,
+        "direct": 6.856672519003041,
+        "embedding": 0.3041057529626414,
+        "hubs": 0.7915553660131991,
+        "head": 0.28030218894127756,
+        "local": 0.5618930219206959,
+        "scalars": 0.46476215589791536
+      },
+      "val_loss": 6.29207389494952
+    },
+    {
+      "step": 45,
+      "train_loss": 6.171892166137695,
+      "flops": 1.433654035218432e+16,
+      "flops_executed": 1.894080577536e+16,
+      "forward_equivalents": 12836.285995403394,
+      "draws": 72720,
+      "population": 256,
+      "train_seconds": 418.5034778176341,
+      "gpu_hours": 0.11625096606045392,
+      "elapsed_seconds": 594.6768415889237,
+      "step_host_ms": 9295.768311014399,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9296.8623046875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03119244403205812,
+        "direct": 6.848663275013678,
+        "embedding": 0.30406708794180304,
+        "hubs": 0.7909896920900792,
+        "head": 0.28892775205895305,
+        "local": 0.562513035023585,
+        "scalars": 0.4645553620066494
+      }
+    },
+    {
+      "step": 46,
+      "train_loss": 6.181331157684326,
+      "flops": 1.4655130137788416e+16,
+      "flops_executed": 1.9361712570368e+16,
+      "forward_equivalents": 13121.536795301246,
+      "draws": 74336,
+      "population": 256,
+      "train_seconds": 427.7936780425953,
+      "gpu_hours": 0.11883157723405424,
+      "elapsed_seconds": 603.9689833580051,
+      "step_host_ms": 9290.200224961154,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9291.31640625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031110457028262317,
+        "direct": 6.851753192953765,
+        "embedding": 0.3035707640228793,
+        "hubs": 0.7909890660084784,
+        "head": 0.27982667298056185,
+        "local": 0.5620569880120456,
+        "scalars": 0.4660311450716108
+      },
+      "val_loss": 6.238939229179831
+    },
+    {
+      "step": 47,
+      "train_loss": 6.258387565612793,
+      "flops": 1.4973719923392512e+16,
+      "flops_executed": 1.9782619365376e+16,
+      "forward_equivalents": 13406.787595199099,
+      "draws": 75952,
+      "population": 256,
+      "train_seconds": 437.07992789160926,
+      "gpu_hours": 0.12141109108100258,
+      "elapsed_seconds": 618.2093628610019,
+      "step_host_ms": 9286.249849013984,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9287.3525390625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.0312731679296121,
+        "direct": 6.8438307689502835,
+        "embedding": 0.3042226480320096,
+        "hubs": 0.79188080097083,
+        "head": 0.28063093905802816,
+        "local": 0.5634324679849669,
+        "scalars": 0.46585505991242826
+      }
+    },
+    {
+      "step": 48,
+      "train_loss": 6.150209903717041,
+      "flops": 1.5292309708996608e+16,
+      "flops_executed": 2.0203526160384e+16,
+      "forward_equivalents": 13692.038395096952,
+      "draws": 77568,
+      "population": 256,
+      "train_seconds": 446.36660641559865,
+      "gpu_hours": 0.12399072400433296,
+      "elapsed_seconds": 627.4979720899137,
+      "step_host_ms": 9286.678523989394,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9287.802734375,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031235913978889585,
+        "direct": 6.851761627011001,
+        "embedding": 0.30347339098807424,
+        "hubs": 0.7897715410217643,
+        "head": 0.2793906410224736,
+        "local": 0.5641977780032903,
+        "scalars": 0.4622306040255353
+      },
+      "val_loss": 6.212272195255055
+    },
+    {
+      "step": 49,
+      "train_loss": 6.165504455566406,
+      "flops": 1.5610899494600704e+16,
+      "flops_executed": 2.0624432955392e+16,
+      "forward_equivalents": 13977.289194994804,
+      "draws": 79184,
+      "population": 256,
+      "train_seconds": 455.6700687685516,
+      "gpu_hours": 0.12657501910237542,
+      "elapsed_seconds": 641.9423642619513,
+      "step_host_ms": 9303.46235295292,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9304.54296875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031247496022842824,
+        "direct": 6.859488271991722,
+        "embedding": 0.3044309449614957,
+        "hubs": 0.7918236159021035,
+        "head": 0.2812090659281239,
+        "local": 0.5634883500169963,
+        "scalars": 0.46562382904812694
+      }
+    },
+    {
+      "step": 50,
+      "train_loss": 5.926630020141602,
+      "flops": 1.59294892802048e+16,
+      "flops_executed": 2.10453397504e+16,
+      "forward_equivalents": 14262.539994892657,
+      "draws": 80800,
+      "population": 256,
+      "train_seconds": 464.96109761856496,
+      "gpu_hours": 0.12915586044960137,
+      "elapsed_seconds": 651.2353278129594,
+      "step_host_ms": 9291.02885001339,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9292.126953125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03125880297739059,
+        "direct": 6.853578120935708,
+        "embedding": 0.30377963895443827,
+        "hubs": 0.7908826449420303,
+        "head": 0.28114941099192947,
+        "local": 0.5615023559657857,
+        "scalars": 0.46383702801540494
+      },
+      "val_loss": 6.180315943325267,
+      "probe": {
+        "mean_group_cosine": 0.2389880403448658,
+        "min_group_cosine": 0.00398022968378149,
+        "per_group": {
+          "embedding": {
+            "cosine": 0.21657739806350965,
+            "rel_norm": 2.2093582153320312
+          },
+          "gate": {
+            "cosine": 0.030233531031381114,
+            "rel_norm": 2.02365779876709
+          },
+          "head": {
+            "cosine": 0.8493457408289694,
+            "rel_norm": 1.0363800525665283
+          },
+          "hidden": {
+            "cosine": 0.19218974587609503,
+            "rel_norm": 2.4490413665771484
+          },
+          "k": {
+            "cosine": 0.008020858876781755,
+            "rel_norm": 22.870288848876953
+          },
+          "q": {
+            "cosine": 0.03260912393792441,
+            "rel_norm": 16.756067276000977
+          },
+          "scalars": {
+            "cosine": 0.7449242762860043,
+            "rel_norm": 1.751798152923584
+          },
+          "v": {
+            "cosine": 0.022117420826364073,
+            "rel_norm": 2.258509874343872
+          },
+          "ve": {
+            "cosine": 0.00398022968378149,
+            "rel_norm": 11.629629135131836
+          },
+          "writers": {
+            "cosine": 0.2898820780378465,
+            "rel_norm": 1.5715707540512085
+          }
+        },
+        "peak_memory_gib": 6.649749755859375
+      }
+    },
+    {
+      "step": 51,
+      "train_loss": 6.027919769287109,
+      "flops": 1.6248079065808896e+16,
+      "flops_executed": 2.1466246545408e+16,
+      "forward_equivalents": 14547.79079479051,
+      "draws": 82416,
+      "population": 256,
+      "train_seconds": 474.2677272434812,
+      "gpu_hours": 0.13174103534541146,
+      "elapsed_seconds": 674.3587044749875,
+      "step_host_ms": 9306.62962491624,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9307.7158203125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031266912003047764,
+        "direct": 6.855095169041306,
+        "embedding": 0.30402780300937593,
+        "hubs": 0.7919928620103747,
+        "head": 0.2906144979642704,
+        "local": 0.5638213129714131,
+        "scalars": 0.46485335007309914
+      }
+    },
+    {
+      "step": 52,
+      "train_loss": 6.018853187561035,
+      "flops": 1.6566668851412992e+16,
+      "flops_executed": 2.1887153340416e+16,
+      "forward_equivalents": 14833.041594688362,
+      "draws": 84032,
+      "population": 256,
+      "train_seconds": 483.56782008940354,
+      "gpu_hours": 0.13432439446927877,
+      "elapsed_seconds": 683.6607229069341,
+      "step_host_ms": 9300.092845922336,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9301.1630859375,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03123536705970764,
+        "direct": 6.8615297639044,
+        "embedding": 0.3040927239926532,
+        "hubs": 0.7925516769755632,
+        "head": 0.28023855306673795,
+        "local": 0.5629179200623184,
+        "scalars": 0.4624071680009365
+      },
+      "val_loss": 6.176151976865881
+    },
+    {
+      "step": 53,
+      "train_loss": 5.988554954528809,
+      "flops": 1.6885258637017088e+16,
+      "flops_executed": 2.2308060135424e+16,
+      "forward_equivalents": 15118.292394586215,
+      "draws": 85648,
+      "population": 256,
+      "train_seconds": 492.8725878393743,
+      "gpu_hours": 0.136909052177604,
+      "elapsed_seconds": 697.768637512927,
+      "step_host_ms": 9304.767749970779,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9305.85546875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031091026961803436,
+        "direct": 6.856288018985651,
+        "embedding": 0.30380197102203965,
+        "hubs": 0.7955940969986841,
+        "head": 0.282256264006719,
+        "local": 0.5629879320040345,
+        "scalars": 0.46791964804288
+      }
+    },
+    {
+      "step": 54,
+      "train_loss": 6.1153340339660645,
+      "flops": 1.7203848422621184e+16,
+      "flops_executed": 2.2728966930432e+16,
+      "forward_equivalents": 15403.543194484067,
+      "draws": 87264,
+      "population": 256,
+      "train_seconds": 502.16847270342987,
+      "gpu_hours": 0.1394912424176194,
+      "elapsed_seconds": 707.0664963199524,
+      "step_host_ms": 9295.884864055552,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9296.9736328125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03110692393966019,
+        "direct": 6.8581711139995605,
+        "embedding": 0.3044829110149294,
+        "hubs": 0.7911217899527401,
+        "head": 0.2802794019225985,
+        "local": 0.5623667179606855,
+        "scalars": 0.46346528897993267
+      },
+      "val_loss": 6.143097428714528
+    },
+    {
+      "step": 55,
+      "train_loss": 5.968221664428711,
+      "flops": 1.752243820822528e+16,
+      "flops_executed": 2.314987372544e+16,
+      "forward_equivalents": 15688.79399438192,
+      "draws": 88880,
+      "population": 256,
+      "train_seconds": 511.4452642974211,
+      "gpu_hours": 0.14206812897150586,
+      "elapsed_seconds": 730.6806422739755,
+      "step_host_ms": 9276.79159399122,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9277.861328125,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.030985681107267737,
+        "direct": 6.842001784942113,
+        "embedding": 0.30311065493151546,
+        "hubs": 0.7909076459472999,
+        "head": 0.28140670503489673,
+        "local": 0.5604444920318201,
+        "scalars": 0.46285166090819985
+      }
+    },
+    {
+      "step": 56,
+      "train_loss": 5.948487758636475,
+      "flops": 1.7841027993829376e+16,
+      "flops_executed": 2.3570780520448e+16,
+      "forward_equivalents": 15974.044794279773,
+      "draws": 90496,
+      "population": 256,
+      "train_seconds": 520.7347468374064,
+      "gpu_hours": 0.14464854078816844,
+      "elapsed_seconds": 739.9721016819822,
+      "step_host_ms": 9289.482539985329,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9290.5947265625,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031226128106936812,
+        "direct": 6.850417703972198,
+        "embedding": 0.3038844339316711,
+        "hubs": 0.7915963210398331,
+        "head": 0.2816511180717498,
+        "local": 0.5615231819683686,
+        "scalars": 0.4642571699805558
+      },
+      "val_loss": 6.128766705008114
+    },
+    {
+      "step": 57,
+      "train_loss": 6.041522026062012,
+      "flops": 1.815961777943347e+16,
+      "flops_executed": 2.3991687315456e+16,
+      "forward_equivalents": 16259.295594177625,
+      "draws": 92112,
+      "population": 256,
+      "train_seconds": 530.0277131074108,
+      "gpu_hours": 0.14722992030761411,
+      "elapsed_seconds": 754.8915381309344,
+      "step_host_ms": 9292.9662700044,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9294.0498046875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.031241826945915818,
+        "direct": 6.852195281069726,
+        "embedding": 0.30343465495388955,
+        "hubs": 0.7914235619828105,
+        "head": 0.2819819520227611,
+        "local": 0.5619017221033573,
+        "scalars": 0.4658086870331317
+      }
+    },
+    {
+      "step": 58,
+      "train_loss": 5.850739002227783,
+      "flops": 1.847820756503757e+16,
+      "flops_executed": 2.4412594110464e+16,
+      "forward_equivalents": 16544.546394075478,
+      "draws": 93728,
+      "population": 256,
+      "train_seconds": 539.3250090593938,
+      "gpu_hours": 0.14981250251649827,
+      "elapsed_seconds": 764.1907705089543,
+      "step_host_ms": 9297.29595198296,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9298.404296875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03129405900835991,
+        "direct": 6.859423266956583,
+        "embedding": 0.30424392002169043,
+        "hubs": 0.7915244250325486,
+        "head": 0.28046005906071514,
+        "local": 0.5623136949725449,
+        "scalars": 0.46327444294001907
+      },
+      "val_loss": 6.105304661919089
+    },
+    {
+      "step": 59,
+      "train_loss": 5.926578044891357,
+      "flops": 1.8796797350641664e+16,
+      "flops_executed": 2.4833500905472e+16,
+      "forward_equivalents": 16829.797193973332,
+      "draws": 95344,
+      "population": 256,
+      "train_seconds": 548.6088639163645,
+      "gpu_hours": 0.15239135108787902,
+      "elapsed_seconds": 777.1782853169134,
+      "step_host_ms": 9283.85485697072,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9284.96875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03128978400491178,
+        "direct": 6.846238175057806,
+        "embedding": 0.30488174594938755,
+        "hubs": 0.7909310860559344,
+        "head": 0.2819144580280408,
+        "local": 0.5618327530100942,
+        "scalars": 0.462147717946209
+      }
+    },
+    {
+      "step": 60,
+      "train_loss": 6.024619102478027,
+      "flops": 1.911538713624576e+16,
+      "flops_executed": 2.525440770048e+16,
+      "forward_equivalents": 17115.047993871187,
+      "draws": 96960,
+      "population": 256,
+      "train_seconds": 557.9232717773411,
+      "gpu_hours": 0.15497868660481698,
+      "elapsed_seconds": 786.494536743965,
+      "step_host_ms": 9314.407860976644,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9315.4921875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.0311720009194687,
+        "direct": 6.863183617009781,
+        "embedding": 0.3041204509790987,
+        "hubs": 0.792192920926027,
+        "head": 0.2886433550156653,
+        "local": 0.563184275990352,
+        "scalars": 0.4668385289842263
+      },
+      "val_loss": 6.0892166530384735,
+      "probe": {
+        "mean_group_cosine": 0.22693379536304242,
+        "min_group_cosine": 0.0019698912878653913,
+        "per_group": {
+          "embedding": {
+            "cosine": 0.2210687324203381,
+            "rel_norm": 2.200270652770996
+          },
+          "gate": {
+            "cosine": 0.040474328794512814,
+            "rel_norm": 1.2957295179367065
+          },
+          "head": {
+            "cosine": 0.8427518140767116,
+            "rel_norm": 1.041901707649231
+          },
+          "hidden": {
+            "cosine": 0.25161783592271636,
+            "rel_norm": 1.9022672176361084
+          },
+          "k": {
+            "cosine": 0.0019698912878653913,
+            "rel_norm": 20.942899703979492
+          },
+          "q": {
+            "cosine": 0.03688956410478134,
+            "rel_norm": 15.560791015625
+          },
+          "scalars": {
+            "cosine": 0.4205907859734334,
+            "rel_norm": 1.5402629375457764
+          },
+          "v": {
+            "cosine": 0.04474443358936378,
+            "rel_norm": 1.5542088747024536
+          },
+          "ve": {
+            "cosine": 0.008247234933648446,
+            "rel_norm": 8.71668529510498
+          },
+          "writers": {
+            "cosine": 0.400983332527053,
+            "rel_norm": 1.1587454080581665
+          }
+        },
+        "peak_memory_gib": 6.649261474609375
+      }
+    },
+    {
+      "step": 61,
+      "train_loss": 5.882352828979492,
+      "flops": 1.9433976921849856e+16,
+      "flops_executed": 2.5675314495488e+16,
+      "forward_equivalents": 17400.29879376904,
+      "draws": 98576,
+      "population": 256,
+      "train_seconds": 567.2110612284159,
+      "gpu_hours": 0.15755862811900442,
+      "elapsed_seconds": 812.8743546599289,
+      "step_host_ms": 9287.789451074786,
+      "direct_forwards": 256,
+      "step_gpu_ms": 9288.888671875,
+      "peak_memory_gib": 6.630462646484375,
+      "phase_seconds": {
+        "clean": 0.03132594795897603,
+        "direct": 6.849224084988236,
+        "embedding": 0.3036294059129432,
+        "hubs": 0.7910102579044178,
+        "head": 0.28092979302164167,
+        "local": 0.5628478729631752,
+        "scalars": 0.463912989012897
+      },
+      "val_loss": 6.075182886684642,
+      "probe": {
+        "mean_group_cosine": 0.22356552633331006,
+        "min_group_cosine": 0.0029532072715981947,
+        "per_group": {
+          "embedding": {
+            "cosine": 0.22141982741891075,
+            "rel_norm": 2.20556902885437
+          },
+          "gate": {
+            "cosine": 0.016757413875867384,
+            "rel_norm": 1.4718440771102905
+          },
+          "head": {
+            "cosine": 0.8479077465488607,
+            "rel_norm": 1.0350532531738281
+          },
+          "hidden": {
+            "cosine": 0.23190227094489338,
+            "rel_norm": 2.062974452972412
+          },
+          "k": {
+            "cosine": 0.0029532072715981947,
+            "rel_norm": 22.04045295715332
+          },
+          "q": {
+            "cosine": 0.036166474931722745,
+            "rel_norm": 16.096296310424805
+          },
+          "scalars": {
+            "cosine": 0.460084985034971,
+            "rel_norm": 1.3686238527297974
+          },
+          "v": {
+            "cosine": 0.03990695156407291,
+            "rel_norm": 1.7641733884811401
+          },
+          "ve": {
+            "cosine": 0.008294833476613854,
+            "rel_norm": 9.597271919250488
+          },
+          "writers": {
+            "cosine": 0.37026155226558966,
+            "rel_norm": 1.2802499532699585
+          }
+        },
+        "peak_memory_gib": 6.649261474609375
+      }
+    }
+  ],
+  "timing": {
+    "steps_kept": 58,
+    "warmup_discarded": 3,
+    "host_median_ms": 9296.282656490803,
+    "host_p10_ms": 9284.059559111483,
+    "host_p90_ms": 9311.835905269254,
+    "gpu_median_ms": 9297.2861328125,
+    "gpu_p10_ms": 9285.16748046875,
+    "gpu_p90_ms": 9312.9447265625,
+    "likely_launch_bound": false,
+    "wall_seconds": 567.2110612284159,
+    "gpu_hours": 0.15755862811900442,
+    "peak_memory_gib": 6.630462646484375,
+    "scope": "step only; excludes data load and host->device copy unless inside the measured block",
+    "totals": {
+      "flops": 1.9433976921849856e+16,
+      "flops_executed": 2.5675314495488e+16,
+      "forward_equivalents": 17400.29879376904,
+      "draws": 98576,
+      "train_seconds": 567.2110612284159,
+      "eval_seconds": 73.92734160204418,
+      "probe_seconds": 66.32388457702473,
+      "checkpoint_seconds": 5.688298923079856,
+      "allocation_seconds": 0.0
+    },
+    "elapsed_seconds": 835.8156579119386
+  }
+}

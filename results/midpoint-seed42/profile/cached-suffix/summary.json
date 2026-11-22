@@ -1,0 +1,241 @@
+{
+  "sdpa_backends": [
+    "efficient"
+  ],
+  "sdpa_verdict": "efficient",
+  "sdpa": {
+    "efficient": {
+      "op": "aten::_scaled_dot_product_efficient_attention",
+      "count": 1160,
+      "gpu_ms": 1919.2633509999923,
+      "self_gpu_ms": 0.0,
+      "cpu_ms": 122.60539099999438
+    }
+  },
+  "phases": {
+    "clean": {
+      "count": 1,
+      "gpu_ms": 31.228571,
+      "self_gpu_ms": 31.228571,
+      "cpu_ms": 0.0
+    },
+    "direct": {
+      "count": 1,
+      "gpu_ms": 5752.171147,
+      "self_gpu_ms": 5752.171147,
+      "cpu_ms": 0.0
+    },
+    "embedding": {
+      "count": 1,
+      "gpu_ms": 301.9267110000001,
+      "self_gpu_ms": 301.9267110000001,
+      "cpu_ms": 0.0
+    },
+    "hubs": {
+      "count": 1,
+      "gpu_ms": 581.5113240000001,
+      "self_gpu_ms": 581.5113240000001,
+      "cpu_ms": 0.0
+    },
+    "head": {
+      "count": 1,
+      "gpu_ms": 421.89807799999977,
+      "self_gpu_ms": 421.89807799999977,
+      "cpu_ms": 0.0
+    },
+    "local": {
+      "count": 1,
+      "gpu_ms": 556.0149239999996,
+      "self_gpu_ms": 556.0149239999996,
+      "cpu_ms": 0.0
+    },
+    "scalars": {
+      "count": 1,
+      "gpu_ms": 461.37288999999964,
+      "self_gpu_ms": 461.37288999999964,
+      "cpu_ms": 0.0
+    }
+  },
+  "top_gpu_ops": [
+    {
+      "name": "dust/direct",
+      "count": 1,
+      "gpu_ms": 5752.171147,
+      "self_gpu_ms": 5752.171147,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "Command Buffer Full",
+      "count": 25975,
+      "gpu_ms": 3294.9340700000007,
+      "self_gpu_ms": 3294.9340700000007,
+      "cpu_ms": 5806.395310000067
+    },
+    {
+      "name": "aten::copy_",
+      "count": 15312,
+      "gpu_ms": 2088.5002949999935,
+      "self_gpu_ms": 1476.6158920000107,
+      "cpu_ms": 1135.762163000003
+    },
+    {
+      "name": "aten::_efficient_attention_forward",
+      "count": 1160,
+      "gpu_ms": 1919.2633509999923,
+      "self_gpu_ms": 1423.7420699999884,
+      "cpu_ms": 103.40911500000189
+    },
+    {
+      "name": "fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_t, cutlass::arch::Sm80, true, 64, 64, 64, true, true>::Params)",
+      "count": 1160,
+      "gpu_ms": 1423.7420699999884,
+      "self_gpu_ms": 1423.7420699999884,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "aten::mm",
+      "count": 6438,
+      "gpu_ms": 1543.0535250000185,
+      "self_gpu_ms": 1063.5810010000014,
+      "cpu_ms": 792.0043560000191
+    },
+    {
+      "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+      "count": 2700,
+      "gpu_ms": 787.7692409999951,
+      "self_gpu_ms": 787.7692409999951,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "aten::mul",
+      "count": 12847,
+      "gpu_ms": 1115.542555000021,
+      "self_gpu_ms": 777.3606809999926,
+      "cpu_ms": 1267.1464510000037
+    },
+    {
+      "name": "aten::pow",
+      "count": 1992,
+      "gpu_ms": 2934.661275000014,
+      "self_gpu_ms": 741.5961190000104,
+      "cpu_ms": 400.0088110000212
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase&, float)::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::(anonymous namespace)::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase&, float)::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "count": 964,
+      "gpu_ms": 740.8252310000111,
+      "self_gpu_ms": 740.8252310000111,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "count": 8577,
+      "gpu_ms": 630.7451660000035,
+      "self_gpu_ms": 630.7451660000035,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "dust/hubs",
+      "count": 1,
+      "gpu_ms": 581.5113240000001,
+      "self_gpu_ms": 581.5113240000001,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "dust/local",
+      "count": 1,
+      "gpu_ms": 556.0149239999996,
+      "self_gpu_ms": 556.0149239999996,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "dust/scalars",
+      "count": 1,
+      "gpu_ms": 461.37288999999964,
+      "self_gpu_ms": 461.37288999999964,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "aten::add",
+      "count": 10459,
+      "gpu_ms": 606.9462419999458,
+      "self_gpu_ms": 435.5063139999696,
+      "cpu_ms": 836.4464750000071
+    },
+    {
+      "name": "dust/head",
+      "count": 1,
+      "gpu_ms": 421.89807799999977,
+      "self_gpu_ms": 421.89807799999977,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_tn",
+      "count": 1109,
+      "gpu_ms": 415.1650419999979,
+      "self_gpu_ms": 415.1650419999979,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "aten::_fused_rms_norm",
+      "count": 4143,
+      "gpu_ms": 541.2355500000315,
+      "self_gpu_ms": 389.10816500001613,
+      "cpu_ms": 449.5481079999991
+    },
+    {
+      "name": "void at::native::(anonymous namespace)::vectorized_layer_norm_kernel<c10::BFloat16, float, true>(int, float, c10::BFloat16 const*, c10::BFloat16 const*, c10::BFloat16 const*, float*, float*, c10::BFloat16*)",
+      "count": 4023,
+      "gpu_ms": 371.4476520000149,
+      "self_gpu_ms": 371.4476520000149,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char*, 3ul>)",
+      "count": 7440,
+      "gpu_ms": 366.4746679999876,
+      "self_gpu_ms": 366.4746679999876,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "aten::clamp_min",
+      "count": 964,
+      "gpu_ms": 457.0773099999919,
+      "self_gpu_ms": 338.1295910000013,
+      "cpu_ms": 97.31763600001094
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::launch_clamp_scalar(at::TensorIteratorBase&, c10::Scalar, c10::Scalar, at::native::detail::ClampLimits)::{lambda()#1}::operator()() const::{lambda()#9}::operator()() const::{lambda(c10::BFloat16)#1}, std::array<char*, 2ul> >(int, at::native::(anonymous namespace)::launch_clamp_scalar(at::TensorIteratorBase&, c10::Scalar, c10::Scalar, at::native::detail::ClampLimits)::{lambda()#1}::operator()() const::{lambda()#9}::operator()() const::{lambda(c10::BFloat16)#1}, std::array<char*, 2ul>)",
+      "count": 964,
+      "gpu_ms": 338.1295910000013,
+      "self_gpu_ms": 338.1295910000013,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8::Params)",
+      "count": 1508,
+      "gpu_ms": 327.6174529999941,
+      "self_gpu_ms": 327.6174529999941,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_stages_32x1_tn",
+      "count": 3312,
+      "gpu_ms": 318.9139860000094,
+      "self_gpu_ms": 318.9139860000094,
+      "cpu_ms": 0.0
+    },
+    {
+      "name": "dust/embedding",
+      "count": 1,
+      "gpu_ms": 301.9267110000001,
+      "self_gpu_ms": 301.9267110000001,
+      "cpu_ms": 0.0
+    }
+  ],
+  "estimates_profiled": 1,
+  "wall_seconds_per_estimate": 41.32526552735362,
+  "self_gpu_ms_total": 27205.82066299991,
+  "self_cpu_ms_total": 8107.326937000002,
+  "note": "Profiler overhead inflates wall time; use it for shares and kernel identity only. self_cpu well above self_gpu, or GPU gaps in the trace, point to launch overhead."
+}
