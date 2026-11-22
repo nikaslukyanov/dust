@@ -109,6 +109,11 @@ and Slurm provenance: [`results/baseline-three-seed/`](../results/baseline-three
 
 ## Run 3 — midpoint experiments: profiler, Track 3 GPU sweep, Track 2 (2026-11-21)
 
+**Framing.** Cached suffix (A) is the reference, not a result of ours: it restores an optimization the
+paper used and the public code left out. Our methods are judged as cache vs cache + B vs cache + C,
+and both lost in this run. Every Track 2 run below uses cached suffix, and `separate/2` in the Track 3
+table is plain DUST with cached suffix at the same forward passes as the coded methods.
+
 Slurm jobs 14040948 (baseline rerun, `ins056`) and 14040949 (`scripts/gpu_experiments.sbatch`,
 `ins038`), 1 × L40S each, torch 2.10.0+cu128, bf16 autocast, 1M tokens, population 256, seed 42,
 commit `6444d3c`. One seed, one repetition. Evidence: `results/midpoint-seed42/` and
@@ -134,7 +139,7 @@ Profiler overhead inflates wall time; use the profile for shares and kernel iden
 `multiplex_experiment.py --real`, blocks 0/3/6, σ ∈ {0.05, 0.1, 0.2, 0.4, 0.8}, 16 passes, 16 seeds,
 fp32 backprop reference. Cosine to backprop, writers / hidden, compute-matched comparison:
 
-| | separate/2 (A, same passes) | hadamard | rademacher |
+| | cache, separate/2 (same passes) | cache + hadamard | cache + rademacher |
 |---|---|---|---|
 | nrep 2, block 6, σ 0.2 | 0.294 / 0.161 | 0.288 / 0.166 | 0.222 / 0.146 |
 | nrep 8, block 6, σ 0.2 | 0.374 / 0.209 | 0.288 / 0.166 | 0.222 / 0.146 |
@@ -149,7 +154,7 @@ fp32 backprop reference. Cosine to backprop, writers / hidden, compute-matched c
 
 ### Track 2 on GPU — B is worse than fixed allocation with the default settings
 
-| | fixed (A) | variance | agreement |
+| | cache (fixed) | cache + B variance | cache + B agreement |
 |---|---:|---:|---:|
 | best val | **6.07518** | 6.15693 | 6.30006 |
 | test at best val | **6.06012** | 6.14268 | 6.28338 |

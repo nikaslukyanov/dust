@@ -1,6 +1,6 @@
 # DUST project — refined TODO
 
-Updated 2026-11-18. Companion to `ANALYSIS.md` (results so far), `old/PROJECT_PLAN.md` (the original plan) and `lessons/lectures.md` (how we
+Updated 2026-11-21. Companion to `ANALYSIS.md` (results so far), `old/PROJECT_PLAN.md` (the original plan) and `lessons/lectures.md` (how we
 measure performance). Consult `lessons/literature-findings.md` and 'dust/literature/' and your research tool if you need more literature info. Each item says what it is and why it matters, not how it's wired.
 
 Legend: `[x]` done · `[~]` in progress · `[ ]` todo · **(GPU)** needs a GPU to validate.
@@ -12,7 +12,38 @@ Only `dust.py` was modified in place (the estimate/apply split); everything else
 
 ---
 
-## Status on 2026-11-18 — what to fix, what to run
+## Status on 2026-11-21 — neither of our methods works yet
+
+Midpoint GPU run (jobs 14040948/14040949, 1 × L40S, seed 42; `ANALYSIS.md` run 3). **The comparison
+that matters is cache (A) vs cache + allocation (B) vs cache + multiplexing (C).** Cached suffix is
+the reference everything is measured against, not our contribution: it restores an optimization the
+paper already used and the public code omitted.
+
+- **cache + B: worse.** Test 6.143 (`variance`) / 6.283 (`agreement`) vs 6.060 for cache alone, at
+  +4% / −19% FLOPs. `variance` gave the spare draws to the token embedding (lr 1000 inflates its
+  weight); `agreement` gave them to the hubs. Probe cosine rose (0.24 → 0.27–0.29) while loss fell
+  behind, so pooled cosine is the wrong thing to optimize.
+- **cache + C: worse.** At equal forward passes Hadamard ties cache at nrep 2 and loses at nrep 8
+  (block 6 writers 0.288 vs 0.374) at every σ from 0.05 to 0.8, and is 4–10% slower. No training run yet.
+- **SDPA kernel: `efficient`** (memory-efficient CUTLASS), confirmed by the profiler.
+
+### What we work on next (in order)
+
+1. **cache + C training run** (`--multiplex hadamard`, seed 42) so the three-way table has loss for
+   all three. Expected to lose; ~10 min of GPU.
+2. **Diagnose B before retuning it.** Per-group probe cosine for fixed vs B (which groups B starved),
+   and the allocation trajectory from `metrics.jsonl`. Then, in order of cost:
+   - `--allocation-objective gradient` (stops the learning rate pushing every draw to the embedding);
+   - cap the share any one unit can take (e.g. 2× its recipe count), or keep the embedding fixed;
+   - longer recompute interval / slower rate (defaults 4 / 0.5 were guesses on a 61-step run);
+   - judge the policy by loss after N steps, not by pooled cosine.
+   Win condition: cache + B matches cache's loss at fewer FLOPs, or beats it at equal FLOPs, over 3 seeds.
+3. **Decide C's fate.** Either try a higher code rate (3 groups on all of H4's columns, or the hub as
+   a third group: more directions per pass is the only way past the direction-count limit), or close
+   C as a negative result with the derivation and the GPU table. Time-box it.
+4. **D (B + C) is on hold** until at least one of B or C beats cache.
+
+### Earlier items (2026-11-18)
 
 First GPU baseline ran (Patrick, job 13891039, 1 × L40S; merged in PR #8). **Results and what they
 mean: `tasks/ANALYSIS.md`.** Below are only the work items that came out of it.
@@ -76,7 +107,8 @@ covers the first two items below in one go.
 State on 2026-11-18: the three-seed full-replay/suffix/backprop sweep is complete, with offline W&B
 logs and audited evidence in `results/baseline-three-seed/`. B and C still have CPU evidence only.
 The template requires hardware, dtype/backend, batch/context size, warm-up and repetitions for every
-metric. The new GPU sweep has three seeds and one repetition per seed; the SDPA kernel remains unknown.
+metric. The new GPU sweep has three seeds and one repetition per seed; the SDPA kernel is `efficient`
+(profiler, 2026-11-21). B and C now have one-seed GPU evidence too (both negative).
 
 **Title & Team**
 - [x] Title: *Compute-Efficient DUST: Adaptive Population Allocation and Structured Perturbation
@@ -117,13 +149,14 @@ metric. The new GPU sweep has three seeds and one repetition per seed; the SDPA 
 - [~] **Metric provenance table** — for every number in the report: GPU model + count, dtype/backend
       (bf16 autocast vs fp32; SDPA kernel), batch × context, warm-up steps discarded, repetitions /
       seeds. For the GPU baseline: 1 × L40S, bf16 autocast, 8 × 2,048, 3 warm-up steps discarded,
-      58 steps kept, 3 seeds, 1 repetition per seed, SDPA kernel **unknown**. CPU toy numbers must be labelled
+      58 steps kept, 3 seeds, 1 repetition per seed, SDPA kernel `efficient` (memory-efficient CUTLASS). CPU toy numbers must be labelled
       as such (CPU model, fp32, 4×64 model, seed counts as already recorded in Tracks 2–3).
 - [~] **(GPU) Profiling / baseline analysis** — limiting resource per phase. Measured now: the
       `phase_seconds` breakdown and peak training memory 6.63 GiB. All three new launch-bound
       checks report GPU-bound. The L40S roofline is implemented; its bandwidth and kernel conclusions
-      remain predictions. **Still needed:** `torch.profiler` table/trace, actual SDPA kernel,
-      and calibrated MFU. See `ANALYSIS.md`; timing alone does not establish which kernel ran.
+      remain predictions. Profiler (2026-11-21): SDPA kernel is `efficient`; attention ≈ 1.4 s of the
+      estimate, elementwise traffic dominates the rest; CPU waits on a full GPU queue (GPU-bound).
+      **Still needed:** calibrated MFU and the roofline-vs-measured per-phase comparison.
 - [x] **First optimization status** — GPU result for Track 1: cached suffix cuts median step time
       13.54% ± 0.13 percentage points across three seeds (mean step medians 9.273 → 8.018 s).
       Mean test loss: 6.06783 vs 6.06719; **no** peak-memory saving. GPU trajectories are not
@@ -131,15 +164,18 @@ metric. The new GPU sweep has three seeds and one repetition per seed; the SDPA 
       Detailed provenance and compute conventions are in `results/baseline-three-seed/`. CPU results to report
       alongside: allocation measurement validated against seeds (variance ratio 1.01–1.02);
       multiplexing table (Hadamard > Rademacher, no win over plain DUST at nrep 8).
+- [x] **(GPU) B and C status** — cache + B and cache + C both lose to cache alone (one seed; see the
+      2026-11-21 status above). Present as negative results with the diagnosis, not as optimizations.
 
 **Future Work**
-- [ ] **Remaining work & experiments** — condense from the sections below: Track 2 comparison at equal
-      and smaller budgets, Track 3 GPU σ sweep, Track D, model sizes, runner / matrix / plots.
+- [ ] **Remaining work & experiments** — the "what we work on next" list in the 2026-11-21 status:
+      cache + C training run, diagnose and retune B, decide C (higher code rate or close it), D on hold;
+      then 3 seeds on whatever survives, runner / plots.
 - [ ] **Scope adjustments.** The GPU baseline exists, so this is no longer the fallback for having
       none; it is still the likely narrowing given what is left to code. Draft it:
       (1) 1M tokens / population 256 / single L40S only; (2) drop or shrink the model-size study;
-      (3) C reported as a gradient-quality diagnostic only unless the bf16 σ sweep shows a win, so D
-      becomes conditional; (4) 10M and multi-GPU runs out of scope.
+      (3) the bf16 σ sweep showed no win, so C is a gradient-quality diagnostic unless a higher code
+      rate changes that, and D is on hold; (4) 10M and multi-GPU runs out of scope.
 
 **Blockers & Limitations**
 - [ ] **Write up, with resolution or plan for each:**
@@ -381,6 +417,8 @@ more draws to the groups whose estimate is least reliable.
     dead-band beyond the damping.
 - [ ] **(GPU)** multi-GPU path: the split statistics are summed over ranks with `all_reduce` so every
       rank picks the same allocation — untested.
+- [~] **(GPU) First comparison done 2026-11-21, B loses:** cache + `variance` test 6.143, cache +
+      `agreement` 6.283, cache alone 6.060 (seed 42, default settings). See the status section.
 - [ ] **Compare** B (both policies) against the fixed allocation at equal budget, then at smaller
       budgets to find what B needs to match A. Vary the recompute interval; report the overhead
       (measure-only run, `--allocation-interval 0`, against a fixed run).
@@ -440,16 +478,17 @@ separate out each group's individual effect afterward.
     tolerates a larger σ. CPU runs are fp32 and cannot show this.
   - Toy training, 20 steps, one seed, untuned — plumbing check: C reaches 2.28 (Hadamard) / 2.14
     (Rademacher) best val against 1.98 for A, at 27% fewer forward-equivalents.
-- [ ] **(GPU) Experiment, GPU half** — rerun `multiplex_experiment.py` on the real model under bf16,
-      per block, with a σ sweep (the bias is second order in σ, the readout noise falls with σ), and
-      time it. This decides whether C is worth a training campaign.
+- [x] **(GPU) Experiment, GPU half** — `multiplex_experiment.py --real`, blocks 0/3/6, σ 0.05–0.8,
+      nrep 2 and 8, 16 seeds (2026-11-21). Hadamard ties plain (cache) DUST at nrep 2 and loses at
+      nrep 8 at every σ; 4–10% slower. Not worth a training campaign as is.
+- [ ] **(GPU) cache + C training run** (`--multiplex hadamard`) for the three-way loss table.
 - [ ] **Higher code rate** — untested variants that test more directions per pass: 3 groups on all of
       H4's columns (rate 3/4, cross-curvature aliasing back); adding the block's hub as a third group;
       groups from the adjacent block.
 - Not done: a learning-rate retune for C (Hadamard estimates are not shrunk by the (1 − 1/nrep)
   centering factor, so the same lr is a bigger step); `roofline.py` does not model the shared passes.
 
-## Track D — combine B and C — todo
+## Track D — combine B and C — on hold (neither B nor C beats cache yet)
 
 - [ ] Make adaptive allocation and multiplexing agree on sizes (draw counts vs code lengths), integrate
       them, and attribute the speedup to each piece against baselines A, B, and C.
@@ -480,7 +519,7 @@ these are the refinements the lectures call for, grouped by file.
       relu², the fp32 logit cap every draw, norms, residual ops); weights are <1% of bytes, so they
       are not "re-streamed like decode". With the `math` attention kernel it is 8.2 s, dominated by
       the materialised [T, T] scores.
-- [ ] **(GPU) roofline calibration.** L40S added (2026-11-18). Check which SDPA kernel runs; calibrate the per-launch latency
+- [ ] **(GPU) roofline calibration.** L40S added (2026-11-18). SDPA kernel: `efficient` (2026-11-21). Calibrate the per-launch latency
       from a trace; compare predicted vs measured per-phase time; split measured step time into kernel
       compute / HBM / launch / other and feed the measured fractions to `amdahl()`.
 - [ ] **profiling — actually see the launch overhead.** Read the trace *gaps*, not just the per-op
