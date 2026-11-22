@@ -223,3 +223,24 @@ Both methods are judged against one cache point. What they need is cache's **dra
 with writer/hidden draws scaled 0.5× and 0.75× (loss vs FLOPs). A method helps only if its point lies
 below that curve. C at −38.5% FLOPs and B (`gradient`) at −8.7% may be no better than spending fewer
 draws uniformly.
+
+### The control (job 14048409): C loses to simply using fewer draws
+
+Cache with the rounded recipe's writer/hidden draws halved (`--direct-multiple 4 --direct-scale 0.5`,
+`[20,16,8,6,4,2,2,2]`) runs exactly C's forward passes:
+
+| | cache (rounded) | cache, half draws | cache + hadamard |
+|---|---:|---:|---:|
+| test at best val | 6.0923 | **6.1056** (+0.013) | 6.1251 (+0.033) |
+| FLOPs / step | 2.797e14 | 1.721e14 (−38.5%) | 1.721e14 (−38.5%) |
+| median step | 8.41 s | **5.35 s** (−36.4%) | 5.47 s (−35.0%) |
+| peak memory | 6.63 GiB | 6.63 GiB | 6.82 GiB |
+
+- **At identical FLOPs, half-draw cache beats C** on loss (by 0.020), step time and memory. C's whole
+  saving comes from using fewer forward passes, which plain DUST gets without coding. Consistent with
+  the GPU gradient sweep and the direction-count derivation. **C is closed as a negative result.**
+- **The draw-count curve is flat here:** halving the writer/hidden draws costs only +0.013 test loss
+  for −38.5% FLOPs at 1M tokens / 61 steps. The paper's population-256 recipe has slack in this regime.
+- **B is below this bar too:** its best setting (objective `gradient`) spent −8.7% FLOPs for +0.048,
+  far worse than a uniform cut. Any future B result must beat the uniform-scaling curve, not one
+  cache point.
