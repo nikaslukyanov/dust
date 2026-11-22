@@ -20,6 +20,7 @@
 #   track2   1M / population 256: fixed allocation, then --adaptive variance and agreement, same seed.
 #   track3train  cache vs cache + --multiplex hadamard training runs, writer/hidden draws rounded to 4.
 #   track3control  cache with half the writer/hidden draws: the same forward passes as cache + C.
+#   fastgrid  --fast check (equivalence, speedup), then fast runs at 1, 0.75, 0.5, 0.25 x draws, +/- --antithetic.
 #   track2b  B retune round 1: objective gradient, FLOP budget, both, agreement + FLOP budget, measure-only.
 # Needs .venv/baseline-cu128 (built by scripts/launch_baseline.sh's setup job) and data/ from prepare_data.py.
 # Writes runs/midpoint-seed<SEED>/. A failed training run continues with the same command: each
@@ -112,6 +113,30 @@ for task in $tasks; do
             --output "$out/track3train/cache-half" 2>&1 | tee -a "$out/track3train-cache-half.log"
         "$py" new_implementation/compare_runs.py "$out/track3train/cache" \
             "$out/track3train/cache-half" "$out/track3train/hadamard" | tee "$out/track3control-comparison.txt"
+        ;;
+    fastgrid)
+        # Fast path check (equivalence + speedup), then the draw-count curve with the fast path, with and
+        # without antithetic draws. Reference: track2/fixed (plain path, full recipe, same seed).
+        "$py" -u new_implementation/fast_check.py --tokens 1M --population 256 --output "$out/fast-check" \
+            2>&1 | tee "$out/fast-check.log"
+        run() {
+            local name=$1; shift
+            local resume=()
+            if ls "$out/fastgrid/$name"/state*.pt >/dev/null 2>&1; then resume=(--resume); fi
+            "$py" -u dust.py --device cuda --tokens 1M --population 256 --seed "$seed" --fast \
+                --probe-interval 10 --checkpoint-interval 10 "$@" ${resume[@]+"${resume[@]}"} \
+                --output "$out/fastgrid/$name" 2>&1 | tee -a "$out/fastgrid-$name.log"
+        }
+        run full
+        run full-anti --antithetic
+        run half --direct-scale 0.5
+        run half-anti --direct-scale 0.5 --antithetic
+        run quarter --direct-scale 0.25
+        run quarter-anti --direct-scale 0.25 --antithetic
+        run three-quarter --direct-scale 0.75
+        "$py" new_implementation/compare_runs.py "$out/track2/fixed" "$out/fastgrid/full" "$out/fastgrid/full-anti" \
+            "$out/fastgrid/three-quarter" "$out/fastgrid/half" "$out/fastgrid/half-anti" \
+            "$out/fastgrid/quarter" "$out/fastgrid/quarter-anti" | tee "$out/fastgrid-comparison.txt"
         ;;
     *) echo "Unknown task: $task" >&2; exit 2 ;;
     esac

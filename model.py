@@ -1,4 +1,5 @@
 """The transformer DUST trains: a decoder-only GPT with value embeddings and a learned residual mix."""
+import functools
 from dataclasses import dataclass
 
 import torch
@@ -6,11 +7,106 @@ from torch import nn
 from torch.nn import functional as F
 
 
+# Fast path (off by default, so the upstream reference stays reproducible): set_fast(True) or --fast.
+# The same math with fewer, fused kernels:
+# - full-window blocks call SDPA with is_causal=True (no explicit mask, so the flash kernel can run);
+#   sliding-window blocks use FlexAttention with a causal + window block mask, which skips the
+#   masked-out tiles instead of computing the dense [T, T] scores;
+# - RMSNorm feeding a Linear, rotary + q/k norm, relu^2, the residual mix, and the soft-capped
+#   cross-entropy are each one compiled kernel on CUDA. Under bf16 autocast the norms emit bf16
+#   directly: autocast would round them to bf16 for the next matmul anyway, so only the separate
+#   cast kernels disappear. On CPU the same functions run eagerly (identical math, for tests).
+FAST = False
+
+
+def set_fast(enabled=True):
+    global FAST
+    FAST = bool(enabled)
+    if FAST:  # one compiled graph per distinct shape (batch 8 clean, 8 * nrep draws, eval, probe)
+        import torch._dynamo
+        torch._dynamo.config.cache_size_limit = max(torch._dynamo.config.cache_size_limit, 64)
+
+
+def _autocast_dtype(x):
+    kind = x.device.type
+    return torch.get_autocast_dtype(kind) if torch.is_autocast_enabled(kind) else None
+
+
+@functools.lru_cache(maxsize=None)
+def _compiled(fn):
+    return torch.compile(fn, dynamic=False)
+
+
+def _run(fn, *args):
+    """fn compiled on CUDA, eager elsewhere."""
+    return (_compiled(fn) if args[0].is_cuda else fn)(*args)
+
+
+def _norm_cast(x, dtype):
+    y = F.rms_norm(x, (x.size(-1),))
+    return y if dtype is None else y.to(dtype)
+
+
+def norm_for_matmul(x):
+    """norm(x), in the dtype the following matmul runs in under autocast."""
+    if not FAST:
+        return norm(x)
+    dtype = _autocast_dtype(x)
+    return _run(_norm_cast, x, dtype) if dtype is not None and x.is_cuda else _norm_cast(x, dtype)
+
+
+def _qk_prep(q, k, cos, sin, dtype):
+    q, k = apply_rotary_emb(q, cos, sin), apply_rotary_emb(k, cos, sin)
+    return _norm_cast(q, dtype), _norm_cast(k, dtype)
+
+
+def _relu2(h):
+    return F.relu(h).square()
+
+
+def _mix(x, x0, a, b):
+    return a * x + b * x0
+
+
+def _capped_ce(logits, targets, vocab, reduction):
+    logits = logits[..., :vocab].float()
+    logits = 15 * torch.tanh(logits / 15)
+    return F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1,
+                           reduction=reduction)
+
+
+@functools.lru_cache(maxsize=None)
+def _window_block_mask(length, window, device):
+    from torch.nn.attention.flex_attention import create_block_mask
+
+    def keep(b, h, q_idx, kv_idx):
+        distance = q_idx - kv_idx
+        return (distance >= 0) & (distance <= window)
+
+    return create_block_mask(keep, B=None, H=None, Q_LEN=length, KV_LEN=length, device=device)
+
+
+def _fast_attention(q, k, v, window):
+    length = q.shape[1]
+    dtype = _autocast_dtype(v) or v.dtype
+    q, k, v = (t.transpose(1, 2).to(dtype) for t in (q, k, v))
+    if window >= length - 1:  # the window covers every earlier key: plain causal attention
+        out = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+    else:
+        from torch.nn.attention.flex_attention import flex_attention
+        mask = _window_block_mask(length, window, str(q.device))
+        flex = _compiled(flex_attention) if q.is_cuda else flex_attention
+        out = flex(q, k, v, block_mask=mask)
+    return out.transpose(1, 2)
+
+
 def attention(q, k, v, window):
     """Causal attention with a left window; tensors have shape [batch, token, head, dim].
 
     A query at position s sees keys at s - window to s.
     """
+    if FAST:
+        return _fast_attention(q, k, v, window)
     length = q.shape[1]
     positions = torch.arange(length, device=q.device)
     distance = positions[:, None] - positions[None, :]
@@ -80,8 +176,11 @@ class CausalSelfAttention(nn.Module):
             v = v + gate.unsqueeze(-1) * ve
 
         cos, sin = cos_sin
-        q, k = (apply_rotary_emb(q, cos, sin), apply_rotary_emb(k, cos, sin))
-        q, k = (norm(q), norm(k))
+        if FAST:
+            q, k = _run(_qk_prep, q, k, cos, sin, _autocast_dtype(q))
+        else:
+            q, k = (apply_rotary_emb(q, cos, sin), apply_rotary_emb(k, cos, sin))
+            q, k = (norm(q), norm(k))
         y = attention(q, k, v, window_size[0])
         y = y.contiguous().view(B, T, -1)
         return self.c_proj(y)
@@ -94,7 +193,8 @@ class MLP(nn.Module):
         self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd, bias=False)
 
     def forward(self, x):
-        return self.c_proj(F.relu(self.c_fc(x)).square())
+        h = self.c_fc(x)
+        return self.c_proj(_run(_relu2, h) if FAST else F.relu(h).square())
 
 
 class Block(nn.Module):
@@ -105,8 +205,8 @@ class Block(nn.Module):
 
     def forward(self, x, ve, cos_sin, window_size):
         # Pre-norm block. attn.c_proj and mlp.c_proj are the "writers" into the residual stream.
-        x = x + self.attn(norm(x), ve, cos_sin, window_size)
-        x = x + self.mlp(norm(x))
+        x = x + self.attn(norm_for_matmul(x), ve, cos_sin, window_size)
+        x = x + self.mlp(norm_for_matmul(x))
         return x
 
 
@@ -199,10 +299,15 @@ class GPT(nn.Module):
             block = self.transformer.h[i]
             if streams is not None:
                 streams.append(x)
-            x = self.resid_lambdas[i] * x + self.x0_lambdas[i] * x0
+            if FAST:
+                x = _run(_mix, x, x0, self.resid_lambdas[i], self.x0_lambdas[i])
+            else:
+                x = self.resid_lambdas[i] * x + self.x0_lambdas[i] * x0
             ve = self.value_embeds[str(i)](idx) if str(i) in self.value_embeds else None
             x = block(x, ve, cos_sin, self.window_sizes[i])
-        x = norm(x)
+        x = norm_for_matmul(x)
+        if FAST and targets is not None:
+            return _run(_capped_ce, self.lm_head(x), targets, self.config.vocab_size, loss_reduction)
         logits = self.lm_head(x)[..., :self.config.vocab_size].float()
         logits = 15 * torch.tanh(logits / 15)  # soft cap, repeated in DUST.head_error
         if targets is not None:

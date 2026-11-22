@@ -132,8 +132,16 @@ class DUST:
     draws per group, half the forward passes for those two groups.
     """
 
-    def __init__(self, model, settings, seed=42, rank=0, world=1, suffix=True, multiplex=None):
+    def __init__(self, model, settings, seed=42, rank=0, world=1, suffix=True, multiplex=None, antithetic=False):
         self.model, self.settings, self.world, self.suffix = model, settings, world, suffix
+        # Antithetic direct draws: within each chunk, draws come in pairs (a, -a), so a pair's centered
+        # reward is a central difference: the curvature term cancels exactly, at the same forward passes.
+        # The estimate's expectation is then the full gradient, where independent draws give (1 - 1/n)
+        # of it (centering removes one draw's worth); it is scaled by (1 - 1/n) so the learning rate
+        # means the same thing in both modes. Needs an even nrep.
+        if antithetic and settings.nrep % 2:
+            raise ValueError('Antithetic draws need an even nrep')
+        self.antithetic = antithetic
         if multiplex is not None and multiplex not in KINDS:
             raise ValueError(f'multiplex must be None or one of {KINDS}')
         self.multiplex = multiplex
@@ -253,7 +261,11 @@ class DUST:
         halves = {s: [torch.zeros_like(errors[s]), torch.zeros_like(errors[s])] for s in sites} if paired else {}
 
         for chunk in range(chunks):
-            noise = {s: self.noise(n * self.batch, self.length, width(s)) for s in sites}
+            if self.antithetic:
+                half = {s: self.noise(n // 2 * self.batch, self.length, width(s)) for s in sites}
+                noise = {s: torch.cat([a, -a]) for s, a in half.items()}
+            else:
+                noise = {s: self.noise(n * self.batch, self.length, width(s)) for s in sites}
             self.jitter = {s: sigma * a for s, a in noise.items()}
             try:
                 perturbed_loss = self.losses(x, y, resume).view(n, self.batch, self.length)
@@ -278,7 +290,8 @@ class DUST:
                 a, b, name = self.reassemble(site, a), self.reassemble(site, b), site + '.weight'
             sums = torch.stack([(a - b).square().sum(), (a * b).sum(), a.square().sum(), b.square().sum()])
             self.split[name] = sums, paired * n
-        return {s: error / draws for s, error in errors.items()}
+        scale = (1 - 1 / n) / draws if self.antithetic else 1 / draws
+        return {s: error * scale for s, error in errors.items()}
 
     def multiplexed_errors(self, groups, passes, start, kind='hadamard'):
         """Estimate several groups' output errors from shared, sign-coded forward passes (method C).
@@ -716,7 +729,7 @@ def snapshot(model):
 def train(config, settings, training, validation, testing, output, *, steps, eval_interval, seed=42,
           device=torch.device('cpu'), rank=0, world=1, suffix=True, batch_size=8, checkpoint_interval=0,
           resume=False, probe_interval=0, probe_seeds=(0,), allocation=None, multiplex=None, metadata=None,
-          wandb=None, echo=print):
+          wandb=None, echo=print, antithetic=False):
     """Train with DUST and write the run to ``output``; returns result.json's contents (rank 0) or None.
 
     ``training`` rows are consumed in order, ``batch_size`` per step; every rank sees the same batch and
@@ -759,6 +772,8 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
     fingerprint = dict(model=asdict(config), recipe=asdict(settings), seed=seed, world=world,
                        suffix=suffix, batch_size=batch_size, data_sha256=data_hash(training, validation),
                        allocation=allocation, multiplex=multiplex)
+    if antithetic:  # only in the fingerprint when on, so older checkpoints still resume
+        fingerprint['antithetic'] = True
 
     model = make_model(config, device, seed)
     optimizer = make_optimizer(model, settings)
@@ -767,7 +782,7 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
         allocator = make_allocator(model, optimizer, config, settings, world=world, batch_size=batch_size,
                                    suffix=suffix, **allocation)
     estimator = DUST(model, allocator.recipe(settings) if allocator else settings, seed, rank, world,
-                     suffix=suffix, multiplex=multiplex)
+                     suffix=suffix, multiplex=multiplex, antithetic=antithetic)
     estimator.measure_split = allocator is not None
     cost = partial(dust_update_cost, config=config, world=world, batch=batch_size, suffix=suffix,
                    multiplex=multiplex is not None)
@@ -946,6 +961,11 @@ def main():
                         help='Scale every block\'s writer and hidden draws by this factor (after --direct-multiple), '
                              'rounded to a multiple of the chunk size: the plain-DUST draw-count control, e.g. 0.5 '
                              'runs the forward passes --multiplex uses.')
+    parser.add_argument('--antithetic', action='store_true',
+                        help='Direct draws in antithetic pairs (a, -a): a central difference per pair at the same '
+                             'forward passes. Needs an even nrep.')
+    parser.add_argument('--fast', action='store_true',
+                        help='Fused kernels and flash/flex attention (model.set_fast): the same math, fewer kernels.')
     parser.add_argument('--allocation-policy', choices=('variance', 'agreement'), default='variance',
                         help='With --adaptive: draws in proportion to per-draw noise (variance), or to equalize '
                              'the cosine between half-population estimates (agreement; also moves the hubs).')
@@ -978,6 +998,9 @@ def main():
         parser.error('--allocation-interval must be >= 0')
     if args.adaptive and args.multiplex:
         parser.error('--adaptive with --multiplex (variant D) is not built yet')
+    if args.fast:
+        import model as model_module
+        model_module.set_fast(True)
     allocation = None
     if args.adaptive:
         allocation = dict(policy=args.allocation_policy, interval=args.allocation_interval,
@@ -1039,6 +1062,8 @@ def main():
         recipe=asdict(settings),
         allocation=allocation,  # None: fixed; else the adaptive options, and `recipe` is the starting point
         multiplex=args.multiplex,
+        antithetic=args.antithetic,
+        fast=args.fast,
         reward_centering='per-token local draw-chunk mean; skipped at nrep=1; no rescaling',
         execution='full-replay' if args.full_replay else 'cached-suffix',
         device=str(device),
@@ -1058,7 +1083,7 @@ def main():
         steps=steps, eval_interval=interval, seed=args.seed, device=device, rank=rank, world=world,
         suffix=not args.full_replay, checkpoint_interval=args.checkpoint_interval, resume=args.resume,
         probe_interval=args.probe_interval, probe_seeds=tuple(range(args.probe_seeds)),
-        allocation=allocation, multiplex=args.multiplex, metadata=metadata,
+        allocation=allocation, multiplex=args.multiplex, metadata=metadata, antithetic=args.antithetic,
         wandb=wandb_options(args), echo=lambda line: print(line, flush=True),
     )
     if world > 1:
