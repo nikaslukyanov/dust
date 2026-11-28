@@ -524,10 +524,11 @@ these are the refinements the lectures call for, grouped by file.
       and paired seed summaries. The CPU toy campaign verifies execution and artifacts.
 - [ ] **(GPU) A/B run:** dry-run the commands, launch on Insomnia, and summarize after all seed jobs
       complete. Use the [A/B instructions](../README.md#fixed-versus-adaptive-allocation) to stage
-      dependencies and data.
+      dependencies and data. Use the existing CUDA environment for the dry run, which imports
+      PyTorch.
 
       ```bash
-      python3 scripts/launch_ab.py --dry-run --seeds 42 43 44 --output runs/ab-gpu
+      .venv/baseline-cu128/bin/python scripts/launch_ab.py --dry-run --seeds 42 43 44 --output runs/ab-gpu
       python3 scripts/launch_ab.py --seeds 42 43 44 --output runs/ab-gpu
       .venv/baseline-cu128/bin/python runs/ab-gpu/source/scripts/ab_experiment.py summary --output runs/ab-gpu
       ```

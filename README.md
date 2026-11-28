@@ -85,14 +85,25 @@ On Insomnia, stage the CUDA wheelhouse and prepare the FineWeb data from the rep
 ```bash
 python3 scripts/stage_baseline_wheels.py .venv/wheelhouse-cu128
 python3 prepare_data.py --tokens 1M
-python3 scripts/launch_ab.py --dry-run --seeds 42 43 44 --output runs/ab-gpu
+```
+
+The Slurm setup job installs the staged wheels. The dry run requires PyTorch and prints the
+matrix and Slurm commands. Use the existing CUDA environment on Insomnia or a local Python
+environment with PyTorch.
+
+```bash
+.venv/baseline-cu128/bin/python scripts/launch_ab.py --dry-run --seeds 42 43 44 --output runs/ab-gpu
+```
+
+Submit the campaign from an Insomnia login node.
+
+```bash
 python3 scripts/launch_ab.py --seeds 42 43 44 --output runs/ab-gpu
 ```
 
-The dry run requires PyTorch and prints the matrix and Slurm commands. The launch snapshots a clean
-commit, verifies the token files and tokenizer, and schedules one L40S job per seed. Each seed runs
-the seven cases sequentially at 1M tokens, population 256, and 61 steps. The case order rotates by
-seed. GPU campaign validation is pending.
+The launch snapshots a clean commit, verifies the token files and tokenizer, and schedules one L40S
+job per seed. Each seed runs the seven cases sequentially at 1M tokens, population 256, and 61 steps.
+The case order rotates by seed. GPU campaign validation is pending.
 
 Repeat the same run or launch command to resume. The runner skips verified cases and uses
 `state.pt` to resume an interrupted case. It retains attempts that stop before their first
