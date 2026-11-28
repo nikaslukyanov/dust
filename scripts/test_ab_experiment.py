@@ -81,6 +81,22 @@ def test_slurm_dry_run_shell_quotes_and_no_writes(tmp_path):
     assert not out.exists()
 
 
+def test_snapshot_reuses_compatible_batch(tmp_path):
+    from launch_ab import git, snapshot
+
+    batch = tmp_path / 'batch'
+    launch = {'commit': git('rev-parse', 'HEAD'), 'seeds': [42]}
+    snapshot(batch, launch)
+    marker = batch / 'environment.ready'
+    marker.touch()
+    snapshot(batch, launch)
+    assert marker.is_file()
+    assert json.loads((batch / 'launch.json').read_text()) == launch
+    assert (batch / 'source/scripts/launch_ab.py').is_file()
+    with pytest.raises(ValueError, match='incompatible launch settings'):
+        snapshot(batch, {**launch, 'seeds': [43]})
+
+
 def run_toy(out, *args):
     return cli('scripts/ab_experiment.py', 'run', '--toy', '--output', out, '--seeds', 42, '--steps', 5, *args)
 

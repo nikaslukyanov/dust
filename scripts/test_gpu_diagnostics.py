@@ -3,8 +3,11 @@ import os
 from pathlib import Path
 import re
 import shlex
+import shutil
 import subprocess
 import sys
+import time
+from types import SimpleNamespace
 
 import pytest
 
@@ -32,6 +35,11 @@ def test_profile_toy_writes_evidence(tmp_path):
     result = read_json(output / 'result.json')
 
     assert manifest['runtime']['device'] == 'cpu'
+    assert manifest['runtime']['float32_matmul_precision'] == 'high'
+    assert isinstance(manifest['runtime']['deterministic_algorithms'], bool)
+    assert isinstance(manifest['runtime']['cuda_matmul_allow_tf32'], bool)
+    assert set(manifest['runtime']['cudnn']) == {'enabled', 'deterministic', 'benchmark', 'allow_tf32'}
+    assert all(isinstance(flag, bool) for flag in manifest['runtime']['cudnn'].values())
     assert manifest['config']['batch_size'] == 8
     assert manifest['recipes'][0]['scale'] == 1
     assert manifest['data']['shape'] == [8, 65]
@@ -56,6 +64,58 @@ def test_profile_toy_writes_evidence(tmp_path):
         assert sum(bool(re.search(r'"name"\s*:\s*"dust/clean"', line)) for line in trace) == 2
     assert profile['profiler']['record_shapes'] is False
     assert profile['profiler']['profile_memory'] is False
+
+
+def test_profile_rejects_nonfinite_checkpoint(tmp_path):
+    import torch
+    from gpu_diagnostics import TOY_CONFIG, make_model
+
+    model = make_model(TOY_CONFIG, torch.device('cpu'), seed=42)
+    with torch.no_grad():
+        model.lm_head.weight[0, 0] = float('nan')
+    checkpoint = tmp_path / 'nonfinite.pt'
+    torch.save(model.state_dict(), checkpoint)
+    output = tmp_path / 'profile'
+    run = cli('profile', '--toy', '--output', output, '--checkpoint', checkpoint,
+              '--warmup', 0, '--repeats', 1)
+    result = read_json(output / 'result.json')
+    assert (run.returncode, result['status']) == (1, 'failed')
+    assert result['error']['type'] == 'FloatingPointError'
+    assert 'Non-finite clean loss' in run.stderr
+    manifest = read_json(output / 'manifest.json')
+    assert manifest['model_state']['checkpoint']['path'] == str(checkpoint)
+    assert not (output / 'trace.json').exists()
+
+
+def test_profiler_phase_totals_use_cpu_annotations(tmp_path, monkeypatch):
+    import torch
+    import gpu_diagnostics as diagnostics
+
+    device = torch.autograd.DeviceType
+    averages = [
+        SimpleNamespace(key='dust/clean', count=2, device_type=device.CPU,
+                        cpu_time_total=60.0, device_time_total=12.0),
+        SimpleNamespace(key='dust/clean', count=2, device_type=device.CUDA,
+                        cpu_time_total=0.0, device_time_total=48.0),
+    ]
+    profiler = SimpleNamespace(key_averages=lambda: averages, events=lambda: ())
+
+    def profile_estimate(*args, trace_path, **kwargs):
+        trace_path.touch()
+        return 'test profiler', profiler
+
+    estimator = SimpleNamespace(estimate=lambda x, y: ({'head': torch.ones(1)}, 1, 1.0),
+                                close=lambda: None)
+    monkeypatch.setattr(torch.cuda, 'is_available', lambda: False)
+    monkeypatch.setattr(diagnostics, 'DUST', lambda *args, **kwargs: estimator)
+    monkeypatch.setattr(diagnostics, 'profile_estimate', profile_estimate)
+    args = diagnostics.parse_args(['profile', '--output', str(tmp_path), '--warmup', '0', '--repeats', '1'])
+    result = {'artifacts': {}}
+    diagnostics.run_profile(args, None, SimpleNamespace(is_cuda=True), None,
+                            diagnostics.diagnostic_plan(args)['recipes'][0], result)
+    assert result['profile']['profiler']['phases'] == {
+        'clean': {'count': 2, 'cpu_total_us': 60.0, 'device_total_us': 12.0},
+    }
 
 
 def test_profile_dry_run_leaves_no_output(tmp_path):
@@ -134,6 +194,14 @@ def test_quality_summary_uses_sample_sd_over_seeds():
             ref_norm=dict(mean=4, sample_sd=0), est_norm=dict(mean=8, sample_sd=4),
         )},
     )
+
+
+def test_quality_rejects_aliased_perturbation_seeds(tmp_path):
+    output = tmp_path / 'aliased seeds'
+    run = cli('quality', '--toy', '--output', output, '--scales', 1, '--seeds', 0, 2**32)
+    assert run.returncode == 2, run.stderr
+    assert '--seeds' in run.stderr
+    assert not output.exists()
 
 
 def test_quality_oom_reports_unavailable_and_removes_hooks(tmp_path, monkeypatch):
@@ -237,3 +305,71 @@ def test_launcher_dry_run_writes_nothing_and_preserves_arguments(tmp_path):
     assert inner_args[1:] == ['scripts/gpu_diagnostics.py', *expected, '--data-dir', '$scratch']
     assert not output.exists()
     assert not submission.exists()
+
+
+def test_concurrent_diagnostic_launch_submits_once(tmp_path):
+    checkout = tmp_path / 'checkout'
+    subprocess.run(['git', 'clone', '--quiet', '--shared', str(ROOT), str(checkout)], check=True)
+    for name in ('launch_diagnostics.py', 'launch_ab.py'):
+        shutil.copyfile(ROOT / 'scripts' / name, checkout / 'scripts' / name)
+    subprocess.run(['git', '-C', str(checkout), '-c', 'user.name=Diagnostics test',
+                    '-c', 'user.email=diagnostics@example.test', 'commit', '--quiet',
+                    '--allow-empty', '-am', 'Prepare launcher fixture'], check=True)
+    python = checkout / '.venv/baseline-cu128/bin/python'
+    python.parent.mkdir(parents=True)
+    python.symlink_to(sys.executable)
+    data = tmp_path / 'data'
+    data.mkdir()
+    for name in ('train_1M.pt', 'manifest.json'):
+        (data / name).touch()
+
+    reached = tmp_path / 'reached'
+    release = tmp_path / 'release'
+    submissions = tmp_path / 'submissions'
+    real_git = shutil.which('git')
+    git_script = tmp_path / 'git'
+    git_script.write_text(f'''#!{sys.executable}
+import os
+from pathlib import Path
+import sys
+import time
+
+if os.getenv('PAUSE_TEST_LAUNCH') == '1' and sys.argv[-2:] == ['rev-parse', 'HEAD']:
+    Path({str(reached)!r}).touch()
+    deadline = time.monotonic() + 40
+    while not Path({str(release)!r}).exists():
+        assert time.monotonic() < deadline
+        time.sleep(0.02)
+os.execv({real_git!r}, [{real_git!r}, *sys.argv[1:]])
+''')
+    sbatch = tmp_path / 'sbatch'
+    sbatch.write_text(f'''#!/bin/sh
+echo submitted >> {shlex.quote(str(submissions))}
+wc -l < {shlex.quote(str(submissions))}
+''')
+    git_script.chmod(0o755)
+    sbatch.chmod(0o755)
+
+    env = {**os.environ, 'PATH': str(tmp_path) + os.pathsep + os.environ['PATH']}
+    output = tmp_path / 'same output'
+    command = [sys.executable, 'scripts/launch_diagnostics.py', 'profile',
+               '--output', str(output), '--data-dir', str(data)]
+    with subprocess.Popen(command, cwd=checkout, env={**env, 'PAUSE_TEST_LAUNCH': '1'},
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as first:
+        try:
+            deadline = time.monotonic() + 15
+            while not reached.exists():
+                assert first.poll() is None and time.monotonic() < deadline
+                time.sleep(0.02)
+            assert not output.exists()
+            second = subprocess.run(command, cwd=checkout, env=env, capture_output=True, text=True, timeout=30)
+            assert second.returncode == 0, second.stderr
+            launch = (output / 'launch.json').read_bytes()
+            submission = (output / 'submission.json').read_bytes()
+        finally:
+            release.touch()
+        _, errors = first.communicate(timeout=40)
+
+    assert (first.returncode, submissions.read_text().splitlines()) == (1, ['submitted']), errors
+    assert (output / 'launch.json').read_bytes() == launch
+    assert (output / 'submission.json').read_bytes() == submission
