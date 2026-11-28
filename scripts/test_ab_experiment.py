@@ -193,6 +193,42 @@ def test_verified_data_detects_changed_bytes(tmp_path):
     assert 'Data checksum mismatch: test.pt' in baseline.stderr
 
 
+@pytest.mark.parametrize('problem', ['corrupt', 'missing'])
+def test_unsealed_result_rejects_an_invalid_checkpoint(tmp_path, finished_toy, problem):
+    out = tmp_path / 'unsealed'
+    shutil.copytree(finished_toy, out)
+    case = out / 'seed-42/fixed'
+    receipt, checkpoint = case / 'complete.json', case / 'state.pt'
+    receipt.unlink()
+    if problem == 'corrupt':
+        checkpoint.write_text('truncated checkpoint\n')
+    else:
+        checkpoint.unlink()
+
+    call = run_toy(out)
+    assert (call.returncode, receipt.exists()) == (2, False), call.stdout + call.stderr
+    assert str(case) in call.stderr
+    assert 'checkpoint' in call.stderr
+
+
+def test_unsealed_result_recovers_from_the_checkpoint(tmp_path, finished_toy):
+    out = tmp_path / 'unsealed'
+    shutil.copytree(finished_toy, out)
+    case = out / 'seed-42/fixed'
+    result = case / 'result.json'
+    original = json.loads(result.read_text())
+    (case / 'complete.json').unlink()
+
+    call = run_toy(out)
+    assert call.returncode == 0, call.stderr
+    assert f'Resuming {case} at step 5 of 5' in call.stdout
+    assert call.stdout.count('Skipping verified') == 6
+    recovered = json.loads(result.read_text())
+    assert recovered['history'] == original['history']
+    assert recovered['test_at_best_val'] == original['test_at_best_val']
+    assert summary(out)['seeds'][0]['cases']['fixed']['metrics']['draws'] == 860
+
+
 def test_recovers_a_final_checkpoint_with_a_torn_tail(tmp_path, finished_toy):
     out = tmp_path / 'interrupted'
     shutil.copytree(finished_toy, out)
