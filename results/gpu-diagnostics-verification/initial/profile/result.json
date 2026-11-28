@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "command": "profile",
+  "status": "complete",
+  "reason": null,
+  "artifacts": {
+    "manifest": "manifest.json",
+    "result": "result.json",
+    "trace": "trace.json",
+    "table": "profile.txt"
+  },
+  "profile": {
+    "ordinary_timing": {
+      "steps_kept": 5,
+      "warmup_discarded": 3,
+      "host_median_ms": 8041.926528094336,
+      "host_p10_ms": 8006.258578365669,
+      "host_p90_ms": 8066.399259259924,
+      "gpu_median_ms": 8041.91015625,
+      "gpu_p10_ms": 8006.2396484375,
+      "gpu_p90_ms": 8066.36669921875,
+      "scope": "Estimate only. Host time ends before the final timing synchronization. CUDA event elapsed time can include idle gaps.",
+      "host_ms": [
+        7993.517163908109,
+        8025.370700052008,
+        8041.926528094336,
+        8050.709479954094,
+        8076.859112130478
+      ],
+      "cuda_event_ms": [
+        7993.4951171875,
+        8025.3564453125,
+        8041.91015625,
+        8050.66357421875,
+        8076.83544921875
+      ],
+      "peak_memory_gib_including_warmup": 6.3793535232543945
+    },
+    "mfu": {
+      "needed": 0.0919647616372298,
+      "executed": 0.12143320409221717,
+      "reason": null,
+      "dense_bf16_peak_flops_per_second": 362050000000000.0,
+      "scope": "Analytic FLOPs divided by the ordinary CUDA event median and L40S dense BF16 peak. Excludes apply, optimizer, and data. Hardware utilization was not measured."
+    },
+    "synchronized_phase_timing": {
+      "seconds": {
+        "clean": 0.03111278498545289,
+        "direct": 5.818131605163217,
+        "embedding": 0.3041315369773656,
+        "hubs": 0.5901661070529372,
+        "head": 0.2799738380126655,
+        "local": 0.567218568874523,
+        "scalars": 0.46088645118288696
+      },
+      "scope": "One separate estimate. CUDA synchronization at phase boundaries changes execution."
+    },
+    "profiler": {
+      "active": 1,
+      "record_shapes": false,
+      "profile_memory": false,
+      "phases": {
+        "clean": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 31415.77
+        },
+        "direct": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 5849823.474
+        },
+        "embedding": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 306218.96699999925
+        },
+        "hubs": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 591327.6739999996
+        },
+        "head": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 322242.61700000055
+        },
+        "local": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 573659.8459999999
+        },
+        "scalars": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 466079.3990000002
+        }
+      },
+      "scope": "Inclusive totals over instrumented estimates. Profiling adds overhead.",
+      "sdpa": {
+        "operators": {
+          "aten::scaled_dot_product_attention": 1160,
+          "aten::_scaled_dot_product_efficient_attention": 1160,
+          "aten::_efficient_attention_forward": 1160
+        },
+        "observed_backends": [
+          "efficient"
+        ],
+        "trace_kernel_name_matches": {
+          "fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_t, cutlass::arch::Sm80, true, 64, 64, 64, true, true>::Params)": 1160
+        },
+        "trace_kernel_name_filter": [
+          "attention",
+          "fmha"
+        ]
+      }
+    }
+  },
+  "model_state_sha256_after": "65daa6215b6ef81e805a1a7f4acf5240963639f6fcdd6f6c9396ebde6e6ef026"
+}

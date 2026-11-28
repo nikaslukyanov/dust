@@ -1,0 +1,88 @@
+{
+  "source_sha": "4ef4ac0406cd6b77855178031b7355f501da78bb",
+  "phase_annotation_durations_us": {
+    "clean": [
+      21613.315
+    ],
+    "direct": [
+      507084.372
+    ],
+    "embedding": [
+      41607.215
+    ],
+    "hubs": [
+      155196.136
+    ],
+    "head": [
+      255835.417
+    ],
+    "local": [
+      46114.136
+    ],
+    "scalars": [
+      321195.117
+    ]
+  },
+  "profile_phases": {
+    "clean": {
+      "count": 1,
+      "cpu_total_us": 21613.315,
+      "device_total_us": null
+    },
+    "direct": {
+      "count": 1,
+      "cpu_total_us": 507084.372,
+      "device_total_us": null
+    },
+    "embedding": {
+      "count": 1,
+      "cpu_total_us": 41607.215000000084,
+      "device_total_us": null
+    },
+    "hubs": {
+      "count": 1,
+      "cpu_total_us": 155196.13599999994,
+      "device_total_us": null
+    },
+    "head": {
+      "count": 1,
+      "cpu_total_us": 255835.41700000002,
+      "device_total_us": null
+    },
+    "local": {
+      "count": 1,
+      "cpu_total_us": 46114.13600000006,
+      "device_total_us": null
+    },
+    "scalars": {
+      "count": 1,
+      "cpu_total_us": 321195.11699999985,
+      "device_total_us": null
+    }
+  },
+  "manifest_flags": {
+    "cuda_visible_devices": "",
+    "float32_matmul_precision": "high",
+    "deterministic_algorithms": false,
+    "cuda_matmul_allow_tf32": true,
+    "cudnn": {
+      "enabled": true,
+      "deterministic": false,
+      "benchmark": false,
+      "allow_tf32": true
+    }
+  },
+  "pytorch_flags": {
+    "cuda_visible_devices": "",
+    "float32_matmul_precision": "high",
+    "deterministic_algorithms": false,
+    "cuda_matmul_allow_tf32": true,
+    "cudnn": {
+      "enabled": true,
+      "deterministic": false,
+      "benchmark": false,
+      "allow_tf32": true
+    }
+  },
+  "trace_sha256": "ba605dfe68e814ce41099912568f2a663b27bd73760ab83270602fa4f9b10149"
+}

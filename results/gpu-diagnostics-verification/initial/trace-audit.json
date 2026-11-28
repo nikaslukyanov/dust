@@ -1,0 +1,77 @@
+{
+  "attention_kernels": {
+    "fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_t, cutlass::arch::Sm80, true, 64, 64, 64, true, true>::Params)": 1160
+  },
+  "bytes": 205937866,
+  "categories": {
+    "(none)": 60,
+    "Trace": 1,
+    "ac2g": 170747,
+    "cpu_op": 373700,
+    "cuda_driver": 2226,
+    "cuda_runtime": 87428,
+    "gpu_memcpy": 46,
+    "gpu_memset": 9,
+    "gpu_user_annotation": 7,
+    "kernel": 81038,
+    "overhead": 28861,
+    "user_annotation": 7
+  },
+  "efficient_attention_calls_by_phase": {
+    "clean": 8,
+    "direct": 716,
+    "embedding": 40,
+    "head": 0,
+    "hubs": 72,
+    "local": 196,
+    "scalars": 128
+  },
+  "events": 744130,
+  "kernel_events_by_device": {
+    "0": 81038
+  },
+  "kernels_linked_to_sdpa": {
+    "aten::_efficient_attention_forward": 1160
+  },
+  "phase_counts": {
+    "clean": 1,
+    "direct": 1,
+    "embedding": 1,
+    "head": 1,
+    "hubs": 1,
+    "local": 1,
+    "scalars": 1
+  },
+  "phase_cpu_trace_us": {
+    "clean": 10469.764,
+    "direct": 5695066.761,
+    "embedding": 338919.572,
+    "head": 480980.195,
+    "hubs": 575079.766,
+    "local": 488952.206,
+    "scalars": 552183.96
+  },
+  "phase_gpu_trace_span_us": {
+    "clean": 31415.772,
+    "direct": 5849823.476,
+    "embedding": 306218.969,
+    "head": 322242.619,
+    "hubs": 591327.676,
+    "local": 573659.848,
+    "scalars": 466079.401
+  },
+  "sdpa_nested_same_name": {
+    "aten::scaled_dot_product_attention": 964
+  },
+  "sdpa_operators": {
+    "aten::_efficient_attention_forward": 1160,
+    "aten::_scaled_dot_product_efficient_attention": 1160,
+    "aten::scaled_dot_product_attention": 2124
+  },
+  "sdpa_outer_operators": {
+    "aten::_efficient_attention_forward": 1160,
+    "aten::_scaled_dot_product_efficient_attention": 1160,
+    "aten::scaled_dot_product_attention": 1160
+  },
+  "sha256": "8070ade582144eb158dfeed6c60047c1e64e6f12c9a33b7fbccda9145b18aade"
+}

@@ -1,0 +1,76 @@
+{
+  "original": {
+    "clean": {
+      "count": 1,
+      "cpu_total_us": 0,
+      "device_total_us": 5003.267000000001
+    },
+    "direct": {
+      "count": 1,
+      "cpu_total_us": 0,
+      "device_total_us": 44916.12
+    },
+    "embedding": {
+      "count": 1,
+      "cpu_total_us": 0,
+      "device_total_us": 4849.826000000001
+    },
+    "hubs": {
+      "count": 1,
+      "cpu_total_us": 0,
+      "device_total_us": 13453.468
+    },
+    "head": {
+      "count": 1,
+      "cpu_total_us": 0,
+      "device_total_us": 21045.107000000004
+    },
+    "local": {
+      "count": 1,
+      "cpu_total_us": 0,
+      "device_total_us": 23269.122000000003
+    },
+    "scalars": {
+      "count": 1,
+      "cpu_total_us": 0,
+      "device_total_us": 72265.68599999999
+    }
+  },
+  "corrected": {
+    "clean": {
+      "count": 1,
+      "cpu_total_us": 5977.539,
+      "device_total_us": 458.50099999999316
+    },
+    "direct": {
+      "count": 1,
+      "cpu_total_us": 45014.433000000005,
+      "device_total_us": 4501.250000000063
+    },
+    "embedding": {
+      "count": 1,
+      "cpu_total_us": 4922.303,
+      "device_total_us": 475.00699999997596
+    },
+    "hubs": {
+      "count": 1,
+      "cpu_total_us": 13538.280000000006,
+      "device_total_us": 1329.9619999999486
+    },
+    "head": {
+      "count": 1,
+      "cpu_total_us": 21116.630999999994,
+      "device_total_us": 2010.3560000002617
+    },
+    "local": {
+      "count": 1,
+      "cpu_total_us": 23343.483000000007,
+      "device_total_us": 2129.9900000001508
+    },
+    "scalars": {
+      "count": 1,
+      "cpu_total_us": 72374.88399999999,
+      "device_total_us": 6777.751000000004
+    }
+  }
+}

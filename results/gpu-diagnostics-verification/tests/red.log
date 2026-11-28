@@ -1,0 +1,158 @@
+FFFF.                                                                    [100%]
+=================================== FAILURES ===================================
+__________________ test_profile_rejects_nonfinite_checkpoint ___________________
+
+tmp_path = PosixPath('/private/var/folders/x3/40vnrw8d4fz2ns5khjmvbp380000gn/T/pytest-of-patrick/pytest-44/test_profile_rejects_nonfinite0')
+
+    def test_profile_rejects_nonfinite_checkpoint(tmp_path):
+        import torch
+        from gpu_diagnostics import TOY_CONFIG, make_model
+    
+        model = make_model(TOY_CONFIG, torch.device('cpu'), seed=42)
+        with torch.no_grad():
+            model.lm_head.weight[0, 0] = float('nan')
+        checkpoint = tmp_path / 'nonfinite.pt'
+        torch.save(model.state_dict(), checkpoint)
+        output = tmp_path / 'profile'
+        run = cli('profile', '--toy', '--output', output, '--checkpoint', checkpoint,
+                  '--warmup', 0, '--repeats', 1)
+        result = read_json(output / 'result.json')
+>       assert (run.returncode, result['status']) == (1, 'failed')
+E       AssertionError: assert (0, 'complete') == (1, 'failed')
+E         
+E         At index 0 diff: 0 != 1
+E         Use -v to get more diff
+
+scripts/test_gpu_diagnostics.py:77: AssertionError
+________________ test_profiler_phase_totals_use_cpu_annotations ________________
+
+tmp_path = PosixPath('/private/var/folders/x3/40vnrw8d4fz2ns5khjmvbp380000gn/T/pytest-of-patrick/pytest-44/test_profiler_phase_totals_use0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10f75d350>
+
+    def test_profiler_phase_totals_use_cpu_annotations(tmp_path, monkeypatch):
+        import torch
+        import gpu_diagnostics as diagnostics
+    
+        device = torch.autograd.DeviceType
+        averages = [
+            SimpleNamespace(key='dust/clean', count=2, device_type=device.CPU,
+                            cpu_time_total=60.0, device_time_total=12.0),
+            SimpleNamespace(key='dust/clean', count=2, device_type=device.CUDA,
+                            cpu_time_total=0.0, device_time_total=48.0),
+        ]
+        profiler = SimpleNamespace(key_averages=lambda: averages, events=lambda: ())
+    
+        def profile_estimate(*args, trace_path, **kwargs):
+            trace_path.touch()
+            return 'test profiler', profiler
+    
+        estimator = SimpleNamespace(estimate=lambda x, y: ({'head': torch.ones(1)}, 1, 1.0),
+                                    close=lambda: None)
+        monkeypatch.setattr(torch.cuda, 'is_available', lambda: False)
+        monkeypatch.setattr(diagnostics, 'DUST', lambda *args, **kwargs: estimator)
+        monkeypatch.setattr(diagnostics, 'profile_estimate', profile_estimate)
+        args = diagnostics.parse_args(['profile', '--output', str(tmp_path), '--warmup', '0', '--repeats', '1'])
+        result = {'artifacts': {}}
+        diagnostics.run_profile(args, None, SimpleNamespace(is_cuda=True), None,
+                                diagnostics.diagnostic_plan(args)['recipes'][0], result)
+>       assert result['profile']['profiler']['phases'] == {
+            'clean': {'count': 2, 'cpu_total_us': 60.0, 'device_total_us': 12.0},
+        }
+E       AssertionError: assert {'clean': {'c...al_us': 48.0}} == {'clean': {'c...al_us': 12.0}}
+E         
+E         Differing items:
+E         {'clean': {'count': 2, 'cpu_total_us': 0.0, 'device_total_us': 48.0}} != {'clean': {'count': 2, 'cpu_total_us': 60.0, 'device_total_us': 12.0}}
+E         Use -v to get more diff
+
+scripts/test_gpu_diagnostics.py:111: AssertionError
+_______________ test_quality_rejects_aliased_perturbation_seeds ________________
+
+tmp_path = PosixPath('/private/var/folders/x3/40vnrw8d4fz2ns5khjmvbp380000gn/T/pytest-of-patrick/pytest-44/test_quality_rejects_aliased_p0')
+
+>   ???
+E   AssertionError: 
+E   assert 0 == 2
+E    +  where 0 = CompletedProcess(args=['/private/tmp/dust-ab-verify-venv/bin/python', '/private/tmp/dust-gpu-diagnostics-fixes/scripts..._rejects_aliased_p0/aliased seeds', '--scales', '1', '--seeds', '0', '4294967296'], returncode=0, stdout='', stderr='').returncode
+
+scripts/test_gpu_diagnostics.py:197: AssertionError
+________________ test_concurrent_diagnostic_launch_submits_once ________________
+
+tmp_path = PosixPath('/private/var/folders/x3/40vnrw8d4fz2ns5khjmvbp380000gn/T/pytest-of-patrick/pytest-44/test_concurrent_diagnostic_lau0')
+
+        assert inner_args[1:] == ['scripts/gpu_diagnostics.py', *expected, '--data-dir', '$scratch']
+        assert not output.exists()
+        assert not submission.exists()
+    
+    
+    def test_concurrent_diagnostic_launch_submits_once(tmp_path):
+        checkout = tmp_path / 'checkout'
+        subprocess.run(['git', 'clone', '--quiet', '--shared', str(ROOT), str(checkout)], check=True)
+        for name in ('launch_diagnostics.py', 'launch_ab.py'):
+            shutil.copyfile(ROOT / 'scripts' / name, checkout / 'scripts' / name)
+        subprocess.run(['git', '-C', str(checkout), '-c', 'user.name=Diagnostics test',
+                        '-c', 'user.email=diagnostics@example.test', 'commit', '--quiet',
+                        '--allow-empty', '-am', 'Prepare launcher fixture'], check=True)
+        python = checkout / '.venv/baseline-cu128/bin/python'
+        python.parent.mkdir(parents=True)
+        python.symlink_to(sys.executable)
+        data = tmp_path / 'data'
+        data.mkdir()
+        for name in ('train_1M.pt', 'manifest.json'):
+            (data / name).touch()
+    
+        reached = tmp_path / 'reached'
+        release = tmp_path / 'release'
+        submissions = tmp_path / 'submissions'
+        real_git = shutil.which('git')
+        git_script = tmp_path / 'git'
+        git_script.write_text(f'''#!{sys.executable}
+    import os
+    from pathlib import Path
+    import sys
+    import time
+    
+    if os.getenv('PAUSE_TEST_LAUNCH') == '1' and sys.argv[-2:] == ['rev-parse', 'HEAD']:
+        Path({str(reached)!r}).touch()
+        deadline = time.monotonic() + 40
+        while not Path({str(release)!r}).exists():
+            assert time.monotonic() < deadline
+            time.sleep(0.02)
+    os.execv({real_git!r}, [{real_git!r}, *sys.argv[1:]])
+    ''')
+        sbatch = tmp_path / 'sbatch'
+        sbatch.write_text(f'''#!/bin/sh
+    echo submitted >> {shlex.quote(str(submissions))}
+    wc -l < {shlex.quote(str(submissions))}
+    ''')
+        git_script.chmod(0o755)
+        sbatch.chmod(0o755)
+    
+        env = {**os.environ, 'PATH': str(tmp_path) + os.pathsep + os.environ['PATH']}
+        output = tmp_path / 'same output'
+        command = [sys.executable, 'scripts/launch_diagnostics.py', 'profile',
+                   '--output', str(output), '--data-dir', str(data)]
+        with subprocess.Popen(command, cwd=checkout, env={**env, 'PAUSE_TEST_LAUNCH': '1'},
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as first:
+            try:
+                deadline = time.monotonic() + 15
+                while not reached.exists():
+                    assert first.poll() is None and time.monotonic() < deadline
+                    time.sleep(0.02)
+                assert not output.exists()
+                second = subprocess.run(command, cwd=checkout, env=env, capture_output=True, text=True, timeout=30)
+                assert second.returncode == 0, second.stderr
+                launch = (output / 'launch.json').read_bytes()
+>               submission = (output / 'submission.json').read_bytes()
+E               AssertionError: 
+E               assert (0, ['submitt... 'submitted']) == (1, ['submitted'])
+E                 
+E                 At index 0 diff: 0 != 1
+E                 Use -v to get more diff
+
+scripts/test_gpu_diagnostics.py:368: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/test_gpu_diagnostics.py::test_profile_rejects_nonfinite_checkpoint
+FAILED scripts/test_gpu_diagnostics.py::test_profiler_phase_totals_use_cpu_annotations
+FAILED scripts/test_gpu_diagnostics.py::test_quality_rejects_aliased_perturbation_seeds
+FAILED scripts/test_gpu_diagnostics.py::test_concurrent_diagnostic_launch_submits_once
+4 failed, 1 passed in 33.15s

@@ -1,0 +1,24 @@
+PartitionName=short
+   AllowGroups=ALL AllowAccounts=ALL AllowQos=ALL
+   AllocNodes=ALL Default=NO QoS=N/A
+   DefaultTime=NONE DisableRootJobs=NO ExclusiveUser=NO ExclusiveTopo=NO GraceTime=0 Hidden=NO
+   MaxNodes=UNLIMITED MaxTime=12:00:00 MinNodes=0 LLN=NO MaxCPUsPerNode=UNLIMITED MaxCPUsPerSocket=UNLIMITED
+   Nodes=ins[001-043,046-048,050-062,064-078,080-096]
+   PriorityJobFactor=1 PriorityTier=1 RootOnly=NO ReqResv=NO OverSubscribe=NO
+   OverTimeLimit=NONE PreemptMode=REQUEUE
+   State=UP TotalCPUs=14544 TotalNodes=91 SelectTypeParameters=NONE
+   JobDefaults=(null)
+   DefMemPerCPU=4015 MaxMemPerCPU=6400
+   TRES=cpu=14544,mem=62697419M,node=91,billing=14544,gres/gpu=154,gres/gpu:h100=4,gres/gpu:l40=6,gres/gpu:l40s=16
+
+DefMemPerCPU            = 5800
+JobSubmitPlugins        = lua
+MaxMemPerNode           = UNLIMITED
+SelectType              = select/cons_tres
+SelectTypeParameters    = CR_CORE_MEMORY,CR_CORE_DEFAULT_DIST_BLOCK
+TaskPlugin              = task/cgroup
+TaskPluginParam         = (null type)
+JobIDRaw|ReqCPUS|AllocCPUS|ReqMem|ReqTRES|AllocTRES|SubmitLine
+14151783|11|12|64G|billing=8,cpu=8,gres/gpu=1,mem=64G,node=1|billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1|sbatch --parsable --account=edu --partition=short --qos=free_short --nodes=1 --ntasks=1 --cpus-per-task=8 --mem=64G --gres=gpu:1 --constraint=l40s --time=00:15:00 --no-requeue --job-name=dust-verification-profile --output=/insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/profile/job-%j.log /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/profile/source/scripts/diagnostics_gpu.sbatch /insomnia001/home/pts2125/hpml/dust /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/profile /insomnia001/home/pts2125/hpml/dust/data profile --output /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/profile/diagnostics --seed 42 --warmup 3 --repeats 5 --active 1
+14151784|11|12|64G|billing=8,cpu=8,gres/gpu=1,mem=64G,node=1|billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1|sbatch --parsable --account=edu --partition=short --qos=free_short --nodes=1 --ntasks=1 --cpus-per-task=8 --mem=64G --gres=gpu:1 --constraint=l40s --time=00:15:00 --no-requeue --job-name=dust-verification-quality --output=/insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/quality/job-%j.log /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/quality/source/scripts/diagnostics_gpu.sbatch /insomnia001/home/pts2125/hpml/dust /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/quality /insomnia001/home/pts2125/hpml/dust/data quality --output /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/quality/diagnostics --seed 42 --populations 256 --seeds 0 1 --reference-chunk 1
+14151785|11|12|64G|billing=8,cpu=8,gres/gpu=1,mem=64G,node=1|billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1|sbatch --parsable --account=edu --partition=short --qos=free_short --nodes=1 --ntasks=1 --cpus-per-task=8 --mem=64G --gres=gpu:1 --constraint=l40s --time=00:15:00 --no-requeue --job-name=dust-verification-cpu-toy --output=/insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/cpu-toy/job-%j.log /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/cpu-toy.sbatch /insomnia001/home/pts2125/hpml/dust /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/cpu-toy quality --toy --output /insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/cpu-toy/diagnostics --seed 42 --scales 1 2 --seeds 0 1 --reference-chunk 1

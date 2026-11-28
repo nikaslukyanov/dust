@@ -42,6 +42,10 @@ Two consequences drive everything in this folder:
 - **`profiling.py`** — the **torch.profiler harness**: the per-op / per-phase table and a Perfetto
   trace, plus a double-batch test that says whether the step is GPU-bound or launch-bound before we
   trust any savings number.
+- **`../scripts/gpu_diagnostics.py`** runs profiling and gradient quality checks on one frozen model
+  and batch. It records source and data identities, observed SDPA operators, separate timing scopes,
+  analytic costs, and raw perturbation-seed metrics. The optional checkpoint selects saved model
+  weights. See the [CPU and L40S commands](../README.md#frozen-model-diagnostics).
 - **`checkpoint.py`** — **full-state save/resume**: weights, optimizer momentum, the perturbation RNG,
   the step counter, and the adaptive-allocator state, written atomically, one file per worker. (The
   stock code saves weights only, which cannot resume a run cleanly.)

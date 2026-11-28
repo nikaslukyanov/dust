@@ -1,0 +1,45 @@
+{
+  "source_sha": "4ef4ac0406cd6b77855178031b7355f501da78bb",
+  "rejections": [
+    {
+      "argv": [
+        "/private/tmp/dust-ab-verify-venv/bin/python",
+        "scripts/gpu_diagnostics.py",
+        "quality",
+        "--output",
+        "/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/aliased seeds",
+        "--toy",
+        "--scales",
+        "1",
+        "--seeds",
+        "0",
+        "4294967296"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "stderr": "usage: gpu_diagnostics.py [-h] {profile,quality} ...\ngpu_diagnostics.py: error: --seeds must be unsigned 32-bit integers\n"
+    },
+    {
+      "argv": [
+        "/private/tmp/dust-ab-verify-venv/bin/python",
+        "scripts/launch_diagnostics.py",
+        "quality",
+        "--output",
+        "/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/aliased seeds",
+        "--dry-run",
+        "--seeds",
+        "0",
+        "4294967296"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "stderr": "usage: launch_diagnostics.py [-h] {profile,quality} ...\nlaunch_diagnostics.py: error: --seeds must be unsigned 32-bit integers\n"
+    }
+  ],
+  "accepted_boundary": [
+    0,
+    4294967295
+  ],
+  "accepted_model_seed": 4294967296,
+  "output_created": false
+}

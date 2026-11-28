@@ -1,0 +1,15 @@
+{
+  "source_sha": "4ef4ac0406cd6b77855178031b7355f501da78bb",
+  "written_phase_summary": {
+    "clean": {
+      "count": 3,
+      "cpu_total_us": 91.5,
+      "device_total_us": 20.75
+    },
+    "local": {
+      "count": 3,
+      "cpu_total_us": 17.0,
+      "device_total_us": 7.5
+    }
+  }
+}

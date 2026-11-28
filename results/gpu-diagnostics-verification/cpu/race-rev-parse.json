@@ -1,0 +1,50 @@
+{
+  "source_sha": "4ef4ac0406cd6b77855178031b7355f501da78bb",
+  "pause_at": "rev-parse",
+  "command": [
+    "/private/tmp/dust-ab-verify-venv/bin/python",
+    "scripts/launch_diagnostics.py",
+    "profile",
+    "--output",
+    "/private/tmp/dust fixed launcher race eiulzxuk/same output",
+    "--data-dir",
+    "/private/tmp/dust fixed launcher race eiulzxuk/data"
+  ],
+  "checkout": "/private/tmp/dust fixed launcher race eiulzxuk/checkout",
+  "launch_unchanged": true,
+  "submission_unchanged": true,
+  "first": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "ValueError: /private/tmp/dust fixed launcher race eiulzxuk/same output: choose a new launch directory\n"
+  },
+  "second": {
+    "exit": 0,
+    "stdout": "sbatch --parsable '--output=/private/tmp/dust fixed launcher race eiulzxuk/same output/job-%j.log' '/private/tmp/dust fixed launcher race eiulzxuk/same output/source/scripts/diagnostics_gpu.sbatch' '/private/tmp/dust fixed launcher race eiulzxuk/checkout' '/private/tmp/dust fixed launcher race eiulzxuk/same output' '/private/tmp/dust fixed launcher race eiulzxuk/data' profile --output '/private/tmp/dust fixed launcher race eiulzxuk/same output/diagnostics' --seed 42 --warmup 3 --repeats 5 --active 1\nSubmitted Slurm job 1\n",
+    "stderr": ""
+  },
+  "sbatch_calls": [
+    [
+      "--parsable",
+      "--output=/private/tmp/dust fixed launcher race eiulzxuk/same output/job-%j.log",
+      "/private/tmp/dust fixed launcher race eiulzxuk/same output/source/scripts/diagnostics_gpu.sbatch",
+      "/private/tmp/dust fixed launcher race eiulzxuk/checkout",
+      "/private/tmp/dust fixed launcher race eiulzxuk/same output",
+      "/private/tmp/dust fixed launcher race eiulzxuk/data",
+      "profile",
+      "--output",
+      "/private/tmp/dust fixed launcher race eiulzxuk/same output/diagnostics",
+      "--seed",
+      "42",
+      "--warmup",
+      "3",
+      "--repeats",
+      "5",
+      "--active",
+      "1"
+    ]
+  ],
+  "submission": {
+    "job_id": "1"
+  }
+}

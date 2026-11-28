@@ -130,6 +130,52 @@ comparison uses the matched control's step and training times to estimate measur
 training time. The summary computes each difference per seed, then reports the mean and sample
 standard deviation across seeds. Use toy results to verify the pipeline.
 
+## Frozen-model diagnostics
+
+Profile cached-suffix DUST or compare its gradients across populations without updating the model.
+Start with the CPU toy commands.
+
+```bash
+OMP_NUM_THREADS=1 python3 scripts/gpu_diagnostics.py profile --toy --warmup 1 --repeats 2 --active 1 --output runs/profile-toy
+OMP_NUM_THREADS=1 python3 scripts/gpu_diagnostics.py quality --toy --scales 1 2 --seeds 0 1 2 --output runs/quality-toy
+```
+
+On Insomnia, use the prepared FineWeb data and existing `.venv/baseline-cu128` environment.
+Preview the snapshot and launch commands before submitting a bounded check.
+
+```bash
+.venv/baseline-cu128/bin/python scripts/launch_diagnostics.py profile --dry-run --output runs/profile-gpu
+.venv/baseline-cu128/bin/python scripts/launch_diagnostics.py profile --output runs/profile-gpu
+.venv/baseline-cu128/bin/python scripts/launch_diagnostics.py quality --populations 256 --seeds 0 1 --output runs/quality-gpu
+```
+
+Each launch snapshots a clean commit and requests one L40S. The profile uses the stock 1M recipe
+at population 256, batch 8, and context 2,048. Quality accepts the shipped populations
+`256 1024 4096 16384`. Larger recipes can exceed one L40S's memory. A population that exhausts CUDA
+memory is recorded as unavailable; the runner does not shrink its recipe or batch.
+
+The default model is initialized with seed 42. Add `--checkpoint /path/to/best.pt` to use saved
+model weights. Every population uses that same frozen model and the same first eight training
+sequences. The reference uses chunked FP32 backprop; DUST uses the existing bf16 CUDA path.
+Toy scales change the toy recipe's direct draws and are labelled separately from real populations.
+
+The direct command writes `manifest.json` and `result.json` under `--output`. Slurm launches put
+them in `OUTPUT/diagnostics/`. The manifest records recipes, source, data, model, seeds, and runtime.
+Profile outputs also include an operator table and Chrome trace. Ordinary estimate timing,
+synchronized phase timing, and profiler timing are separate measurements. FLOPs are analytic
+needed and dense-executed estimates. MFU uses the unprofiled estimate time and the L40S's dense
+bf16 peak; it is not hardware-counter utilization. Quality reports raw per-seed group metrics,
+means, and sample standard deviations. Quality timings include estimate normalization and copying,
+with no discarded warm-up samples. These are perturbation-seed repetitions on one model
+and batch, not independent training runs. Perturbation seeds must be distinct unsigned 32-bit
+integers, which avoids aliases in PyTorch's CPU generator.
+
+Use a new output directory for each diagnostic. Existing outputs are never overwritten.
+An interrupted or partial diagnostic remains available for inspection and must be rerun into
+a new directory. The full population sweep and comparisons with the paper remain separate work.
+See the [verification record](results/gpu-diagnostics-verification/README.md) for completed CPU
+and initial L40S checks, the reporting fixes, and the pending corrected GPU runs.
+
 ## Outputs
 
 Each run saves its configuration, metrics, a validation-selected `best.pt`, and

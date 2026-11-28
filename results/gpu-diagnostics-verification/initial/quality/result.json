@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "command": "quality",
+  "status": "complete",
+  "reason": null,
+  "artifacts": {
+    "manifest": "manifest.json",
+    "result": "result.json"
+  },
+  "quality": {
+    "reference": {
+      "precision": "fp32",
+      "float32_matmul_precision": "highest",
+      "chunk": 1,
+      "loss": 8.318515539169312
+    },
+    "timing": {
+      "warmup": 0,
+      "scope": "Raw per-seed time includes estimate, normalization, and gradient clones. Excludes reference and comparison. Host time ends before final timing sync."
+    },
+    "populations": [
+      {
+        "population": 256,
+        "recipe": {
+          "writers": [
+            38,
+            32,
+            16,
+            10,
+            6,
+            4,
+            2,
+            2
+          ],
+          "hidden": [
+            38,
+            32,
+            16,
+            10,
+            6,
+            4,
+            2,
+            2
+          ],
+          "hubs": [
+            6,
+            6,
+            4,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "embedding": 10,
+          "head": 1024,
+          "local": {
+            "q": 2,
+            "v": 20,
+            "gate": 6,
+            "k": 12,
+            "ve": 8
+          },
+          "nrep": 2,
+          "lr": 0.25,
+          "momentum": 0.95,
+          "gamma": 0.98
+        },
+        "analytic_cost": {
+          "suffix": true,
+          "world": 1,
+          "batch": 8,
+          "draws": {
+            "writers": 110,
+            "hidden": 110,
+            "hubs": 26,
+            "embedding": 10,
+            "head": 1024,
+            "q": 16,
+            "v": 160,
+            "gate": 24,
+            "k": 96,
+            "ve": 32,
+            "scalars": 8
+          },
+          "total_draws": 1616,
+          "population_K": 256,
+          "flops_total": 267762169544704.0,
+          "flops_per_group": {
+            "writers": 101600857161728.0,
+            "hidden": 101600857161728.0,
+            "hubs": 20722177015808.0,
+            "embedding": 11168760463360,
+            "head": 4398046511104.0,
+            "q": 447045697536.0,
+            "v": 4470456975360.0,
+            "gate": 722057822208.0,
+            "k": 2682274185216.0,
+            "ve": 962743762944.0,
+            "scalars": 17870016741376
+          },
+          "flops_clean_forward": 1116876046336,
+          "forward_equivalents": 239.74206486307853,
+          "forward_equivalents_per_gpu": 239.74206486307853,
+          "direct_forwards": 256,
+          "count": "needed",
+          "flops_total_executed": 353561707806720.0,
+          "note": "forward_equivalents = update FLOPs / one clean forward. population_K excludes head, attention-internal and scalar draws. Every direct draw pays a full head recompute, which suffix caching does not remove. FLOPs predict wall-clock only when the step is GPU-bound; DUST issues many tiny forwards through Python hooks, so confirm with profiling.launch_bound_test before reading forward_equivalents as time."
+        },
+        "status": "complete",
+        "samples": [
+          {
+            "seed": 0,
+            "clean_loss": 8.318514823913574,
+            "per_group": {
+              "embedding": {
+                "cosine": 0.16455631600722515,
+                "rel_norm": 2.351116180419922,
+                "ref_norm": 0.0004381657636258751,
+                "est_norm": 0.0010301786242052913
+              },
+              "gate": {
+                "cosine": 0.0007838918048593624,
+                "rel_norm": 2.6976699829101562,
+                "ref_norm": 1.0864783689612523e-05,
+                "est_norm": 2.9309601814020425e-05
+              },
+              "head": {
+                "cosine": 0.9295442246408985,
+                "rel_norm": 0.9374979734420776,
+                "ref_norm": 0.969902515411377,
+                "est_norm": 0.9092816710472107
+              },
+              "hidden": {
+                "cosine": 0.11756057012312894,
+                "rel_norm": 3.5712130069732666,
+                "ref_norm": 0.020076019689440727,
+                "est_norm": 0.07169574499130249
+              },
+              "k": {
+                "cosine": 0.004214937571368086,
+                "rel_norm": 34.33474349975586,
+                "ref_norm": 0.0012520712334662676,
+                "est_norm": 0.042989544570446014
+              },
+              "q": {
+                "cosine": 0.017924115030642,
+                "rel_norm": 23.327842712402344,
+                "ref_norm": 0.0012408436741679907,
+                "est_norm": 0.028946205973625183
+              },
+              "scalars": {
+                "cosine": 0.7598465020028644,
+                "rel_norm": 1.9876035451889038,
+                "ref_norm": 0.0015343360137194395,
+                "est_norm": 0.003049651626497507
+              },
+              "v": {
+                "cosine": 0.022494873018647797,
+                "rel_norm": 2.3189802169799805,
+                "ref_norm": 0.016186513006687164,
+                "est_norm": 0.03753620386123657
+              },
+              "ve": {
+                "cosine": 0.003918055649053452,
+                "rel_norm": 15.704421997070312,
+                "ref_norm": 9.356421651318669e-05,
+                "est_norm": 0.0014693719567731023
+              },
+              "writers": {
+                "cosine": 0.18666983849423294,
+                "rel_norm": 1.8980876207351685,
+                "ref_norm": 0.03605782240629196,
+                "est_norm": 0.06844090670347214
+              }
+            },
+            "host_ms": 8129.453700967133,
+            "cuda_event_ms": 8129.46728515625
+          },
+          {
+            "seed": 1,
+            "clean_loss": 8.318514823913574,
+            "per_group": {
+              "embedding": {
+                "cosine": 0.1668945487287553,
+                "rel_norm": 2.3576292991638184,
+                "ref_norm": 0.0004381657636258751,
+                "est_norm": 0.0010330324294045568
+              },
+              "gate": {
+                "cosine": 0.10610647341604729,
+                "rel_norm": 2.527604579925537,
+                "ref_norm": 1.0864783689612523e-05,
+                "est_norm": 2.746187601587735e-05
+              },
+              "head": {
+                "cosine": 0.9302066111669273,
+                "rel_norm": 0.9364096522331238,
+                "ref_norm": 0.969902515411377,
+                "est_norm": 0.9082260727882385
+              },
+              "hidden": {
+                "cosine": 0.11486181496190773,
+                "rel_norm": 3.564690351486206,
+                "ref_norm": 0.020076019689440727,
+                "est_norm": 0.07156479358673096
+              },
+              "k": {
+                "cosine": 0.005138944229428098,
+                "rel_norm": 34.52798080444336,
+                "ref_norm": 0.0012520712334662676,
+                "est_norm": 0.04323149099946022
+              },
+              "q": {
+                "cosine": 0.013590811062824623,
+                "rel_norm": 23.354961395263672,
+                "ref_norm": 0.0012408436741679907,
+                "est_norm": 0.02897985652089119
+              },
+              "scalars": {
+                "cosine": 0.7429294643511515,
+                "rel_norm": 1.754044771194458,
+                "ref_norm": 0.0015343360137194395,
+                "est_norm": 0.002691294066607952
+              },
+              "v": {
+                "cosine": 0.016799233922602394,
+                "rel_norm": 2.3132741451263428,
+                "ref_norm": 0.016186513006687164,
+                "est_norm": 0.037443842738866806
+              },
+              "ve": {
+                "cosine": 0.0058122850510188805,
+                "rel_norm": 15.483055114746094,
+                "ref_norm": 9.356421651318669e-05,
+                "est_norm": 0.0014486599247902632
+              },
+              "writers": {
+                "cosine": 0.18530935955517983,
+                "rel_norm": 1.8860890865325928,
+                "ref_norm": 0.03605782240629196,
+                "est_norm": 0.06800826638936996
+              }
+            },
+            "host_ms": 8037.114558974281,
+            "cuda_event_ms": 8037.1103515625
+          }
+        ],
+        "summary": {
+          "clean_loss": {
+            "mean": 8.318514823913574,
+            "sample_sd": 0.0
+          },
+          "per_group": {
+            "embedding": {
+              "cosine": {
+                "mean": 0.16572543236799023,
+                "sample_sd": 0.0016533802133862556
+              },
+              "rel_norm": {
+                "mean": 2.35437273979187,
+                "sample_sd": 0.004605470430482412
+              },
+              "ref_norm": {
+                "mean": 0.0004381657636258751,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.001031605526804924,
+                "sample_sd": 2.0179450085860473e-06
+              }
+            },
+            "gate": {
+              "cosine": {
+                "mean": 0.05344518261045333,
+                "sample_sd": 0.07447431166934455
+              },
+              "rel_norm": {
+                "mean": 2.6126372814178467,
+                "sample_sd": 0.12025439969564711
+              },
+              "ref_norm": {
+                "mean": 1.0864783689612523e-05,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 2.8385738914948888e-05,
+                "sample_sd": 1.3065394416402935e-06
+              }
+            },
+            "head": {
+              "cosine": {
+                "mean": 0.9298754179039128,
+                "sample_sd": 0.00046837800432155763
+              },
+              "rel_norm": {
+                "mean": 0.9369538128376007,
+                "sample_sd": 0.0007695593069604141
+              },
+              "ref_norm": {
+                "mean": 0.969902515411377,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.9087538719177246,
+                "sample_sd": 0.0007464206871279334
+              }
+            },
+            "hidden": {
+              "cosine": {
+                "mean": 0.11621119254251833,
+                "sample_sd": 0.0019083080752617149
+              },
+              "rel_norm": {
+                "mean": 3.5679516792297363,
+                "sample_sd": 0.004612213926244156
+              },
+              "ref_norm": {
+                "mean": 0.020076019689440727,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.07163026928901672,
+                "sample_sd": 9.259662617843418e-05
+              }
+            },
+            "k": {
+              "cosine": {
+                "mean": 0.004676940900398092,
+                "sample_sd": 0.0006533713737757543
+              },
+              "rel_norm": {
+                "mean": 34.43136215209961,
+                "sample_sd": 0.13663940852274228
+              },
+              "ref_norm": {
+                "mean": 0.0012520712334662676,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.04311051778495312,
+                "sample_sd": 0.00017108196063981467
+              }
+            },
+            "q": {
+              "cosine": {
+                "mean": 0.01575746304673331,
+                "sample_sd": 0.00306410862058624
+              },
+              "rel_norm": {
+                "mean": 23.341402053833008,
+                "sample_sd": 0.019175804548092524
+              },
+              "ref_norm": {
+                "mean": 0.0012408436741679907,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.028963031247258186,
+                "sample_sd": 2.379453016243161e-05
+              }
+            },
+            "scalars": {
+              "cosine": {
+                "mean": 0.751387983177008,
+                "sample_sd": 0.01196215204111436
+              },
+              "rel_norm": {
+                "mean": 1.870824158191681,
+                "sample_sd": 0.1651509928970889
+              },
+              "ref_norm": {
+                "mean": 0.0015343360137194395,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.0028704728465527296,
+                "sample_sd": 0.00025339706068736864
+              }
+            },
+            "v": {
+              "cosine": {
+                "mean": 0.019647053470625096,
+                "sample_sd": 0.0040274250280049224
+              },
+              "rel_norm": {
+                "mean": 2.3161271810531616,
+                "sample_sd": 0.004034802101644907
+              },
+              "ref_norm": {
+                "mean": 0.016186513006687164,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.03749002330005169,
+                "sample_sd": 6.530917594566224e-05
+              }
+            },
+            "ve": {
+              "cosine": {
+                "mean": 0.004865170350036166,
+                "sample_sd": 0.0013394224552526932
+              },
+              "rel_norm": {
+                "mean": 15.593738555908203,
+                "sample_sd": 0.15653002362157956
+              },
+              "ref_norm": {
+                "mean": 9.356421651318669e-05,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.0014590159407816827,
+                "sample_sd": 1.4645618267218187e-05
+              }
+            },
+            "writers": {
+              "cosine": {
+                "mean": 0.18598959902470638,
+                "sample_sd": 0.0009620038834659348
+              },
+              "rel_norm": {
+                "mean": 1.8920883536338806,
+                "sample_sd": 0.00848424489893999
+              },
+              "ref_norm": {
+                "mean": 0.03605782240629196,
+                "sample_sd": 0.0
+              },
+              "est_norm": {
+                "mean": 0.06822458654642105,
+                "sample_sd": 0.0003059228999163243
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "model_state_sha256_after": "65daa6215b6ef81e805a1a7f4acf5240963639f6fcdd6f6c9396ebde6e6ef026"
+}

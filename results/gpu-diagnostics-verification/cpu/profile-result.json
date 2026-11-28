@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "command": "profile",
+  "status": "complete",
+  "reason": null,
+  "artifacts": {
+    "manifest": "manifest.json",
+    "result": "result.json",
+    "trace": "trace.json",
+    "table": "profile.txt"
+  },
+  "profile": {
+    "ordinary_timing": {
+      "steps_kept": 2,
+      "warmup_discarded": 1,
+      "host_median_ms": 1227.4886874947697,
+      "host_p10_ms": 1227.391203865409,
+      "host_p90_ms": 1227.5861711241305,
+      "scope": "Estimate only. Host time ends before the final timing synchronization. CUDA event elapsed time can include idle gaps.",
+      "host_ms": [
+        1227.3668329580687,
+        1227.6105420314707
+      ],
+      "cuda_event_ms": [],
+      "peak_memory_gib_including_warmup": null
+    },
+    "mfu": {
+      "needed": null,
+      "executed": null,
+      "reason": "CUDA timing unavailable on CPU",
+      "dense_bf16_peak_flops_per_second": 362050000000000.0,
+      "scope": "Analytic FLOPs divided by the ordinary CUDA event median and L40S dense BF16 peak. Excludes apply, optimizer, and data. Hardware utilization was not measured."
+    },
+    "synchronized_phase_timing": {
+      "seconds": {
+        "clean": 0.01942475000396371,
+        "direct": 0.4647101250011474,
+        "embedding": 0.0394054590142332,
+        "hubs": 0.14548941602697596,
+        "head": 0.215769124974031,
+        "local": 0.04364120803074911,
+        "scalars": 0.3180153339635581
+      },
+      "scope": "One separate estimate. CUDA synchronization at phase boundaries changes execution."
+    },
+    "profiler": {
+      "active": 1,
+      "record_shapes": false,
+      "profile_memory": false,
+      "phases": {
+        "clean": {
+          "count": 1,
+          "cpu_total_us": 21613.315,
+          "device_total_us": null
+        },
+        "direct": {
+          "count": 1,
+          "cpu_total_us": 507084.372,
+          "device_total_us": null
+        },
+        "embedding": {
+          "count": 1,
+          "cpu_total_us": 41607.215000000084,
+          "device_total_us": null
+        },
+        "hubs": {
+          "count": 1,
+          "cpu_total_us": 155196.13599999994,
+          "device_total_us": null
+        },
+        "head": {
+          "count": 1,
+          "cpu_total_us": 255835.41700000002,
+          "device_total_us": null
+        },
+        "local": {
+          "count": 1,
+          "cpu_total_us": 46114.13600000006,
+          "device_total_us": null
+        },
+        "scalars": {
+          "count": 1,
+          "cpu_total_us": 321195.11699999985,
+          "device_total_us": null
+        }
+      },
+      "scope": "Inclusive CPU phase durations and sums of associated device kernel times, over instrumented estimates. Profiling adds overhead.",
+      "sdpa": {
+        "operators": {
+          "aten::scaled_dot_product_attention": 148,
+          "aten::_scaled_dot_product_flash_attention_for_cpu": 148
+        },
+        "observed_backends": [
+          "cpu_flash"
+        ],
+        "trace_kernel_name_matches": {},
+        "trace_kernel_name_filter": [
+          "attention",
+          "fmha"
+        ]
+      }
+    }
+  },
+  "model_state_sha256_after": "1ee22330c569095a00965daba5f7a8a18c437b035d7910b304c779b92dd56c1d"
+}

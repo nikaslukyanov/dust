@@ -1,0 +1,48 @@
+{
+  "source_sha": "4ef4ac0406cd6b77855178031b7355f501da78bb",
+  "initial": {
+    "argv": [
+      "/private/tmp/dust-ab-verify-venv/bin/python",
+      "scripts/launch_ab.py",
+      "--output",
+      "/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot",
+      "--seeds",
+      "42"
+    ],
+    "exit": 0,
+    "stdout": "sbatch --parsable '--output=/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/setup-%j.log' '/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/source/scripts/setup_baseline_gpu.sbatch' /private/tmp/dust-fix-independent.W9aWsY/checkout '/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot' ab\nsbatch --parsable '--output=/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/seed-42/job-%j.log' --dependency=afterok:100 '/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/source/scripts/ab_gpu.sbatch' /private/tmp/dust-fix-independent.W9aWsY/checkout '/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot' 42\n",
+    "stderr": ""
+  },
+  "reuse": {
+    "argv": [
+      "/private/tmp/dust-ab-verify-venv/bin/python",
+      "scripts/launch_ab.py",
+      "--output",
+      "/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot",
+      "--seeds",
+      "42"
+    ],
+    "exit": 0,
+    "stdout": "sbatch --parsable '--output=/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/seed-42/job-%j.log' '/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/source/scripts/ab_gpu.sbatch' /private/tmp/dust-fix-independent.W9aWsY/checkout '/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot' 42\n",
+    "stderr": ""
+  },
+  "incompatible": {
+    "argv": [
+      "/private/tmp/dust-ab-verify-venv/bin/python",
+      "scripts/launch_ab.py",
+      "--output",
+      "/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot",
+      "--seeds",
+      "43"
+    ],
+    "exit": 2,
+    "stdout": "",
+    "stderr": "usage: launch_ab.py [-h] [--output OUTPUT] [--seeds SEEDS [SEEDS ...]]\n                    [--dry-run]\nlaunch_ab.py: error: /Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot: incompatible launch settings or source commit\n"
+  },
+  "submissions": [
+    "--parsable --output=/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/setup-%j.log",
+    "--parsable --output=/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/seed-42/job-%j.log",
+    "--parsable --output=/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/ab compatible snapshot/seed-42/job-%j.log"
+  ],
+  "launch_metadata_unchanged": true
+}

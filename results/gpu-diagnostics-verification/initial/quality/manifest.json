@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "command": "quality",
+  "mode": "l40s",
+  "config": {
+    "sequence_len": 2048,
+    "vocab_size": 4096,
+    "n_layer": 8,
+    "n_head": 8,
+    "n_kv_head": 8,
+    "n_embd": 512,
+    "window_pattern": "SSSL",
+    "batch_size": 8
+  },
+  "seed": 42,
+  "options": {
+    "populations": [
+      256
+    ],
+    "seeds": [
+      0,
+      1
+    ],
+    "reference_chunk": 1
+  },
+  "data_dir": "/tmp/dust-diagnostics-14151784-RAaEMg",
+  "checkpoint": null,
+  "execution": {
+    "suffix": true,
+    "world": 1,
+    "multiplex": null,
+    "precision": "bf16",
+    "float32_matmul_precision": "high",
+    "perturbation_rng": {
+      "seed_argument": "--seeds",
+      "reseed_before_estimate": true
+    },
+    "reference": {
+      "precision": "fp32",
+      "float32_matmul_precision": "highest",
+      "chunk": 1
+    }
+  },
+  "recipes": [
+    {
+      "population": 256,
+      "recipe": {
+        "writers": [
+          38,
+          32,
+          16,
+          10,
+          6,
+          4,
+          2,
+          2
+        ],
+        "hidden": [
+          38,
+          32,
+          16,
+          10,
+          6,
+          4,
+          2,
+          2
+        ],
+        "hubs": [
+          6,
+          6,
+          4,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "embedding": 10,
+        "head": 1024,
+        "local": {
+          "q": 2,
+          "v": 20,
+          "gate": 6,
+          "k": 12,
+          "ve": 8
+        },
+        "nrep": 2,
+        "lr": 0.25,
+        "momentum": 0.95,
+        "gamma": 0.98
+      },
+      "analytic_cost": {
+        "suffix": true,
+        "world": 1,
+        "batch": 8,
+        "draws": {
+          "writers": 110,
+          "hidden": 110,
+          "hubs": 26,
+          "embedding": 10,
+          "head": 1024,
+          "q": 16,
+          "v": 160,
+          "gate": 24,
+          "k": 96,
+          "ve": 32,
+          "scalars": 8
+        },
+        "total_draws": 1616,
+        "population_K": 256,
+        "flops_total": 267762169544704.0,
+        "flops_per_group": {
+          "writers": 101600857161728.0,
+          "hidden": 101600857161728.0,
+          "hubs": 20722177015808.0,
+          "embedding": 11168760463360,
+          "head": 4398046511104.0,
+          "q": 447045697536.0,
+          "v": 4470456975360.0,
+          "gate": 722057822208.0,
+          "k": 2682274185216.0,
+          "ve": 962743762944.0,
+          "scalars": 17870016741376
+        },
+        "flops_clean_forward": 1116876046336,
+        "forward_equivalents": 239.74206486307853,
+        "forward_equivalents_per_gpu": 239.74206486307853,
+        "direct_forwards": 256,
+        "count": "needed",
+        "flops_total_executed": 353561707806720.0,
+        "note": "forward_equivalents = update FLOPs / one clean forward. population_K excludes head, attention-internal and scalar draws. Every direct draw pays a full head recompute, which suffix caching does not remove. FLOPs predict wall-clock only when the step is GPU-bound; DUST issues many tiny forwards through Python hooks, so confirm with profiling.launch_bound_test before reading forward_equivalents as time."
+      }
+    }
+  ],
+  "reproduction_argv": [
+    "/insomnia001/home/pts2125/hpml/dust/.venv/baseline-cu128/bin/python",
+    "/insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/quality/source/scripts/gpu_diagnostics.py",
+    "quality",
+    "--output",
+    "/insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/quality/diagnostics",
+    "--seed",
+    "42",
+    "--populations",
+    "256",
+    "--seeds",
+    "0",
+    "1",
+    "--reference-chunk",
+    "1",
+    "--data-dir",
+    "/tmp/dust-diagnostics-14151784-RAaEMg"
+  ],
+  "cwd": "/insomnia001/home/pts2125/hpml/runs/gpu-diagnostics-88c5bf0-20261128T063649Z/quality/source",
+  "source": {
+    "commit": "88c5bf0550fcf9779b2066bc4b2da8da21926b57",
+    "files": {
+      "dust.py": "6bc92ca6c3827a4572c6014062051f8eb9c19a4fea5e8ceb275ea3e518876301",
+      "model.py": "96c83b63457035db87dd9bedba7935c0a15a0a0ed987a899e09d4a566ec35212",
+      "requirements.txt": "1dbe24f35ad8d47aeeff3b482d0fe2d5115cd1c879a153caf53caffb14830f98",
+      "scripts/ab_experiment.py": "86d7fc9e1ada0553556df58e372e0f22fa5c58ecf54bb33a4792e5464f36443b",
+      "scripts/ab_results.py": "8d2bda427ca4cabce5c0a09597f01f7f28b4f91c4f7f35ab0edc7862f7fd929b",
+      "scripts/check_baseline_results.py": "db5e58edeaa3e7ead1d9556640d540081100f0ba5f0f2001e8779a4ebb665dca",
+      "scripts/gpu_diagnostics.py": "f8d41c0a7c27f1d6d166263b82f9b77563c58ebe79bee517d916de6e55d89970",
+      "scripts/verify_data.py": "802d428d88cb763ecc99c34f67590b90ff85b4887b1fdac2d73bd28582e4b246",
+      "new_implementation/accounting.py": "da7b6911aaa082ddc760cf1df28c859212aaaad294253db7421f67a060316fbb",
+      "new_implementation/allocation.py": "dd62c526b2dbb8f795944776191a8986b7578ad4f6c07863e61dc8a15f20a02b",
+      "new_implementation/checkpoint.py": "8490b4ab2aeb1fa0841d62d7ea41efe38b68562f9fd10c03f2625b1a28b53e2e",
+      "new_implementation/gradient_check.py": "4c38c5680072d26cdb463f88c14ae063ff3927138eba1c8ab554e2a528a70a08",
+      "new_implementation/groups.py": "f57dc40e507e7262cc40f592b7f5884cba9f18b5bc4e963c5ae03cc61f4bec61",
+      "new_implementation/multiplexing.py": "65c859122452850609672e7189b8045502cd68d4efa5f1f621ff8aa38df71140",
+      "new_implementation/profiling.py": "0098ad8becfd8517f1c2fe81b6db66f5f48d0424ad02e5b0fc49269b62c62bb7",
+      "new_implementation/roofline.py": "98a23f965126aeb9087201f3fc7988a4c8b5aff8ccba1a073a7e1787179948a2",
+      "new_implementation/run_metrics.py": "127b4f7bacbb4b6d797be7f12156435ac81782d68f67e05d3748dc091efb782f",
+      "new_implementation/toy.py": "972db49bcc40fa48b40c432957b270dd02acc72b5eb3316da7a686a179aa4395",
+      "new_implementation/tracking.py": "be370755cb3f5bc60df294b370685c63d1ad8b9666bdf9c179177603b8e9875d"
+    },
+    "launch_sha256": "6f8a942213b48fab16e0c3b026f86ab1014c251cd0f9d5178eb5a291b35399db"
+  },
+  "runtime": {
+    "device": "cuda:0",
+    "python": "3.11.5",
+    "torch": "2.10.0+cu128",
+    "system": "Linux",
+    "architecture": "x86_64",
+    "torch_threads": 11,
+    "gpu": "NVIDIA L40S",
+    "gpu_memory_bytes": 47803596800,
+    "compute_capability": [
+      8,
+      9
+    ],
+    "cuda": "12.8",
+    "cuda_visible_devices": "0"
+  },
+  "data": {
+    "manifest_sha256": "72ef758235245db94b56c3958dca85d1f3b81cdc623b3ed17c82199bdda2d215",
+    "tokenizer_sha256": "a15168ae52f4a1b1c80b270a5e18a2ce3e038b5e3772a1ad3982044602da0ae7",
+    "files": {
+      "train_1M.pt": "f9996e06a0a617c5acf25e3454ccfbbe550db89f1ab0d587fe7d48b7d38efd7d"
+    },
+    "source": "train_1M.pt",
+    "first_row": 0,
+    "row_count": 8,
+    "tensor_sha256": "1e204526b83e3fa1e27e5f0aa50f35129fff84b34bbfb7d2e4993acb6a3e8951",
+    "shape": [
+      8,
+      2049
+    ],
+    "dtype": "torch.int64"
+  },
+  "model_state": {
+    "sha256": "65daa6215b6ef81e805a1a7f4acf5240963639f6fcdd6f6c9396ebde6e6ef026",
+    "initialization": "seeded",
+    "model_seed": 42,
+    "checkpoint": null,
+    "scope": "Model state dict in sorted key order with dtype and shape."
+  }
+}

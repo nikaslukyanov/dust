@@ -1,0 +1,31 @@
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                            dust/direct         0.00%       0.000us         0.00%       0.000us       0.000us        5.850s        72.77%        5.850s        5.850s             1  
+                                    Command Buffer Full        76.34%        6.215s        76.34%        6.215s     215.487us        3.693s        45.93%        3.693s     128.022us         28843  
+                     aten::_efficient_attention_forward         0.11%       9.281ms         1.28%     104.429ms      90.025us        1.496s        18.61%        2.121s       1.829ms          1160  
+fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemE...         0.00%       0.000us         0.00%       0.000us       0.000us        1.496s        18.61%        1.496s       1.289ms          1160  
+                                            aten::copy_         0.65%      52.859ms        14.83%        1.207s      78.832us        1.478s        18.38%        2.154s     140.653us         15312  
+                                               aten::mm         0.93%      76.119ms         9.97%     812.088ms     126.140us        1.104s        13.73%        1.631s     253.348us          6438  
+void at::native::unrolled_elementwise_kernel<at::nat...         0.00%       0.000us         0.00%       0.000us       0.000us     788.096ms         9.80%     788.096ms     291.887us          2700  
+                                              aten::mul         0.89%      72.064ms        16.19%        1.318s     102.621us     778.600ms         9.69%        1.147s      89.258us         12847  
+                                              aten::pow         0.14%      11.102ms         5.15%     419.188ms     210.436us     741.809ms         9.23%        2.978s       1.495ms          1992  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     741.022ms         9.22%     741.022ms     768.696us           964  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     630.776ms         7.85%     630.776ms      73.543us          8577  
+                                              dust/hubs         0.00%       0.000us         0.00%       0.000us       0.000us     591.328ms         7.36%     591.328ms     591.328ms             1  
+                                             dust/local         0.00%       0.000us         0.00%       0.000us       0.000us     573.660ms         7.14%     573.660ms     573.660ms             1  
+                                           dust/scalars         0.00%       0.000us         0.00%       0.000us       0.000us     466.079ms         5.80%     466.079ms     466.079ms             1  
+                                              aten::add         0.61%      49.344ms        10.50%     854.709ms      81.720us     437.780ms         5.45%     624.000ms      59.662us         10459  
+         ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_tn         0.00%       0.000us         0.00%       0.000us       0.000us     430.128ms         5.35%     430.128ms     387.852us          1109  
+                                  aten::_fused_rms_norm         0.30%      24.792ms         5.61%     456.920ms     110.287us     399.209ms         4.97%     564.686ms     136.299us          4143  
+void at::native::(anonymous namespace)::vectorized_l...         0.00%       0.000us         0.00%       0.000us       0.000us     380.901ms         4.74%     380.901ms      94.681us          4023  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     367.570ms         4.57%     367.570ms      49.405us          7440  
+                                        aten::clamp_min         0.07%       5.572ms         1.26%     102.476ms     106.303us     339.157ms         4.22%     468.250ms     485.737us           964  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     339.157ms         4.22%     339.157ms     351.822us           964  
+ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_stages_3...         0.00%       0.000us         0.00%       0.000us       0.000us     338.182ms         4.21%     338.182ms     102.108us          3312  
+void cutlass::Kernel2<cutlass_80_tensorop_bf16_s1681...         0.00%       0.000us         0.00%       0.000us       0.000us     333.373ms         4.15%     333.373ms     221.070us          1508  
+                                              dust/head         0.00%       0.000us         0.00%       0.000us       0.000us     322.243ms         4.01%     322.243ms     322.243ms             1  
+                                         dust/embedding         0.00%       0.000us         0.00%       0.000us       0.000us     306.219ms         3.81%     306.219ms     306.219ms             1  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 8.142s
+Self CUDA time total: 8.039s

@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "command": "profile",
+  "mode": "cpu-toy",
+  "config": {
+    "sequence_len": 64,
+    "vocab_size": 4096,
+    "n_layer": 4,
+    "n_head": 4,
+    "n_kv_head": 4,
+    "n_embd": 64,
+    "window_pattern": "SSSL",
+    "batch_size": 8
+  },
+  "seed": 42,
+  "options": {
+    "warmup": 1,
+    "repeats": 2,
+    "active": 1
+  },
+  "data_dir": null,
+  "checkpoint": null,
+  "execution": {
+    "suffix": true,
+    "world": 1,
+    "multiplex": null,
+    "precision": "fp32",
+    "float32_matmul_precision": "high",
+    "perturbation_rng": {
+      "initial_seed": 45,
+      "reseed_before_estimate": false
+    }
+  },
+  "recipes": [
+    {
+      "scale": 1,
+      "recipe": {
+        "writers": [
+          4,
+          4,
+          2,
+          2
+        ],
+        "hidden": [
+          4,
+          4,
+          2,
+          2
+        ],
+        "hubs": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "embedding": 2,
+        "head": 64,
+        "local": {
+          "q": 2,
+          "v": 2,
+          "gate": 2,
+          "k": 2,
+          "ve": 2
+        },
+        "nrep": 2,
+        "lr": 0.25,
+        "momentum": 0.95,
+        "gamma": 0.98
+      },
+      "analytic_cost": {
+        "suffix": true,
+        "world": 1,
+        "batch": 8,
+        "draws": {
+          "writers": 12,
+          "hidden": 12,
+          "hubs": 8,
+          "embedding": 2,
+          "head": 64,
+          "q": 8,
+          "v": 8,
+          "gate": 4,
+          "k": 8,
+          "ve": 4,
+          "scalars": 8
+        },
+        "total_draws": 138,
+        "population_K": 34,
+        "flops_total": 23716134912.0,
+        "flops_per_group": {
+          "writers": 5054988288.0,
+          "hidden": 5054988288.0,
+          "hubs": 3227123712.0,
+          "embedding": 967507968,
+          "head": 1073741824.0,
+          "q": 27983872.0,
+          "v": 27983872.0,
+          "gate": 15007744.0,
+          "k": 27983872.0,
+          "ve": 15007744.0,
+          "scalars": 7740063744
+        },
+        "flops_clean_forward": 483753984,
+        "forward_equivalents": 49.02519813046129,
+        "forward_equivalents_per_gpu": 49.02519813046129,
+        "direct_forwards": 34,
+        "count": "needed",
+        "flops_total_executed": 24662507520.0,
+        "note": "forward_equivalents = update FLOPs / one clean forward. population_K excludes head, attention-internal and scalar draws. Every direct draw pays a full head recompute, which suffix caching does not remove. FLOPs predict wall-clock only when the step is GPU-bound; DUST issues many tiny forwards through Python hooks, so confirm with profiling.launch_bound_test before reading forward_equivalents as time."
+      }
+    }
+  ],
+  "reproduction_argv": [
+    "/private/tmp/dust-ab-verify-venv/bin/python",
+    "/private/tmp/dust-fix-independent.W9aWsY/checkout/scripts/gpu_diagnostics.py",
+    "profile",
+    "--toy",
+    "--output",
+    "/Users/patrick/Documents/school/hpml/dust/runs/gpu-diagnostics-development/fix-verification/profile",
+    "--warmup",
+    "1",
+    "--repeats",
+    "2",
+    "--active",
+    "1"
+  ],
+  "cwd": "/private/tmp/dust-fix-independent.W9aWsY/checkout",
+  "source": {
+    "commit": "4ef4ac0406cd6b77855178031b7355f501da78bb",
+    "files": {
+      "dust.py": "6bc92ca6c3827a4572c6014062051f8eb9c19a4fea5e8ceb275ea3e518876301",
+      "model.py": "96c83b63457035db87dd9bedba7935c0a15a0a0ed987a899e09d4a566ec35212",
+      "requirements.txt": "1dbe24f35ad8d47aeeff3b482d0fe2d5115cd1c879a153caf53caffb14830f98",
+      "scripts/ab_experiment.py": "86d7fc9e1ada0553556df58e372e0f22fa5c58ecf54bb33a4792e5464f36443b",
+      "scripts/ab_results.py": "8d2bda427ca4cabce5c0a09597f01f7f28b4f91c4f7f35ab0edc7862f7fd929b",
+      "scripts/check_baseline_results.py": "db5e58edeaa3e7ead1d9556640d540081100f0ba5f0f2001e8779a4ebb665dca",
+      "scripts/gpu_diagnostics.py": "13565ad864e79a5fe795cdc2d30c1d0ab7a2e51fbbc6ec8d42d07aeb233aa9d3",
+      "scripts/verify_data.py": "802d428d88cb763ecc99c34f67590b90ff85b4887b1fdac2d73bd28582e4b246",
+      "new_implementation/accounting.py": "da7b6911aaa082ddc760cf1df28c859212aaaad294253db7421f67a060316fbb",
+      "new_implementation/allocation.py": "dd62c526b2dbb8f795944776191a8986b7578ad4f6c07863e61dc8a15f20a02b",
+      "new_implementation/checkpoint.py": "8490b4ab2aeb1fa0841d62d7ea41efe38b68562f9fd10c03f2625b1a28b53e2e",
+      "new_implementation/gradient_check.py": "4c38c5680072d26cdb463f88c14ae063ff3927138eba1c8ab554e2a528a70a08",
+      "new_implementation/groups.py": "f57dc40e507e7262cc40f592b7f5884cba9f18b5bc4e963c5ae03cc61f4bec61",
+      "new_implementation/multiplexing.py": "65c859122452850609672e7189b8045502cd68d4efa5f1f621ff8aa38df71140",
+      "new_implementation/profiling.py": "0098ad8becfd8517f1c2fe81b6db66f5f48d0424ad02e5b0fc49269b62c62bb7",
+      "new_implementation/roofline.py": "98a23f965126aeb9087201f3fc7988a4c8b5aff8ccba1a073a7e1787179948a2",
+      "new_implementation/run_metrics.py": "127b4f7bacbb4b6d797be7f12156435ac81782d68f67e05d3748dc091efb782f",
+      "new_implementation/toy.py": "972db49bcc40fa48b40c432957b270dd02acc72b5eb3316da7a686a179aa4395",
+      "new_implementation/tracking.py": "be370755cb3f5bc60df294b370685c63d1ad8b9666bdf9c179177603b8e9875d"
+    },
+    "launch_sha256": null
+  },
+  "runtime": {
+    "device": "cpu",
+    "python": "3.13.5",
+    "torch": "2.10.0",
+    "system": "Darwin",
+    "architecture": "arm64",
+    "torch_threads": 1,
+    "cuda_visible_devices": "",
+    "float32_matmul_precision": "high",
+    "deterministic_algorithms": false,
+    "cuda_matmul_allow_tf32": true,
+    "cudnn": {
+      "enabled": true,
+      "deterministic": false,
+      "benchmark": false,
+      "allow_tf32": true
+    }
+  },
+  "data": {
+    "source": "toy rule",
+    "seed": 42,
+    "tensor_sha256": "ce445fc785bb5ad65266fb70cf06f8d3c8451ca138b92358c2297301715f80d0",
+    "shape": [
+      8,
+      65
+    ],
+    "dtype": "torch.int64"
+  },
+  "model_state": {
+    "sha256": "1ee22330c569095a00965daba5f7a8a18c437b035d7910b304c779b92dd56c1d",
+    "initialization": "seeded",
+    "model_seed": 42,
+    "checkpoint": null,
+    "scope": "Model state dict in sorted key order with dtype and shape."
+  }
+}

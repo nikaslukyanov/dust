@@ -1,0 +1,321 @@
+{
+  "profile": {
+    "runtime": {
+      "device": "cuda:0",
+      "python": "3.11.5",
+      "torch": "2.10.0+cu128",
+      "system": "Linux",
+      "architecture": "x86_64",
+      "torch_threads": 11,
+      "gpu": "NVIDIA L40S",
+      "gpu_memory_bytes": 47803596800,
+      "compute_capability": [
+        8,
+        9
+      ],
+      "cuda": "12.8",
+      "cuda_visible_devices": "0"
+    },
+    "data": {
+      "manifest_sha256": "72ef758235245db94b56c3958dca85d1f3b81cdc623b3ed17c82199bdda2d215",
+      "tokenizer_sha256": "a15168ae52f4a1b1c80b270a5e18a2ce3e038b5e3772a1ad3982044602da0ae7",
+      "files": {
+        "train_1M.pt": "f9996e06a0a617c5acf25e3454ccfbbe550db89f1ab0d587fe7d48b7d38efd7d"
+      },
+      "source": "train_1M.pt",
+      "first_row": 0,
+      "row_count": 8,
+      "tensor_sha256": "1e204526b83e3fa1e27e5f0aa50f35129fff84b34bbfb7d2e4993acb6a3e8951",
+      "shape": [
+        8,
+        2049
+      ],
+      "dtype": "torch.int64"
+    },
+    "source_files_verified": 19,
+    "model_state_sha256": "65daa6215b6ef81e805a1a7f4acf5240963639f6fcdd6f6c9396ebde6e6ef026",
+    "measurements": {
+      "cost": {
+        "nominal_population": 256,
+        "all_draws": 1616,
+        "needed_flops": 267762169544704,
+        "dense_executed_flops": 353561707806720
+      },
+      "ordinary_timing": {
+        "steps_kept": 5,
+        "warmup_discarded": 3,
+        "host_median_ms": 8041.926528094336,
+        "host_p10_ms": 8006.258578365669,
+        "host_p90_ms": 8066.399259259924,
+        "gpu_median_ms": 8041.91015625,
+        "gpu_p10_ms": 8006.2396484375,
+        "gpu_p90_ms": 8066.36669921875,
+        "scope": "Estimate only. Host time ends before the final timing synchronization. CUDA event elapsed time can include idle gaps.",
+        "host_ms": [
+          7993.517163908109,
+          8025.370700052008,
+          8041.926528094336,
+          8050.709479954094,
+          8076.859112130478
+        ],
+        "cuda_event_ms": [
+          7993.4951171875,
+          8025.3564453125,
+          8041.91015625,
+          8050.66357421875,
+          8076.83544921875
+        ],
+        "peak_memory_gib_including_warmup": 6.3793535232543945
+      },
+      "mfu": {
+        "needed": 0.0919647616372298,
+        "executed": 0.12143320409221717,
+        "reason": null,
+        "dense_bf16_peak_flops_per_second": 362050000000000.0,
+        "scope": "Analytic FLOPs divided by the ordinary CUDA event median and L40S dense BF16 peak. Excludes apply, optimizer, and data. Hardware utilization was not measured."
+      },
+      "phases": {
+        "clean": 0.03111278498545289,
+        "direct": 5.818131605163217,
+        "embedding": 0.3041315369773656,
+        "hubs": 0.5901661070529372,
+        "head": 0.2799738380126655,
+        "local": 0.567218568874523,
+        "scalars": 0.46088645118288696
+      },
+      "profiler_phase_totals": {
+        "clean": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 31415.77
+        },
+        "direct": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 5849823.474
+        },
+        "embedding": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 306218.96699999925
+        },
+        "hubs": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 591327.6739999996
+        },
+        "head": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 322242.61700000055
+        },
+        "local": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 573659.8459999999
+        },
+        "scalars": {
+          "count": 1,
+          "cpu_total_us": 0,
+          "device_total_us": 466079.3990000002
+        }
+      },
+      "sdpa": {
+        "operators": {
+          "aten::scaled_dot_product_attention": 1160,
+          "aten::_scaled_dot_product_efficient_attention": 1160,
+          "aten::_efficient_attention_forward": 1160
+        },
+        "observed_backends": [
+          "efficient"
+        ],
+        "trace_kernel_name_matches": {
+          "fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_t, cutlass::arch::Sm80, true, 64, 64, 64, true, true>::Params)": 1160
+        },
+        "trace_kernel_name_filter": [
+          "attention",
+          "fmha"
+        ]
+      },
+      "cpu_phase_differences": {
+        "clean": {
+          "result_us": 0,
+          "trace_us": 10469.764
+        },
+        "direct": {
+          "result_us": 0,
+          "trace_us": 5695066.761
+        },
+        "embedding": {
+          "result_us": 0,
+          "trace_us": 338919.572
+        },
+        "hubs": {
+          "result_us": 0,
+          "trace_us": 575079.766
+        },
+        "head": {
+          "result_us": 0,
+          "trace_us": 480980.195
+        },
+        "local": {
+          "result_us": 0,
+          "trace_us": 488952.206
+        },
+        "scalars": {
+          "result_us": 0,
+          "trace_us": 552183.96
+        }
+      },
+      "sdpa_count_differences": {},
+      "raw_trace_sdpa": {
+        "aten::_efficient_attention_forward": 1160,
+        "aten::_scaled_dot_product_efficient_attention": 1160,
+        "aten::scaled_dot_product_attention": 2124
+      },
+      "nested_trace_sdpa": {
+        "aten::scaled_dot_product_attention": 964
+      },
+      "trace_bytes": 205937866,
+      "trace_sha256": "8070ade582144eb158dfeed6c60047c1e64e6f12c9a33b7fbccda9145b18aade"
+    }
+  },
+  "quality": {
+    "runtime": {
+      "device": "cuda:0",
+      "python": "3.11.5",
+      "torch": "2.10.0+cu128",
+      "system": "Linux",
+      "architecture": "x86_64",
+      "torch_threads": 11,
+      "gpu": "NVIDIA L40S",
+      "gpu_memory_bytes": 47803596800,
+      "compute_capability": [
+        8,
+        9
+      ],
+      "cuda": "12.8",
+      "cuda_visible_devices": "0"
+    },
+    "data": {
+      "manifest_sha256": "72ef758235245db94b56c3958dca85d1f3b81cdc623b3ed17c82199bdda2d215",
+      "tokenizer_sha256": "a15168ae52f4a1b1c80b270a5e18a2ce3e038b5e3772a1ad3982044602da0ae7",
+      "files": {
+        "train_1M.pt": "f9996e06a0a617c5acf25e3454ccfbbe550db89f1ab0d587fe7d48b7d38efd7d"
+      },
+      "source": "train_1M.pt",
+      "first_row": 0,
+      "row_count": 8,
+      "tensor_sha256": "1e204526b83e3fa1e27e5f0aa50f35129fff84b34bbfb7d2e4993acb6a3e8951",
+      "shape": [
+        8,
+        2049
+      ],
+      "dtype": "torch.int64"
+    },
+    "source_files_verified": 19,
+    "model_state_sha256": "65daa6215b6ef81e805a1a7f4acf5240963639f6fcdd6f6c9396ebde6e6ef026",
+    "measurements": {
+      "reference_loss": 8.318515539169312,
+      "population_audit": {
+        "256": {
+          "cost": {
+            "nominal_population": 256,
+            "all_draws": 1616,
+            "needed_flops": 267762169544704,
+            "dense_executed_flops": 353561707806720
+          },
+          "summary_metrics": 41,
+          "samples": [
+            {
+              "seed": 0,
+              "clean_loss": 8.318514823913574,
+              "host_ms": 8129.453700967133,
+              "cuda_event_ms": 8129.46728515625
+            },
+            {
+              "seed": 1,
+              "clean_loss": 8.318514823913574,
+              "host_ms": 8037.114558974281,
+              "cuda_event_ms": 8037.1103515625
+            }
+          ]
+        }
+      }
+    }
+  },
+  "cpu-toy": {
+    "runtime": {
+      "device": "cpu",
+      "python": "3.11.5",
+      "torch": "2.10.0+cu128",
+      "system": "Linux",
+      "architecture": "x86_64",
+      "torch_threads": 11,
+      "cuda_visible_devices": ""
+    },
+    "data": {
+      "source": "toy rule",
+      "seed": 42,
+      "tensor_sha256": "ce445fc785bb5ad65266fb70cf06f8d3c8451ca138b92358c2297301715f80d0",
+      "shape": [
+        8,
+        65
+      ],
+      "dtype": "torch.int64"
+    },
+    "source_files_verified": 19,
+    "model_state_sha256": "0ed0e5d3b3a928a708c46f5ee2246b936e43d4d4dd0995f43a8cca62997f5148",
+    "measurements": {
+      "reference_loss": 8.316617608070374,
+      "population_audit": {
+        "1": {
+          "cost": {
+            "nominal_population": 34,
+            "all_draws": 138,
+            "needed_flops": 23716134912,
+            "dense_executed_flops": 24662507520
+          },
+          "summary_metrics": 41,
+          "samples": [
+            {
+              "seed": 0,
+              "clean_loss": 8.316617965698242,
+              "host_ms": 497.93566996231675,
+              "cuda_event_ms": null
+            },
+            {
+              "seed": 1,
+              "clean_loss": 8.316617965698242,
+              "host_ms": 539.9443530477583,
+              "cuda_event_ms": null
+            }
+          ]
+        },
+        "2": {
+          "cost": {
+            "nominal_population": 68,
+            "all_draws": 172,
+            "needed_flops": 38020743168,
+            "dense_executed_flops": 39426457600
+          },
+          "summary_metrics": 41,
+          "samples": [
+            {
+              "seed": 0,
+              "clean_loss": 8.316617965698242,
+              "host_ms": 731.8341040518135,
+              "cuda_event_ms": null
+            },
+            {
+              "seed": 1,
+              "clean_loss": 8.316617965698242,
+              "host_ms": 680.072563001886,
+              "cuda_event_ms": null
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -61,8 +61,14 @@ covers the first two items below in one go.
       percentage points (sample SD). W&B logs are offline under project `dust-hpml`.
 - [ ] **W&B dashboard:** configure the shared team login, sync the nine offline artifacts from
       `runs/baseline-gpu-20261118-172822/`, and record the accessible dashboard URL.
-- [ ] **Profiler pass** (`profiling.py`): per-phase table, trace, MFU. *For:* the report's profiling section.
+- [~] **Profiler pass** (`profiling.py`): the diagnostic CLI now records a per-phase table, trace,
+      observed SDPA operators, and analytic MFU from separate unprofiled timing.
+      Initial L40S evidence identified memory-efficient SDPA and a phase-summary bug, now fixed.
+      Corrected CLI jobs `14151824/14151825` are queued. See the
+      [verification record](../results/gpu-diagnostics-verification/README.md).
+      *For:* the report's profiling section.
 - [ ] **Quality vs population** (`gradient_check.py`) against the paper. *For:* final gate for A.
+      The reproducible CLI is implemented; the full GPU population sweep remains pending.
 - [ ] **(GPU) Track 2 (B):** run the fixed, adaptive, and matched measurement-overhead cases at
       equal draw budgets. Smaller budgets and the interval sweep remain separate.
 - [ ] **Track 3 (C) on GPU:** `multiplex_experiment.py`, real model, bf16, σ sweep. *For:* decides if C
@@ -194,6 +200,24 @@ metric. The new GPU sweep has three seeds and one repetition per seed; the SDPA 
 - [x] **`new_implementation/profiling.py` — the torch.profiler harness.** Produces the per-op and
       per-phase breakdown and a timeline trace, plus a quick "double the batch and see if the time
       doubles" test that says whether we're GPU-bound or launch-bound before trusting any savings number.
+- [x] **Frozen-model diagnostics CLI** (`scripts/gpu_diagnostics.py`): `profile` keeps ordinary,
+      synchronized-phase, and profiler timings separate. `quality` reuses one model and batch for
+      the shipped populations, with FP32 chunked backprop and bf16 DUST on CUDA. Both record source,
+      data, runtime, recipes, and frozen-model hashes. Quality saves raw perturbation-seed metrics
+      and mean/sample-SD summaries. CPU toy checks, explicit failures, and safe Slurm dry runs are
+      implemented. Use a fresh output directory; these diagnostics do not resume.
+
+      ```bash
+      OMP_NUM_THREADS=1 python3 scripts/gpu_diagnostics.py profile --toy --warmup 1 --repeats 2 --output runs/profile-toy
+      OMP_NUM_THREADS=1 python3 scripts/gpu_diagnostics.py quality --toy --scales 1 2 --seeds 0 1 2 --output runs/quality-toy
+      .venv/baseline-cu128/bin/python scripts/launch_diagnostics.py profile --dry-run --output runs/profile-gpu
+      .venv/baseline-cu128/bin/python scripts/launch_diagnostics.py profile --output runs/profile-gpu
+      .venv/baseline-cu128/bin/python scripts/launch_diagnostics.py quality --populations 256 --seeds 0 1 --output runs/quality-gpu
+      ```
+
+      Add `--checkpoint /path/to/best.pt` for trained weights. The default is seeded initialization.
+      The broader population sweep, paper comparison, roofline calibration, and multiplexing
+      diagnostics remain separate. See [usage and measurement scopes](../README.md#frozen-model-diagnostics).
 - [x] **`new_implementation/checkpoint.py` — resume a run exactly where it stopped.** Saves everything
       needed to continue bit-for-bit (weights, optimizer momentum, the noise generator's state, the
       allocator's state, the step count), writes it safely, one file per worker.
@@ -488,6 +512,10 @@ these are the refinements the lectures call for, grouped by file.
 - [ ] **(GPU) roofline calibration.** L40S added (2026-11-18). Check which SDPA kernel runs; calibrate the per-launch latency
       from a trace; compare predicted vs measured per-phase time; split measured step time into kernel
       compute / HBM / launch / other and feed the measured fractions to `amdahl()`.
+- [ ] **Account for local attention baseline recomputes.** The new L40S trace includes 32 baseline
+      attention calls in `DUST.local_errors` that `analytic_cost` omits. Audit these terms with
+      `FlopCounterMode` before changing the shared cost model. The new diagnostics report the
+      existing formulas as estimates; they do not claim a complete count of executed work.
 - [ ] **profiling — actually see the launch overhead.** Read the trace *gaps*, not just the per-op
       table (GPU-idle gap per step, mean-kernel-vs-gap "thin comb" test); add an nsys timeline with NVTX
       region labels; add a graph-break / compiled-region counter for the compiled path; run Nsight

@@ -1,0 +1,30 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_quality_summary_uses_sample_sd_over_seeds ________________
+
+    def test_quality_summary_uses_sample_sd_over_seeds():
+        from gpu_diagnostics import summarize_quality
+    
+        samples = [
+            dict(seed=0, clean_loss=3, per_group={'head': dict(cosine=0.25, rel_norm=1, ref_norm=4, est_norm=4)}),
+            dict(seed=1, clean_loss=5, per_group={'head': dict(cosine=0.50, rel_norm=2, ref_norm=4, est_norm=8)}),
+            dict(seed=2, clean_loss=7, per_group={'head': dict(cosine=0.75, rel_norm=3, ref_norm=4, est_norm=12)}),
+        ]
+>       assert summarize_quality(samples) == dict(
+            clean_loss=dict(mean=5, sample_sd=2),
+            per_group={'head': dict(
+                cosine=dict(mean=0.5, sample_sd=0.25), rel_norm=dict(mean=2, sample_sd=1),
+                ref_norm=dict(mean=4, sample_sd=0), est_norm=dict(mean=8, sample_sd=4),
+            )},
+        )
+E       AssertionError: assert {'clean_loss'...6580927726}}}} == {'clean_loss'...ple_sd': 1}}}}
+E         
+E         Differing items:
+E         {'clean_loss': {'mean': 5, 'sample_sd': 1.632993161855452}} != {'clean_loss': {'mean': 5, 'sample_sd': 2}}
+E         {'per_group': {'head': {'cosine': {'mean': 0.5, 'sample_sd': 0.2041241452319315}, 'est_norm': {'mean': 8, 'sample_sd': 3.265986323710904}, 'ref_norm': {'mean': 4, 'sample_sd': 0.0}, 'rel_norm': {'mean': 2, 'sample_sd': 0.816496580927726}}}} != {'per_group': {'head': {'cosine': {'mean': 0.5, 'sample_sd': 0.25}, 'est_norm': {'mean': 8, 'sample_sd': 4}, 'ref_norm': {'mean': 4, 'sample_sd': 0}, 'rel_norm': {'mean': 2, 'sample_sd': 1}}}}
+E         Use -v to get more diff
+
+scripts/test_gpu_diagnostics.py:130: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/test_gpu_diagnostics.py::test_quality_summary_uses_sample_sd_over_seeds
+1 failed in 0.91s

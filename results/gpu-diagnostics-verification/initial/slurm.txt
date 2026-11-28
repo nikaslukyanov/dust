@@ -1,0 +1,29 @@
+JobIDRaw|JobName|State|ExitCode|Elapsed|NodeList|ReqCPUS|AllocCPUS|ReqMem|AllocTRES|MaxRSS|Timelimit
+14151783|dust-verification-profile|COMPLETED|0:0|00:02:21|ins057|11|12|64G|billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1||00:15:00
+14151783.batch|batch|COMPLETED|0:0|00:02:21|ins057|12|12||cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1|3938064K|
+14151783.extern|extern|COMPLETED|0:0|00:02:21|ins057|12|12||billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1||
+14151784|dust-verification-quality|COMPLETED|0:0|00:00:20|ins057|11|12|64G|billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1||00:15:00
+14151784.batch|batch|COMPLETED|0:0|00:00:20|ins057|12|12||cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1|6768K|
+14151784.extern|extern|COMPLETED|0:0|00:00:20|ins057|12|12||billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1||
+14151785|dust-verification-cpu-toy|COMPLETED|0:0|00:00:07|ins057|11|12|64G|billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1||00:15:00
+14151785.batch|batch|COMPLETED|0:0|00:00:07|ins057|12|12||cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1|6956K|
+14151785.extern|extern|COMPLETED|0:0|00:00:07|ins057|12|12||billing=12,cpu=12,gres/gpu:l40s=1,gres/gpu=1,mem=64G,node=1||
+14151798|dust-verification-probe|COMPLETED|0:0|00:00:11|ins057|8|8|16G|billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=16G,node=1||00:03:00
+14151798.batch|batch|COMPLETED|0:0|00:00:11|ins057|8|8||cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=16G,node=1|6924K|
+14151798.extern|extern|COMPLETED|0:0|00:00:11|ins057|8|8||billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=16G,node=1||
+NodeName=ins057 Arch=x86_64 CoresPerSocket=40 
+   CPUAlloc=18 CPUEfctv=160 CPUTot=160 CPULoad=13.64
+   AvailableFeatures=l40s
+   ActiveFeatures=l40s
+   Gres=gpu:l40s:2
+   NodeAddr=ins057 NodeHostName=ins057 Version=25.05.1
+   OS=Linux 5.14.0-362.8.1.el9_3.x86_64 #1 SMP PREEMPT_DYNAMIC Tue Oct 3 11:12:36 EDT 2023 
+   RealMemory=514799 AllocMem=65536 FreeMem=463755 Sockets=2 Boards=1
+   State=MIXED+PLANNED ThreadsPerCore=2 TmpDisk=0 Weight=4 Owner=N/A MCS_label=N/A
+   Partitions=short,burst,friesner1,rcs1 
+   BootTime=2026-11-10T15:29:38 SlurmdStartTime=2026-11-10T16:04:27
+   LastBusyTime=2026-11-27T22:17:42 ResumeAfterTime=None
+   CfgTRES=cpu=160,mem=514799M,billing=160,gres/gpu=2,gres/gpu:l40s=2
+   AllocTRES=cpu=18,mem=64G,gres/gpu=1,gres/gpu:l40s=1
+   CurrentWatts=0 AveWatts=0
+

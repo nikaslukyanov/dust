@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "command": "profile",
+  "status": "failed",
+  "reason": "Diagnostic raised an exception.",
+  "artifacts": {
+    "manifest": "manifest.json",
+    "result": "result.json"
+  },
+  "profile": {
+    "ordinary_timing": {
+      "steps_kept": 1,
+      "warmup_discarded": 0,
+      "host_median_ms": 1254.64658299461,
+      "host_p10_ms": 1254.64658299461,
+      "host_p90_ms": 1254.64658299461,
+      "scope": "Estimate only. Host time ends before the final timing synchronization. CUDA event elapsed time can include idle gaps.",
+      "host_ms": [
+        1254.64658299461
+      ],
+      "cuda_event_ms": [],
+      "peak_memory_gib_including_warmup": null
+    },
+    "mfu": {
+      "needed": null,
+      "executed": null,
+      "reason": "CUDA timing unavailable on CPU",
+      "dense_bf16_peak_flops_per_second": 362050000000000.0,
+      "scope": "Analytic FLOPs divided by the ordinary CUDA event median and L40S dense BF16 peak. Excludes apply, optimizer, and data. Hardware utilization was not measured."
+    },
+    "synchronized_phase_timing": {
+      "seconds": {
+        "clean": 0.018797290977090597,
+        "direct": 0.45832816598704085,
+        "embedding": 0.03831974999047816,
+        "hubs": 0.14314504101639614,
+        "head": 0.2165000420063734,
+        "local": 0.04365070897620171,
+        "scalars": 0.30522504198597744
+      },
+      "scope": "One separate estimate. CUDA synchronization at phase boundaries changes execution."
+    }
+  },
+  "error": {
+    "type": "FloatingPointError",
+    "message": "Non-finite clean loss in profile estimate"
+  }
+}
