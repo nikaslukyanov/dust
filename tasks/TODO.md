@@ -37,7 +37,7 @@ Done on branch `run-pipeline-fixes` (2026-11-18):
       record; executed matches PyTorch's own count exactly on full and sliding windows.
 
 Still to build:
-- [ ] Experiment runner + plots (later), Track D (`dust.py:755`). Smaller model configs: not now.
+- [ ] Campaign plots and Track D. Smaller model configs remain out of scope.
 
 ### 2. Out of scope (decided 2026-11-18)
 
@@ -63,8 +63,8 @@ covers the first two items below in one go.
       `runs/baseline-gpu-20261118-172822/`, and record the accessible dashboard URL.
 - [ ] **Profiler pass** (`profiling.py`): per-phase table, trace, MFU. *For:* the report's profiling section.
 - [ ] **Quality vs population** (`gradient_check.py`) against the paper. *For:* final gate for A.
-- [ ] **Track 2 (B):** `variance` + `agreement` vs fixed at equal budget, then smaller budgets,
-      interval sweep, overhead run (`--allocation-interval 0`).
+- [ ] **(GPU) Track 2 (B):** run the fixed, adaptive, and matched measurement-overhead cases at
+      equal draw budgets. Smaller budgets and the interval sweep remain separate.
 - [ ] **Track 3 (C) on GPU:** `multiplex_experiment.py`, real model, bf16, σ sweep. *For:* decides if C
       is worth training (it loses on CPU).
 - Never run on GPU yet: `--adaptive`, `--multiplex`, multi-GPU, 10M tokens.
@@ -134,7 +134,7 @@ metric. The new GPU sweep has three seeds and one repetition per seed; the SDPA 
 
 **Future Work**
 - [ ] **Remaining work & experiments** — condense from the sections below: Track 2 comparison at equal
-      and smaller budgets, Track 3 GPU σ sweep, Track D, model sizes, runner / matrix / plots.
+      and smaller budgets, Track 3 GPU σ sweep, Track D, model sizes, and plots.
 - [ ] **Scope adjustments.** The GPU baseline exists, so this is no longer the fallback for having
       none; it is still the likely narrowing given what is left to code. Draft it:
       (1) 1M tokens / population 256 / single L40S only; (2) drop or shrink the model-size study;
@@ -381,9 +381,10 @@ more draws to the groups whose estimate is least reliable.
     dead-band beyond the damping.
 - [ ] **(GPU)** multi-GPU path: the split statistics are summed over ranks with `all_reduce` so every
       rank picks the same allocation — untested.
-- [ ] **Compare** B (both policies) against the fixed allocation at equal budget, then at smaller
-      budgets to find what B needs to match A. Vary the recompute interval; report the overhead
-      (measure-only run, `--allocation-interval 0`, against a fixed run).
+- [x] **A/B runner:** compare both policies against the stock fixed case at equal draw budgets.
+      Each interval-0 case has a fixed control with the same adjusted starting recipe.
+- [ ] **(GPU)** Run the 1M-token A/B campaign and report the measured quality, compute, and overhead.
+- [ ] Evaluate smaller draw budgets and vary the recompute interval.
 
 ## Track 3 — perturb several groups at once and untangle them (C) — built and CPU-tested; first result is negative
 
@@ -517,10 +518,19 @@ these are the refinements the lectures call for, grouped by file.
       today, ≈ needed + tile overhead once the masked-aware attention lands). Planned with the
       training-time metrics wiring.
 
-## Experiment campaign — todo
+## Experiment campaign
 
-- [ ] **Runner** (plan P4): sweep method × budget × seed with equal-budget learning-rate tuning and
-      machine-readable output.
+- [x] **Fixed versus adaptive runner:** seven cases, reproducible seeds, checkpoint resume,
+      and paired seed summaries. The CPU toy campaign verifies execution and artifacts.
+- [ ] **(GPU) A/B run:** dry-run the commands, launch on Insomnia, and summarize after all seed jobs
+      complete. Use the [A/B instructions](../README.md#fixed-versus-adaptive-allocation) to stage
+      dependencies and data.
+
+      ```bash
+      python3 scripts/launch_ab.py --dry-run --seeds 42 43 44 --output runs/ab-gpu
+      python3 scripts/launch_ab.py --seeds 42 43 44 --output runs/ab-gpu
+      .venv/baseline-cu128/bin/python runs/ab-gpu/source/scripts/ab_experiment.py summary --output runs/ab-gpu
+      ```
 - [ ] **Matrix:** freeze the comparison set; run all four variants at the small scale, then the best at
       the larger scale; 3 seeds on the key comparisons; a backprop reference per model size.
 - [ ] **Plots:** gradient quality vs compute, held-out loss vs wall/GPU-hours, how the allocation shifts
