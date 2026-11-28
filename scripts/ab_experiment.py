@@ -239,7 +239,7 @@ def completed_case(folder, metadata, *, seal=False):
 def rewind_checkpoint(folder, metadata, training, validation):
     try:
         state = torch.load(folder / 'state.pt', map_location='cpu', weights_only=True, mmap=True)
-    except (pickle.UnpicklingError, EOFError) as error:
+    except (pickle.UnpicklingError, EOFError, RuntimeError) as error:
         raise ValueError('unreadable checkpoint') from error
     case, settings = metadata['case'], metadata['settings']
     step = state['step']
@@ -262,8 +262,8 @@ def run_case(folder, metadata, rows, device):
     config_path = folder / 'config.json'
     if config_path.exists() and read_json(config_path) != metadata:
         raise ValueError('case configuration differs from the experiment manifest')
-    if (folder / 'complete.json').exists() or (folder / 'result.json').exists():
-        completed_case(folder, metadata, seal=True)
+    if (folder / 'complete.json').exists():
+        completed_case(folder, metadata)
         print(f'Skipping verified {folder}', flush=True)
         return
     resume = (folder / 'state.pt').exists()
@@ -271,6 +271,8 @@ def run_case(folder, metadata, rows, device):
         if not config_path.is_file():
             raise ValueError('checkpoint has no case configuration')
         rewind_checkpoint(folder, metadata, *rows[:2])
+    elif (folder / 'result.json').exists():
+        raise ValueError('result has no checkpoint')
     elif folder.exists() and any(folder.iterdir()):
         allowed = {'config.json', 'metrics.jsonl', 'best.pt', *TRAINER_TEMP_FILES}
         files = {path.name for path in folder.iterdir()}
