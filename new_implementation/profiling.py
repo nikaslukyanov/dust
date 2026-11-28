@@ -29,13 +29,15 @@ def _require_torch():
 
 
 def profile_estimate(estimator, x, y, warmup=2, active=1, sort_by='self_cuda_time_total',
-                     row_limit=25, trace_path=None, group_by_shape=False):
+                     row_limit=25, trace_path=None, group_by_shape=False, *,
+                     record_shapes=True, profile_memory=True):
     """Profile DUST.estimate and return (table_str, prof).
 
     Runs ``warmup`` estimates first and discards them (allocator and autotune warmup, Lecture 3),
     then profiles ``active`` estimate() calls. ``sort_by='self_cuda_time_total'`` surfaces GPU hot
     spots; use 'self_cpu_time_total' to surface launch and dispatch overhead. ``trace_path`` exports a
-    Perfetto / chrome trace. The dust/<phase> rows give the per-phase breakdown.
+    Perfetto / chrome trace. The dust/<phase> rows give the per-phase breakdown. Disable shape
+    and memory recording to reduce collector overhead and trace size.
     """
     torch = _require_torch()
     from torch.profiler import profile, ProfilerActivity
@@ -48,7 +50,7 @@ def profile_estimate(estimator, x, y, warmup=2, active=1, sort_by='self_cuda_tim
     activities = [ProfilerActivity.CPU]
     if torch.cuda.is_available():
         activities.append(ProfilerActivity.CUDA)
-    with profile(activities=activities, record_shapes=True, profile_memory=True) as prof:
+    with profile(activities=activities, record_shapes=record_shapes, profile_memory=profile_memory) as prof:
         for _ in range(active):
             estimator.estimate(x, y)
         if torch.cuda.is_available():
