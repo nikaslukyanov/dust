@@ -72,7 +72,8 @@ def parse_args(argv, *, launcher=False):
     profile.add_argument('--active', type=int, default=1)
     quality.add_argument('--populations', type=int, nargs='+', choices=POPULATIONS)
     quality.add_argument('--scales', type=int, nargs='+', help='Positive toy recipe scales (default: 1 2).')
-    quality.add_argument('--seeds', type=int, nargs='+', default=[0, 1, 2])
+    quality.add_argument('--seeds', type=int, nargs='+', default=[0, 1, 2],
+                         help='Distinct unsigned 32-bit perturbation seeds (default: 0 1 2).')
     quality.add_argument('--reference-chunk', type=int, default=1)
     args = parser.parse_args(argv)
     try:
@@ -99,6 +100,8 @@ def parse_args(argv, *, launcher=False):
                 validate_seeds(args.seeds)
             except ValueError as error:
                 raise ValueError(f'--seeds: {error}') from error
+            if max(args.seeds) >= 2**32:
+                raise ValueError('--seeds must be unsigned 32-bit integers')
             if not 1 <= args.reference_chunk <= 8:
                 raise ValueError('--reference-chunk must be between 1 and 8')
     except ValueError as error:
@@ -232,13 +235,18 @@ def run_profile(args, model, x, y, workload, result):
         )
         estimator.phase_seconds = {}
         try:
-            estimator.estimate(x, y)
+            gradients, _, clean_loss = estimator.estimate(x, y)
             profile['synchronized_phase_timing'] = dict(
                 seconds=estimator.phase_seconds,
                 scope='One separate estimate. CUDA synchronization at phase boundaries changes execution.',
             )
         finally:
             estimator.phase_seconds = None
+        if not math.isfinite(clean_loss):
+            raise FloatingPointError('Non-finite clean loss in profile estimate')
+        if not torch.stack([torch.isfinite(gradient).all() for gradient in gradients.values()]).all():
+            raise FloatingPointError('Non-finite gradients in profile estimate')
+        del gradients
 
         write_json(args.output / 'result.json', result)
         table_path = args.output / 'profile.txt'
@@ -261,9 +269,11 @@ def run_profile(args, model, x, y, workload, result):
                     count=event.count, cpu_total_us=event.cpu_time_total,
                     device_total_us=event.device_time_total if is_cuda else None,
                 )
-                for event in averages if event.key.startswith('dust/')
+                for event in averages
+                if event.device_type == torch.autograd.DeviceType.CPU and event.key.startswith('dust/')
             },
-            scope='Inclusive totals over instrumented estimates. Profiling adds overhead.',
+            scope='Inclusive CPU phase durations and sums of associated device kernel times, '
+                  'over instrumented estimates. Profiling adds overhead.',
             sdpa=sdpa_evidence(averages, prof.events() if is_cuda else ()),
         )
     finally:
@@ -358,8 +368,15 @@ def run(args, plan, argv):
     try:
         manifest['source'] = source_identity()
         manifest['runtime'] = actual_runtime(args.toy)
-        manifest['runtime']['cuda_visible_devices'] = os.environ.get('CUDA_VISIBLE_DEVICES')
         torch.set_float32_matmul_precision(plan['execution']['float32_matmul_precision'])
+        manifest['runtime'].update(
+            cuda_visible_devices=os.environ.get('CUDA_VISIBLE_DEVICES'),
+            float32_matmul_precision=torch.get_float32_matmul_precision(),
+            deterministic_algorithms=torch.are_deterministic_algorithms_enabled(),
+            cuda_matmul_allow_tf32=torch.backends.cuda.matmul.allow_tf32,
+            cudnn=dict(enabled=torch.backends.cudnn.enabled, deterministic=torch.backends.cudnn.deterministic,
+                       benchmark=torch.backends.cudnn.benchmark, allow_tf32=torch.backends.cudnn.allow_tf32),
+        )
         config = TOY_CONFIG if args.toy else GPTConfig()
         rows, manifest['data'] = frozen_rows(args, plan)
         device = torch.device(manifest['runtime']['device'])

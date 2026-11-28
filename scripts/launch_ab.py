@@ -30,8 +30,10 @@ def submit(command, dry_run):
     return subprocess.check_output(command, text=True).strip().split(';')[0]
 
 
-def snapshot(batch, launch):
+def snapshot(batch, launch, *, allow_existing=True):
     if batch.exists():
+        if not allow_existing:
+            raise ValueError(f'{batch}: choose a new launch directory')
         if json.loads((batch / 'launch.json').read_text()) != launch:
             raise ValueError(f'{batch}: incompatible launch settings or source commit')
         return

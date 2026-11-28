@@ -49,8 +49,9 @@ def main(argv=None):
         for path in required:
             if not path.is_file():
                 raise ValueError(f'Missing {path}')
-        snapshot(batch, dict(commit=git('rev-parse', 'HEAD'), plan=plan, sbatch_argv=command,
-                             inner_argv_before_scratch=child))
+        launch = dict(commit=git('rev-parse', 'HEAD'), plan=plan, sbatch_argv=command,
+                      inner_argv_before_scratch=child)
+        snapshot(batch, launch, allow_existing=False)
         job_id = submit(command, dry_run=False)
         write_json(batch / 'submission.json', dict(job_id=job_id))
         print(f'Submitted Slurm job {job_id}')
