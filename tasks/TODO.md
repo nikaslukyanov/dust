@@ -531,6 +531,8 @@ these are the refinements the lectures call for, grouped by file.
       python3 scripts/launch_ab.py --seeds 42 43 44 --output runs/ab-gpu
       .venv/baseline-cu128/bin/python runs/ab-gpu/source/scripts/ab_experiment.py summary --output runs/ab-gpu
       ```
+- [ ] **Budget sweeps and learning-rate tuning** (plan P4): extend the runner to sweep
+      method, budget, and seed with equal-budget learning-rate tuning.
 - [ ] **Matrix:** freeze the comparison set; run all four variants at the small scale, then the best at
       the larger scale; 3 seeds on the key comparisons; a backprop reference per model size.
 - [ ] **Plots:** gradient quality vs compute, held-out loss vs wall/GPU-hours, how the allocation shifts

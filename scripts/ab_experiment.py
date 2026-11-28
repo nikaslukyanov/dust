@@ -172,7 +172,6 @@ def bind_manifest(output, manifest):
         if read_json(path) != manifest:
             raise ValueError(f'{path}: incompatible manifest')
         return
-    # Publish once. Two local starts may agree on the manifest and then lock their own seeds.
     with tempfile.NamedTemporaryFile(mode='w', dir=output, prefix='.manifest-', delete=False) as stream:
         pending = Path(stream.name)
         json.dump(manifest, stream, indent=2, allow_nan=False)
@@ -256,7 +255,6 @@ def rewind_checkpoint(folder, metadata, training, validation):
     records = read_records(folder, step)
     check_records(records, case, settings, step)
     check_history(state['extra']['history'], records)
-    # A killed writer can leave a torn line after the committed prefix.
     atomic_write_text(folder / 'metrics.jsonl', ''.join(json.dumps(row) + '\n' for row in records))
 
 
@@ -274,7 +272,6 @@ def run_case(folder, metadata, rows, device):
             raise ValueError('checkpoint has no case configuration')
         rewind_checkpoint(folder, metadata, *rows[:2])
     elif folder.exists() and any(folder.iterdir()):
-        # Before the first checkpoint, retain the interrupted attempt and restart from its seed.
         allowed = {'config.json', 'metrics.jsonl', 'best.pt', *TRAINER_TEMP_FILES}
         files = {path.name for path in folder.iterdir()}
         if files - allowed or (not config_path.exists() and files != {'config.json.tmp'}):
@@ -322,7 +319,6 @@ def run_seed(output, manifest, entry, rows, runtime):
 
 def run_campaign(args):
     if args.toy:
-        # The shared training meters choose CUDA timing when CUDA is visible.
         os.environ['CUDA_VISIBLE_DEVICES'] = ''
     torch.set_float32_matmul_precision('high')
     runtime = actual_runtime(args.toy)

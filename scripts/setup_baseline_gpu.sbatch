@@ -10,7 +10,6 @@
 #SBATCH --time=02:00:00
 #SBATCH --no-requeue
 # Submitted by scripts/launch_baseline.sh. Arguments: REPO BATCH (the launcher's batch folder).
-# Optional third argument ab: prepare the A/B manifest before releasing the seed jobs.
 
 set -euo pipefail
 repo=$1

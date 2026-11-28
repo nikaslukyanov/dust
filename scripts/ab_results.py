@@ -6,7 +6,6 @@ from pathlib import Path
 
 from check_baseline_results import distribution
 
-# Keep this module importable through both pytest and the runner.
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from dust import GPTConfig, Recipe  # noqa: E402

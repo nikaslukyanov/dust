@@ -11,7 +11,6 @@
 #SBATCH --constraint=l40s
 #SBATCH --time=10:00:00
 #SBATCH --no-requeue
-# Submitted by scripts/launch_ab.py. Arguments: REPO BATCH SEED.
 
 set -euo pipefail
 repo=$1
