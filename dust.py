@@ -713,6 +713,12 @@ def snapshot(model):
     return {name: value.detach().cpu().clone() for name, value in model.state_dict().items()}
 
 
+def atomic_write_text(path, text):
+    pending = path.with_name(path.name + '.tmp')
+    pending.write_text(text)
+    pending.replace(path)
+
+
 def train(config, settings, training, validation, testing, output, *, steps, eval_interval, seed=42,
           device=torch.device('cpu'), rank=0, world=1, suffix=True, batch_size=8, checkpoint_interval=0,
           resume=False, probe_interval=0, probe_seeds=(0,), allocation=None, multiplex=None, metadata=None,
@@ -810,11 +816,11 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
         if rank == 0:
             save_best()  # best.pt may hold a better step from after the checkpoint, which is about to rerun
             kept = [line for line in metrics_file.read_text().splitlines() if json.loads(line)['step'] <= start]
-            metrics_file.write_text(''.join(line + '\n' for line in kept))
+            atomic_write_text(metrics_file, ''.join(line + '\n' for line in kept))
         echo(f'Resuming {output} at step {start} of {steps}, best val {best:.4f}')
     else:
         if rank == 0 and metadata is not None:
-            (output / 'config.json').write_text(json.dumps(metadata, indent=2) + '\n')
+            atomic_write_text(output / 'config.json', json.dumps(metadata, indent=2) + '\n')
         start = best_step = 0
         with run_log.timed('eval'):
             best = evaluate(model, validation, device)
@@ -873,7 +879,7 @@ def train(config, settings, training, validation, testing, output, *, steps, eva
     model.load_state_dict(torch.load(output / 'best.pt', map_location=device, weights_only=True))
     result = dict(best_val=best, best_step=best_step, test_at_best_val=evaluate(model, testing, device),
                   history=history, timing=run_log.summary())
-    (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
+    atomic_write_text(output / 'result.json', json.dumps(result, indent=2) + '\n')
     if tracker is not None:
         tracker.finish(result)
     echo(f"Best validation: {best:.4f} (step {best_step}); test: {result['test_at_best_val']:.4f}")

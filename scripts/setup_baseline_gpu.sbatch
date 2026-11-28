@@ -10,6 +10,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --no-requeue
 # Submitted by scripts/launch_baseline.sh. Arguments: REPO BATCH (the launcher's batch folder).
+# Optional third argument ab: prepare the A/B manifest before releasing the seed jobs.
 
 set -euo pipefail
 repo=$1
@@ -42,4 +43,7 @@ cd "$experiment/source"
     new_implementation/test_suffix.py new_implementation/test_gradient_check.py \
     new_implementation/test_checkpoint.py new_implementation/test_training.py \
     --basetemp="$experiment/cpu-tests"
+if [ "${3:-}" = ab ]; then
+    "$env_dir/bin/python" scripts/ab_experiment.py prepare --output "$experiment" --data-dir "$repo/data"
+fi
 date --iso-8601=seconds > "$experiment/environment.ready"

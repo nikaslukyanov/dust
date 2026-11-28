@@ -81,17 +81,7 @@ PY
 stage=data_verification
 mkdir -p "$scratch/data"
 cp "$repo/data/"{train_1M.pt,train_10M.pt,val.pt,test.pt,manifest.json} "$scratch/data/"
-"$python_bin" - "$scratch/data" <<'PY'
-import hashlib, json, sys
-from pathlib import Path
-data = Path(sys.argv[1])
-manifest = json.loads((data / 'manifest.json').read_text())
-for name, info in manifest['files'].items():
-    actual = hashlib.sha256((data / name).read_bytes()).hexdigest()
-    assert actual == info['sha256'], f'Data checksum mismatch: {name}'
-assert hashlib.sha256(Path('tokenizer/tokenizer.json').read_bytes()).hexdigest() == manifest['tokenizer_sha256']
-print('Verified data and tokenizer hashes')
-PY
+"$python_bin" scripts/verify_data.py "$scratch/data"
 
 stage=preflight
 "$python_bin" -u new_implementation/gpu_preflight.py --device cuda --tokens 1M \
