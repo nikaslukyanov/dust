@@ -1,0 +1,36 @@
+{
+  "commit": "a7733056b5004bdd481ee48e5e3ab43b7b3c2967",
+  "runtime": {
+    "device": "cuda:0",
+    "python": "3.11.5",
+    "torch": "2.10.0+cu128",
+    "system": "Linux",
+    "architecture": "x86_64",
+    "torch_threads": 8,
+    "gpu": "NVIDIA L40S",
+    "gpu_memory_bytes": 47803596800,
+    "compute_capability": [
+      8,
+      9
+    ],
+    "cuda": "12.8",
+    "deterministic_algorithms": true,
+    "cublas_workspace_config": ":4096:8"
+  },
+  "seed": 42,
+  "case": "adaptive-variance",
+  "steps": 5,
+  "child_exit_code": -15,
+  "interrupted_checkpoint_step": 2,
+  "exact_fields": [
+    "model",
+    "optimizer",
+    "generator",
+    "torch_rng",
+    "cuda_rng",
+    "allocator_state"
+  ],
+  "exact_gpu_resume": true,
+  "prior_stock_job": "14150545",
+  "scientific_performance_claim": false
+}

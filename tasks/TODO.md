@@ -67,7 +67,8 @@ covers the first two items below in one go.
       equal draw budgets. Smaller budgets and the interval sweep remain separate.
 - [ ] **Track 3 (C) on GPU:** `multiplex_experiment.py`, real model, bf16, σ sweep. *For:* decides if C
       is worth training (it loses on CPU).
-- Never run on GPU yet: `--adaptive`, `--multiplex`, multi-GPU, 10M tokens.
+- A five-step L40S smoke exercised both adaptive policies; the full A/B campaign remains unrun.
+  Never run on GPU yet: `--multiplex`, multi-GPU, 10M tokens.
 
 ---
 
@@ -318,7 +319,7 @@ tail.
 - Note: this is the **only** paper optimization still missing from the public code — the other two
   shortcuts are already in it. It's also the groundwork that multiplexing (Track 3) builds on.
 
-## Track 2 — spend noise draws where they help most (B, our idea) — built and CPU-tested; GPU comparison open
+## Track 2 — spend noise draws where they help most (B, our idea) — built; CPU and GPU smoke checked; full GPU comparison open
 
 The paper hand-tunes how many draws each group gets and freezes it. Our idea is to decide it live, giving
 more draws to the groups whose estimate is least reliable.
@@ -383,6 +384,9 @@ more draws to the groups whose estimate is least reliable.
       rank picks the same allocation — untested.
 - [x] **A/B runner:** compare both policies against the stock fixed case at equal draw budgets.
       Each interval-0 case has a fixed control with the same adjusted starting recipe.
+- [x] **GPU functional checks:** seven five-step L40S cases completed; interrupted recovery passed
+      with deterministic CUDA. Default CUDA showed small embedding-momentum differences between
+      matched controls. [Verification and limitations](../results/ab-runner-verification/README.md).
 - [ ] **(GPU)** Run the 1M-token A/B campaign and report the measured quality, compute, and overhead.
 - [ ] Evaluate smaller draw budgets and vary the recompute interval.
 

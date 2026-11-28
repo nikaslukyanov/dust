@@ -1,0 +1,20 @@
+{
+  "source": "a7733056b5004bdd481ee48e5e3ab43b7b3c2967",
+  "stock_job": "14150545",
+  "deterministic_job": "14150786",
+  "stock_complete_case_count": 7,
+  "draws_per_stock_case": 8080,
+  "deterministic_case": "adaptive-variance",
+  "deterministic_resume_from": 2,
+  "deterministic_resume_to": 5,
+  "deterministic_exact_fields": [
+    "model",
+    "optimizer",
+    "generator",
+    "torch_rng",
+    "cuda_rng",
+    "allocator_state"
+  ],
+  "deterministic_allocation_changed_after_recovery": true,
+  "copied_config_metric_result_hashes_match_receipts": true
+}

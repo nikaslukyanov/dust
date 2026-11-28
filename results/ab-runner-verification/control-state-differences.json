@@ -1,0 +1,168 @@
+{
+  "variance": {
+    "steps": [
+      5,
+      5
+    ],
+    "rng": {
+      "generator": true,
+      "torch_rng": true,
+      "cuda_rng": true
+    },
+    "model": {},
+    "optimizer_param_groups_equal": true,
+    "optimizer": {
+      "56.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 9,
+        "elements": 2097152,
+        "max_abs": 5.960464477539063e-08,
+        "max_reference_abs": 0.0001964569091796875
+      },
+      "57.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 10,
+        "elements": 2097152,
+        "max_abs": 5.960464477539063e-08,
+        "max_reference_abs": 0.0002002716064453125
+      },
+      "58.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 8,
+        "elements": 2097152,
+        "max_abs": 1.1920928955078125e-07,
+        "max_reference_abs": 0.00014019012451171875
+      },
+      "59.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 12,
+        "elements": 2097152,
+        "max_abs": 1.1920928955078125e-07,
+        "max_reference_abs": 0.00011491775512695312
+      }
+    },
+    "loss_deltas": {
+      "0": {
+        "val_loss": 0.0
+      },
+      "1": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      },
+      "2": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      },
+      "3": {
+        "train_loss": 0.0
+      },
+      "4": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      },
+      "5": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      }
+    }
+  },
+  "agreement": {
+    "steps": [
+      5,
+      5
+    ],
+    "rng": {
+      "generator": true,
+      "torch_rng": true,
+      "cuda_rng": true
+    },
+    "model": {},
+    "optimizer_param_groups_equal": true,
+    "optimizer": {
+      "56.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 9,
+        "elements": 2097152,
+        "max_abs": 1.1920928955078125e-07,
+        "max_reference_abs": 0.0001888275146484375
+      },
+      "57.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 9,
+        "elements": 2097152,
+        "max_abs": 5.960464477539063e-08,
+        "max_reference_abs": 0.0001373291015625
+      },
+      "58.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 11,
+        "elements": 2097152,
+        "max_abs": 2.9802322387695312e-08,
+        "max_reference_abs": 9.34600830078125e-05
+      },
+      "59.momentum_buffer": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          4096,
+          512
+        ],
+        "different": 16,
+        "elements": 2097152,
+        "max_abs": 5.960464477539063e-08,
+        "max_reference_abs": 6.4849853515625e-05
+      }
+    },
+    "loss_deltas": {
+      "0": {
+        "val_loss": 0.0
+      },
+      "1": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      },
+      "2": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      },
+      "3": {
+        "train_loss": 0.0
+      },
+      "4": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      },
+      "5": {
+        "val_loss": 0.0,
+        "train_loss": 0.0
+      }
+    }
+  }
+}

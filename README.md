@@ -103,7 +103,10 @@ python3 scripts/launch_ab.py --seeds 42 43 44 --output runs/ab-gpu
 
 The launch snapshots a clean commit, verifies the token files and tokenizer, and schedules one L40S
 job per seed. Each seed runs the seven cases sequentially at 1M tokens, population 256, and 61 steps.
-The case order rotates by seed. GPU campaign validation is pending.
+The case order rotates by seed. A five-step L40S check exercised all seven cases, and a separate
+deterministic-CUDA check verified interrupted recovery. The full GPU campaign remains unrun.
+See the [verification report](results/ab-runner-verification/README.md), including the default-CUDA
+optimizer nondeterminism observed in the smoke test.
 
 Repeat the same run or launch command to resume. The runner skips verified cases and uses
 `state.pt` to resume an interrupted case. It retains attempts that stop before their first

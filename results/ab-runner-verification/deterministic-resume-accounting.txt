@@ -1,0 +1,4 @@
+JobID|JobName|Partition|State|ExitCode|Submit|Start|End|Elapsed|NodeList|ReqTRES|AllocTRES
+14150786|dust-ab-resume|short|COMPLETED|0:0|2026-11-28T01:10:33|2026-11-28T01:10:53|2026-11-28T01:13:05|00:02:12|ins057|billing=8,cpu=8,gres/gpu=1,mem=32G,node=1|billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1
+14150786.batch|batch||COMPLETED|0:0|2026-11-28T01:10:53|2026-11-28T01:10:53|2026-11-28T01:13:05|00:02:12|ins057||cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1
+14150786.extern|extern||COMPLETED|0:0|2026-11-28T01:10:53|2026-11-28T01:10:53|2026-11-28T01:13:05|00:02:12|ins057||billing=8,cpu=8,gres/gpu:l40s=1,gres/gpu=1,mem=32G,node=1
