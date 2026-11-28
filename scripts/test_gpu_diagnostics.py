@@ -1,4 +1,3 @@
-"""Public CLI checks for the frozen-model diagnostics."""
 import json
 import os
 from pathlib import Path

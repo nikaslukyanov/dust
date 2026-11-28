@@ -1,4 +1,3 @@
-"""Stage and submit one frozen-model diagnostic on an Insomnia L40S."""
 import json
 from pathlib import Path
 import shlex
